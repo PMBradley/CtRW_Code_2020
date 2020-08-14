@@ -83,23 +83,32 @@ public class Drive_Mecanum_Tele {
         y = (x * sin) + (y * cos); // positive is forward
         x = (x * cos) - (y * sin); // positive is right
 
-        // Normalize the translational inputs (ensure that all are less than or equal to 1, while maintaining the speed ratio)
-        if(x > 1.0 || y > 1.0){ // if either is greater than 1, normalize, otherwise don't to avoid normalizing the speed up
-            if(x > y){ // if x is the larger offender
-                x = x/x;
-                y = y/x; // divide all involved by x
-            }
-            else { // if y is the larger offender
-                x = x/y;
-                y = y/y; // divide all involved by y
-            }
-        }
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
         powerFL = (y + (r * turnDivisor) + x);
         powerFR = -(y - (r * turnDivisor) - x);
         powerBL = (y + (r * turnDivisor) - x);
         powerBR = -(y - (r * turnDivisor) + x);
+
+
+        // Normalize the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the speed ratio)
+        if(Math.abs(powerFL) > 1.0 || Math.abs(powerFR) > 1.0 || Math.abs(powerBL) > 1.0 || Math.abs(powerBR) > 1.0){ // if any absolute values are greater than 1
+            double largest_value = 0; // find the largest value by going through each value and setting the largest value to it, assuming it is larger than the previous larger value (only set it if it will be larger because of the change)
+            double powers[] = {powerFL, powerFR, powerBL, powerBR}; // an array to hold all of the powers to more easily cycle through them
+
+            for(int i = 0; i < 4; i++){
+                if(powers[i] > largest_value){
+                    largest_value = powers[i];
+                }
+            }
+
+            // then divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
+            powerFL /= largest_value;
+            powerFR /= largest_value;
+            powerBL /= largest_value;
+            powerBR /= largest_value;
+        }
+
 
         // set the motor powers based off of the math done previously
         driveFL.setPower(powerFL);
@@ -122,23 +131,31 @@ public class Drive_Mecanum_Tele {
         }
 
 
-        // Normalize the translational inputs (ensure that all are less than or equal to 1, while maintaining the speed ratio)
-        if (x > 1.0 || y > 1.0) { // if either is greater than 1, normalize, otherwise don't to avoid normalizing the speed up
-            if (x > y) { // if x is the larger offender
-                x = x / x;
-                y = y / x; // divide all involved by x
-            }
-            else { // if y is the larger offender
-                x = x / y;
-                y = y / y; // divide all involved by y
-            }
-        }
-
         // do math to get powers set according to the cartesian mecanum formula
         powerFL = (y + (r * turnDivisor) + x);
         powerFR = -(y - (r * turnDivisor) - x);
         powerBL = (y + (r * turnDivisor) - x);
         powerBR = -(y - (r * turnDivisor) + x);
+
+
+        // Normalize the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the speed ratio)
+        if(Math.abs(powerFL) > 1.0 || Math.abs(powerFR) > 1.0 || Math.abs(powerBL) > 1.0 || Math.abs(powerBR) > 1.0){ // if any absolute values are greater than 1
+            double largest_value = 0; // find the largest value by going through each value and setting the largest value to it, assuming it is larger than the previous larger value (only set it if it will be larger because of the change)
+            double powers[] = {powerFL, powerFR, powerBL, powerBR}; // an array to hold all of the powers to more easily cycle through them
+
+            for(int i = 0; i < 4; i++){
+                if(powers[i] > largest_value){
+                    largest_value = powers[i];
+                }
+            }
+
+            // then divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
+            powerFL /= largest_value;
+            powerFR /= largest_value;
+            powerBL /= largest_value;
+            powerBR /= largest_value;
+        }
+
 
         // set the motor powers based off of the math done previously
         driveFL.setPower(powerFL);

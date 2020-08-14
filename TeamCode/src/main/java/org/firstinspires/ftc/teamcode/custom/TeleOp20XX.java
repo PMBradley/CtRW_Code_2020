@@ -32,15 +32,19 @@ public class TeleOp20XX extends LinearOpMode{
     double boostSpeed = 1; // Speed multiplier for BOOSTING (1 being 100% of power going in)
 
     // Robot Classes
-    private Provider20XX robot = new Provider20XX(hardwareMap); // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
-    private ElapsedTime runtime  = new ElapsedTime(); // internal clock
-    Drive_Mecanum_Tele mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed); // the main mecanum drive class
+    private Provider20XX robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
+    private ElapsedTime runtime; // internal clock
+    Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
 
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
     public void runOpMode() throws InterruptedException {
         /* INCLUDE ANY ROBOT SETUP CODE HERE */
+        // Call class constructors here (so that nothing major happens before init)
+        robot = new Provider20XX(hardwareMap);
+        runtime = new ElapsedTime();
+        mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed);
 
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
