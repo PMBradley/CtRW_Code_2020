@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.hardware.drive.opmode;
+package org.firstinspires.ftc.teamcode.hardware.drive.samples;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
