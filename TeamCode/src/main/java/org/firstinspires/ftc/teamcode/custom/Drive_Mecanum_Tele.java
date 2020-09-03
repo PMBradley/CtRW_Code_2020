@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class Drive_Mecanum_Tele {
 
     // Create and initialize speed modifier variables - using default values (then can be set via a constructor)
-    private double turnDivisor      = 0.5; // what percentage of maximum turning speed should be used as a base turning speed (50% = 0.5, etc) - a multiplier
-    private double translateDivisor = 0.7; // what percentage of maximum translational speed should be used as a base translational speed (50% = 0.5, etc) - a multiplier
-    private double boostingDivisor  = 1.0; // what percentage of maximum translational speed should be used as a boost translational speed (50% = 0.5, etc) - a multiplier
+    private double turnDivisor      = DEFAULT_TURN_DIVISOR; // what percentage of maximum turning speed should be used as a base turning speed (50% = 0.5, etc) - a multiplier
+    private double translateDivisor = DEFAULT_TRANSLATE_DIVISOR; // what percentage of maximum translational speed should be used as a base translational speed (50% = 0.5, etc) - a multiplier
+    private double boostingDivisor  = DEFAULT_BOOSTING_DIVISOR; // what percentage of maximum translational speed should be used as a boost translational speed (50% = 0.5, etc) - a multiplier
 
     // Default speed modifier values
     private static final double DEFAULT_TURN_DIVISOR = 0.6; // default values to use in the event no custom values are passed
@@ -79,6 +79,7 @@ public class Drive_Mecanum_Tele {
         double sin = Math.sin(heading * 0.0174533);
         double cos = Math.cos(heading * 0.0174533);
 
+        /*
         // do math to adjust to make it relative to field
         y = (x * sin) + (y * cos); // positive is forward
         x = (x * cos) - (y * sin); // positive is right
@@ -89,18 +90,18 @@ public class Drive_Mecanum_Tele {
         powerFR = -(y - (r * turnDivisor) - x);
         powerBL = (y + (r * turnDivisor) - x);
         powerBR = -(y - (r * turnDivisor) + x);
+*/
+        double forward = (x * sin) + (y * cos);
+        double right = (x * cos) - (y * sin);
 
+        powerFL = (forward + (r * turnDivisor) + right);
+        powerFR = -(forward - (r * turnDivisor) - right);
+        powerBL = (forward + (r * turnDivisor) - right);
+        powerBR = -(forward - (r * turnDivisor) + right);
 
         // Normalize the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the speed ratio)
         if(Math.abs(powerFL) > 1.0 || Math.abs(powerFR) > 1.0 || Math.abs(powerBL) > 1.0 || Math.abs(powerBR) > 1.0){ // if any absolute values are greater than 1
-            double largest_value = 0; // find the largest value by going through each value and setting the largest value to it, assuming it is larger than the previous larger value (only set it if it will be larger because of the change)
-            double powers[] = {powerFL, powerFR, powerBL, powerBR}; // an array to hold all of the powers to more easily cycle through them
-
-            for(int i = 0; i < 4; i++){
-                if(powers[i] > largest_value){
-                    largest_value = powers[i];
-                }
-            }
+            double largest_value = max(powerFL, powerFR, powerBL, powerBR); // get the largest value of the bunch, to be used below
 
             // then divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
             powerFL /= largest_value;
@@ -140,14 +141,7 @@ public class Drive_Mecanum_Tele {
 
         // Normalize the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the speed ratio)
         if(Math.abs(powerFL) > 1.0 || Math.abs(powerFR) > 1.0 || Math.abs(powerBL) > 1.0 || Math.abs(powerBR) > 1.0){ // if any absolute values are greater than 1
-            double largest_value = 0; // find the largest value by going through each value and setting the largest value to it, assuming it is larger than the previous larger value (only set it if it will be larger because of the change)
-            double powers[] = {powerFL, powerFR, powerBL, powerBR}; // an array to hold all of the powers to more easily cycle through them
-
-            for(int i = 0; i < 4; i++){
-                if(powers[i] > largest_value){
-                    largest_value = powers[i];
-                }
-            }
+            double largest_value = max(powerFL, powerFR, powerBL, powerBR); // get the largest value of the bunch, to be used below
 
             // then divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
             powerFL /= largest_value;
@@ -163,4 +157,26 @@ public class Drive_Mecanum_Tele {
         driveBL.setPower(powerBL);
         driveBR.setPower(powerBR);
     }
+
+
+
+    double max(double input0, double input1, double input2, double input3){
+        double largest_value = 0;
+
+        if(input0 > largest_value){
+            largest_value = input0;
+        }
+        if(input1 > largest_value){
+            largest_value = input1;
+        }
+        if(input2 > largest_value){
+            largest_value = input2;
+        }
+        if(input3 > largest_value){
+            largest_value = input3;
+        }
+
+        return largest_value;
+    }
 }
+

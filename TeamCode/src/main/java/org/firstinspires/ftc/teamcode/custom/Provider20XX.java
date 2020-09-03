@@ -109,12 +109,11 @@ public class Provider20XX {
         // motorIntakeR = mainMap.get(DcMotor.class, "intakeR");
 
         // Set motors to run with encoders (uncomment if you are, comment out if you are not)
-        /*
         driveFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorIntakeL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+       /* motorIntakeL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorIntakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         */

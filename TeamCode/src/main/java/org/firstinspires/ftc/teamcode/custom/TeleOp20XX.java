@@ -35,7 +35,7 @@ public class TeleOp20XX extends LinearOpMode{
     private Provider20XX robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
     Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
-
+    //Drive_Mecanum_Tele_Old mecanum_drive;
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -45,6 +45,7 @@ public class TeleOp20XX extends LinearOpMode{
         robot = new Provider20XX(hardwareMap);
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed);
+        //mecanum_drive = new Drive_Mecanum_Tele_Old(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR);
 
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
@@ -73,6 +74,8 @@ public class TeleOp20XX extends LinearOpMode{
             // Hardware instruction (telling the hardware what to do)
 
             mecanum_drive.drive_field_relative(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x, robot.getHeading(), isBoosting);
+            //mecanum_drive.drive_field_relative(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x, robot.getHeading(), isBoosting, gamepad1.right_trigger);
+
         }
     }
 
