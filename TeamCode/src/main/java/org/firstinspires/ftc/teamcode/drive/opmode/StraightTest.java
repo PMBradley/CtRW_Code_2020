@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.drive.samples.SampleMecanumDrive;
 @Config
 @Autonomous(group = "drive")
 public class StraightTest extends LinearOpMode {
-    public static double DISTANCE = 60;
+    public static double DISTANCE = 30; // distance in inches
 
     @Override
     public void runOpMode() throws InterruptedException {

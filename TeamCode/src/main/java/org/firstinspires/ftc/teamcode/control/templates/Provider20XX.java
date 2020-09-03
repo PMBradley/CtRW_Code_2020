@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 /*
     Welcome to the template Provider class!
     To use it just make a copy of this class, and change all appearances of "20XX" with the starting year of the current season
-    (for example, for the 2020-2021 season, the class would be named Provider2020 and all code within would have to reflect that change)
+    (for example, for the 2020-2021 season, the class would be named Provider2020 and all code within would have to reflect that change).
 
     Happy coding!
  */
