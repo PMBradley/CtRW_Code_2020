@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.drive.Drive_Mecanum_Tele;
 
 
 @TeleOp(name = "Test_TeleOp")
-@Disabled
+//@Disabled
 
 public class Test_TeleOp extends LinearOpMode{
     // TeleOp Variables
@@ -33,6 +33,7 @@ public class Test_TeleOp extends LinearOpMode{
     double turnSpeed = 0.5; // Speed multiplier for turning (1 being 100% of power going in)
     double translateSpeed = 0.4; // Speed multiplier for translation (1 being 100% of power going in)
     double boostSpeed = 1; // Speed multiplier for BOOSTING (1 being 100% of power going in)
+    double stopSpeed = 0;
 
     // Robot Classes
     private Provider20XX robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -62,20 +63,57 @@ public class Test_TeleOp extends LinearOpMode{
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
             // Variables
-
+            double testSpeed = 0.6;
             boolean isBoosting = false; // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
 
 
             // Logic (figuring out what the robot should do)
+            if(gamepad1.dpad_down == true){ // if the dpad down is pressed, set the testSpeed to be negative, otherwise keep it positive
+                testSpeed *= -1;
+            }
+
 
             if(gamepad1.right_bumper == true){ // Figure out if the robot should be boosting
                 isBoosting = true;
             }
 
+            if(gamepad1.a == true){ // if a is pressed, move FL at testSpeed
+                robot.driveFL.setPower(testSpeed);
+            }
+            else{
+                robot.driveFL.setPower(stopSpeed);
+            }
+            if(gamepad1.b == true){ // if a is pressed, move FR at testSpeed
+                robot.driveFR.setPower(-testSpeed);
+            }
+            else{
+                robot.driveFR.setPower(stopSpeed);
+            }
+            if(gamepad1.x == true){ // if a is pressed, move BL at testSpeed
+                robot.driveBL.setPower(testSpeed);
+            }
+            else{
+                robot.driveBL.setPower(stopSpeed);
+            }
+            if(gamepad1.y == true){ // if a is pressed, move BR at testSpeed
+                robot.driveBR.setPower(-testSpeed);
+            }
+            else{
+                robot.driveBR.setPower(stopSpeed);
+            }
+
 
             // Hardware instruction (telling the hardware what to do)
 
-            mecanum_drive.drive_field_relative(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x, robot.getHeading(), isBoosting);
+            //mecanum_drive.drive_field_relative(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x, robot.getHeading(), isBoosting);
+
+            //telemetry
+            telemetry.addData("Drive FL: ", robot.driveFL.getCurrentPosition()); // add telemetry data for motor encoders
+            telemetry.addData("Drive FR: ", robot.driveFR.getCurrentPosition());
+            telemetry.addData("Drive BL: ", robot.driveBL.getCurrentPosition());
+            telemetry.addData("Drive BR: ", robot.driveBR.getCurrentPosition());
+
+            telemetry.update(); // send the queued telemetry to the output
         }
     }
 
