@@ -1,20 +1,16 @@
-package org.firstinspires.ftc.teamcode.custom;
+package org.firstinspires.ftc.teamcode.control;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 /*
@@ -29,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 // The main robot data class - called provider because it provides hardware classes with the robot data that they need to function
 
-public class Provider20XX {
+public class Provider2020 {
     // Motor and servo variables
 
     // Drive motors
@@ -77,7 +73,7 @@ public class Provider20XX {
 
 
     // Default constructor
-    public Provider20XX(HardwareMap hMap){
+    public Provider2020(HardwareMap hMap){
         init_map(hMap); // pull information from the hardware map - MUST BE DONE BEFORE
 
         init_imu(); // setup the IMU and calibrate the current position as 0

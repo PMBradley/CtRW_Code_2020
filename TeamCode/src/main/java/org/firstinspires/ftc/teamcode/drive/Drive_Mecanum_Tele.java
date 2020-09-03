@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.custom;
+package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -75,40 +75,30 @@ public class Drive_Mecanum_Tele {
         }
 
 
-        // Set up heading factor for relative to field
-        double sin = Math.sin(heading * 0.0174533);
-        double cos = Math.cos(heading * 0.0174533);
+        // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
+        double sin = Math.sin(Math.toRadians(heading));
+        double cos = Math.cos(Math.toRadians(heading));
 
-        /*
-        // do math to adjust to make it relative to field
-        y = (x * sin) + (y * cos); // positive is forward
-        x = (x * cos) - (y * sin); // positive is right
-
+        // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
+        double field_x = (x * cos) - (y * sin);
+        double field_y = (x * sin) + (y * cos);
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
-        powerFL = (y + (r * turnDivisor) + x);
-        powerFR = -(y - (r * turnDivisor) - x);
-        powerBL = (y + (r * turnDivisor) - x);
-        powerBR = -(y - (r * turnDivisor) + x);
-*/
-        double forward = (x * sin) + (y * cos);
-        double right = (x * cos) - (y * sin);
+        powerFL = (field_y + (r * turnDivisor) + field_x);
+        powerFR = -(field_y - (r * turnDivisor) - field_x);
+        powerBL = (field_y + (r * turnDivisor) - field_x);
+        powerBR = -(field_y - (r * turnDivisor) + field_x);
 
-        powerFL = (forward + (r * turnDivisor) + right);
-        powerFR = -(forward - (r * turnDivisor) - right);
-        powerBL = (forward + (r * turnDivisor) - right);
-        powerBR = -(forward - (r * turnDivisor) + right);
 
-        // Normalize the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the speed ratio)
-        if(Math.abs(powerFL) > 1.0 || Math.abs(powerFR) > 1.0 || Math.abs(powerBL) > 1.0 || Math.abs(powerBR) > 1.0){ // if any absolute values are greater than 1
-            double largest_value = max(powerFL, powerFR, powerBL, powerBR); // get the largest value of the bunch, to be used below
+       // Unit Vector Normalization - Normalizes the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the ratio between them)
+       double magnitude = Math.sqrt(Math.pow(powerFL, 2) + Math.pow(powerFR, 2) + Math.pow(powerBL, 2) + Math.pow(powerBR, 2)); // get the total magnitude of the powers (square each one, add them, then get that square root)
 
-            // then divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
-            powerFL /= largest_value;
-            powerFR /= largest_value;
-            powerBL /= largest_value;
-            powerBR /= largest_value;
-        }
+       if(magnitude > 1.0){  // if the magnitude is over the max speed, divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
+           powerFL /= magnitude;
+           powerFR /= magnitude;
+           powerBL /= magnitude;
+           powerBR /= magnitude;
+       }
 
 
         // set the motor powers based off of the math done previously
@@ -139,15 +129,14 @@ public class Drive_Mecanum_Tele {
         powerBR = -(y - (r * turnDivisor) + x);
 
 
-        // Normalize the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the speed ratio)
-        if(Math.abs(powerFL) > 1.0 || Math.abs(powerFR) > 1.0 || Math.abs(powerBL) > 1.0 || Math.abs(powerBR) > 1.0){ // if any absolute values are greater than 1
-            double largest_value = max(powerFL, powerFR, powerBL, powerBR); // get the largest value of the bunch, to be used below
+        // Unit Vector Normalization - Normalizes the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the ratio between them)
+        double magnitude = Math.sqrt(Math.pow(powerFL, 2) + Math.pow(powerFR, 2) + Math.pow(powerBL, 2) + Math.pow(powerBR, 2)); // get the total magnitude of the powers (square each one, add them, then get that square root)
 
-            // then divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
-            powerFL /= largest_value;
-            powerFR /= largest_value;
-            powerBL /= largest_value;
-            powerBR /= largest_value;
+        if(magnitude > 1.0){  // if the magnitude is over the max speed, divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
+            powerFL /= magnitude;
+            powerFR /= magnitude;
+            powerBL /= magnitude;
+            powerBR /= magnitude;
         }
 
 
@@ -158,25 +147,5 @@ public class Drive_Mecanum_Tele {
         driveBR.setPower(powerBR);
     }
 
-
-
-    double max(double input0, double input1, double input2, double input3){
-        double largest_value = 0;
-
-        if(input0 > largest_value){
-            largest_value = input0;
-        }
-        if(input1 > largest_value){
-            largest_value = input1;
-        }
-        if(input2 > largest_value){
-            largest_value = input2;
-        }
-        if(input3 > largest_value){
-            largest_value = input3;
-        }
-
-        return largest_value;
-    }
 }
 
