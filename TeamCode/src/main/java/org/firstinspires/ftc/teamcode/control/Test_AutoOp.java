@@ -18,29 +18,28 @@ public class Test_AutoOp extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
         Pose2d startPos1 = new Pose2d(30, 30,  Math.toRadians(-90));
-        Pose2d startPos2 = new Pose2d(50, 10,  Math.toRadians(90));
+        Pose2d startPos2 = new Pose2d(50, 10,  Math.toRadians(0));
         Pose2d startPos3 = new Pose2d(0, 0, Math.toRadians(180));
 
         waitForStart();
 
         if (isStopRequested()) return;
 
-/*
+
         Trajectory traj = drive.trajectoryBuilder(startPos)
-                .lineToLinearHeading(new Vector2d(30, 30), Math.toRadians(0)) // line to startPose1 with linear heading
+                .lineToLinearHeading(new Pose2d(30, 30, Math.toRadians(-90)))
                 .build();
 
-        Trajectory traj1 = drive.trajectoryBuilder(traj.end(), true)
-                .splineTo(new Pose2d(0, 0, Math.toRadians(00)))
+        Trajectory traj1 = drive.trajectoryBuilder(traj.end())
+                .splineTo(new Vector2d(50, 10), Math.toRadians(0))
                 .build();
 
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                //.splineTo(new Pose2d(00, 10, Math.toRadians(180)))
-                //.lineTo(new Vector2d(0, 0))
-                .forward(10)
+        Trajectory traj2 = drive.trajectoryBuilder(traj1.end(), true)
+                .splineTo(new Vector2d(0, 0), 0)
+                //.forward(10)
                 .build();
-*/
-        Trajectory traj = drive.trajectoryBuilder(startPos)
+
+   /*     Trajectory traj = drive.trajectoryBuilder(startPos)
                 .lineToLinearHeading(new Vector2d(30, 30), Math.toRadians(-90)) // line to startPose1 with linear heading
                 .build();
 
@@ -51,7 +50,7 @@ public class Test_AutoOp extends LinearOpMode {
         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
                 .lineTo(new Vector2d(0, 0))
                 .build();
-
+*/
 
 
         drive.followTrajectory(traj);
