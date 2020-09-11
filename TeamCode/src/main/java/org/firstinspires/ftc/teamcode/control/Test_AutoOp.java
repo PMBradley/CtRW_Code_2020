@@ -17,26 +17,39 @@ public class Test_AutoOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
-        Pose2d startPos1 = new Pose2d(30, 30,  Math.toRadians(90));
-        Pose2d startPos2 = new Pose2d(10, 50,  Math.toRadians(180));
-        Pose2d startPos3 = new Pose2d(10, 0, Math.toRadians(180));
+        Pose2d startPos1 = new Pose2d(30, 30,  Math.toRadians(-90));
+        Pose2d startPos2 = new Pose2d(50, 10,  Math.toRadians(90));
+        Pose2d startPos3 = new Pose2d(0, 0, Math.toRadians(180));
 
         waitForStart();
 
         if (isStopRequested()) return;
 
-
+/*
         Trajectory traj = drive.trajectoryBuilder(startPos)
-                .splineToLinearHeading(new Pose2d(30, 30, Math.toRadians(0)), Math.toRadians(90))
+                .lineToLinearHeading(new Vector2d(30, 30), Math.toRadians(0)) // line to startPose1 with linear heading
                 .build();
 
         Trajectory traj1 = drive.trajectoryBuilder(traj.end(), true)
+                .splineTo(new Pose2d(0, 0, Math.toRadians(00)))
+                .build();
+
+        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+                //.splineTo(new Pose2d(00, 10, Math.toRadians(180)))
+                //.lineTo(new Vector2d(0, 0))
+                .forward(10)
+                .build();
+*/
+        Trajectory traj = drive.trajectoryBuilder(startPos)
+                .lineToLinearHeading(new Vector2d(30, 30), Math.toRadians(-90)) // line to startPose1 with linear heading
+                .build();
+
+        Trajectory traj1 = drive.trajectoryBuilder(traj.end())
                 .splineTo(startPos2)
                 .build();
 
         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                //.splineTo(startPos3)
-                .forward(40)
+                .lineTo(new Vector2d(0, 0))
                 .build();
 
 
