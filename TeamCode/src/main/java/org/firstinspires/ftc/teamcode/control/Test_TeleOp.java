@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 
 
 
-@TeleOp(name = "Test_TeleOp")
+@TeleOp(name = "Test_TeleOp", group = "@@@")
 //@Disabled
 
 public class Test_TeleOp extends LinearOpMode{

@@ -11,7 +11,8 @@ import org.firstinspires.ftc.teamcode.hardware.drive.samples.SampleMecanumDrive;
 /*
  * This is an example of a more complex path to really test the tuning.
  */
-@Autonomous(group = "drive")
+@Autonomous(name = "Test_AutoOp", group = "@@@")
+
 public class Test_AutoOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

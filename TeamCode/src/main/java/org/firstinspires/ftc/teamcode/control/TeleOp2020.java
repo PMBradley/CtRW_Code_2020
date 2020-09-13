@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 
 
 
-@TeleOp(name = "TeleOp2020")
+@TeleOp(name = "TeleOp2020", group = "@@@")
 
 public class TeleOp2020 extends LinearOpMode{
     // TeleOp Variables
