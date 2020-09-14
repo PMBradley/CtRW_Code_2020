@@ -105,7 +105,7 @@ public class Provider2020 {
         // motorIntakeR = mainMap.get(DcMotor.class, "intakeR");
 
         // Set motors to run with encoders (uncomment if you are, comment out if you are not)
-        driveFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        /*driveFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -113,6 +113,13 @@ public class Provider2020 {
         motorIntakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         */
+
+       // Reverse motor direction as needed
+        driveFL.setDirection(DcMotor.Direction.REVERSE);
+        driveFR.setDirection(DcMotor.Direction.REVERSE);
+        driveBL.setDirection(DcMotor.Direction.REVERSE);
+        driveBR.setDirection(DcMotor.Direction.REVERSE);
+
 
         // Grabbing servos from hardware map (uncomment if you are using them, comment out if you are not)
         /*
