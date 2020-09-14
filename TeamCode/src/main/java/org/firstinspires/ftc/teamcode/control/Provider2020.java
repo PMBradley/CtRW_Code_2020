@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -109,6 +110,12 @@ public class Provider2020 {
         driveFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        driveFL.setDirection(DcMotorSimple.Direction.REVERSE);
+        driveFR.setDirection(DcMotorSimple.Direction.REVERSE);
+        driveBL.setDirection(DcMotorSimple.Direction.REVERSE);
+        driveBR.setDirection(DcMotorSimple.Direction.REVERSE);
+
        /* motorIntakeL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorIntakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
