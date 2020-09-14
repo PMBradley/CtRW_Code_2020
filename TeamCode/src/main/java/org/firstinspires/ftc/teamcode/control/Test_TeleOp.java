@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 
 
 
-@TeleOp(name = "Test_TeleOp", group = "@@@")
+@TeleOp(name = "Test_TeleOp", group = "@@T")
 //@Disabled
 
 public class Test_TeleOp extends LinearOpMode{
@@ -35,7 +35,7 @@ public class Test_TeleOp extends LinearOpMode{
     double stopSpeed = 0;
 
     // Robot Classes
-    private Provider20XX robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
+    private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
     Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
 
@@ -45,7 +45,7 @@ public class Test_TeleOp extends LinearOpMode{
     public void runOpMode() throws InterruptedException {
         /* INCLUDE ANY ROBOT SETUP CODE HERE */
         // Call class constructors here (so that nothing major happens before init)
-        robot = new Provider20XX(hardwareMap);
+        robot = new Provider2020(hardwareMap);
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed);
 

@@ -111,11 +111,6 @@ public class Provider2020 {
         driveBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        driveFL.setDirection(DcMotorSimple.Direction.REVERSE);
-        driveFR.setDirection(DcMotorSimple.Direction.REVERSE);
-        driveBL.setDirection(DcMotorSimple.Direction.REVERSE);
-        driveBR.setDirection(DcMotorSimple.Direction.REVERSE);
-
        /* motorIntakeL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorIntakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
