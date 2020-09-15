@@ -6,14 +6,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class Drive_Mecanum_Tele {
 
     // Create and initialize speed modifier variables - using default values (then can be set via a constructor)
-    private double turnDivisor      = DEFAULT_TURN_DIVISOR; // what percentage of maximum turning speed should be used as a base turning speed (50% = 0.5, etc) - a multiplier
-    private double translateMultiplier = DEFAULT_TRANSLATE_DIVISOR; // what percentage of maximum translational speed should be used as a base translational speed (50% = 0.5, etc) - a multiplier
-    private double boostingMultiplier  = DEFAULT_BOOSTING_DIVISOR; // what percentage of maximum translational speed should be used as a boost translational speed (50% = 0.5, etc) - a multiplier
+    private double turnMultiplier = DEFAULT_TURN_MULTIPLIER; // what percentage of maximum turning speed should be used as a base turning speed (50% = 0.5, etc) - a multiplier
+    private double translateMultiplier = DEFAULT_TRANSLATE_MULTIPLIER; // what percentage of maximum translational speed should be used as a base translational speed (50% = 0.5, etc) - a multiplier
+    private double boostingMultiplier  = DEFAULT_BOOSTING_MULTIPLIER; // what percentage of maximum translational speed should be used as a boost translational speed (50% = 0.5, etc) - a multiplier
 
     // Default speed modifier values
-    private static final double DEFAULT_TURN_DIVISOR = 0.6; // default values to use in the event no custom values are passed
-    private static final double DEFAULT_TRANSLATE_DIVISOR = 0.6;
-    private static final double DEFAULT_BOOSTING_DIVISOR = 1.0;
+    private static final double DEFAULT_TURN_MULTIPLIER = 0.6; // default values to use in the event no custom values are passed
+    private static final double DEFAULT_TRANSLATE_MULTIPLIER = 0.6;
+    private static final double DEFAULT_BOOSTING_MULTIPLIER = 1.0;
 
 
     //Motor variables
@@ -39,7 +39,7 @@ public class Drive_Mecanum_Tele {
         driveBR = driveMotorBR;
 
         // set custom values to the speed divisors
-        turnDivisor = turnSpeed;
+        turnMultiplier = turnSpeed;
         translateMultiplier = translateSpeed;
         boostingMultiplier = boostingSpeed;
     }
@@ -48,18 +48,7 @@ public class Drive_Mecanum_Tele {
     // Drive functions
 
     public void drive_field_relative(double x, double y, double r, double rawHeading, boolean isBoosting) { // use with controller only - this drives relative to field
-        // if using controller inputs, reverse y in the arguments because down on the stick is positive and up is negative, and we need that to be the opposite way
-        // if boosting is true, the robot will use the boostingDivisor instead of translateDivisor for speed setting
-
-        if(isBoosting){ // if boosting, use the boosting divisor
-            x = x * boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
-            y = y * boostingMultiplier;
-        }
-        else{ // if moving regularly, use the regular translate divisor
-            x = x * translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
-            y = y * translateMultiplier;
-        }
-
+        // if using controller inputs, ensure you reverse y in the arguments because down on the stick is positive and up is negative, and we need that to be the opposite way
 
         // adjust the raw heading (between -180 and 180) to be reversed and between 0 and 359.9999... to make the math easier later
         double heading = rawHeading * -1;
@@ -83,11 +72,22 @@ public class Drive_Mecanum_Tele {
         double field_x = (x * cos) - (y * sin);
         double field_y = (x * sin) + (y * cos);
 
+        // if boosting is true, the robot will use the boostingMultiplier instead of translateMultiplier for speed setting
+        if(isBoosting){ // if boosting, use the boosting speed
+            field_x = field_x * boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
+            field_y = field_y * boostingMultiplier;
+        }
+        else{ // if moving regularly, use the regular translate speed
+            field_x = field_x * translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
+            field_y = field_y * translateMultiplier;
+        }
+
+
         // do math to get powers relative to field in addition to the cartesian mecanum formula
-        powerFL = (field_y + (r * turnDivisor) + field_x);
-        powerFR = (field_y - (r * turnDivisor) - field_x); // -
-        powerBL = (field_y + (r * turnDivisor) - field_x);
-        powerBR = (field_y - (r * turnDivisor) + field_x); //-
+        powerFL = (field_y + (r * turnMultiplier) + field_x);
+        powerFR = (field_y - (r * turnMultiplier) - field_x);
+        powerBL = (field_y + (r * turnMultiplier) - field_x);
+        powerBR = (field_y - (r * turnMultiplier) + field_x);
 
 
        // Unit Vector Normalization - Normalizes the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the ratio between them)
@@ -109,7 +109,9 @@ public class Drive_Mecanum_Tele {
     }
 
     public void drive_robot_relative(double x, double y, double r, boolean isBoosting) { // use with controller only - this drives relative to the robot
-        // if using controller inputs, reverse y in the arguments because down on the stick is positive and up is negative, and we need that to be the opposite way
+        drive_field_relative(x, y, r, 0, isBoosting); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative)
+
+        /*// if using controller inputs, reverse y in the arguments because down on the stick is positive and up is negative, and we need that to be the opposite way
         // if boosting is true, the robot will use the boostingDivisor instead of translateDivisor for speed setting
 
         if(isBoosting){ // if boosting, use the boosting divisor
@@ -144,7 +146,7 @@ public class Drive_Mecanum_Tele {
         driveFL.setPower(powerFL);
         driveFR.setPower(powerFR);
         driveBL.setPower(powerBL);
-        driveBR.setPower(powerBR);
+        driveBR.setPower(powerBR);*/
     }
 
 }
