@@ -17,6 +17,9 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
         - Gamepad1 right stick (x axis only) = rotation
         - Gamepad1 right bumbper = boost button
 
+        Mode toggling:
+        - Gamepad1 dpad_up = toggle drive relative to field
+        - Gamepad1 dpad_down = toggle drive using encoders
  */
 
 
@@ -43,7 +46,10 @@ public class TeleOp2020 extends LinearOpMode{
     private ElapsedTime runtime; // internal clock
     Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
 
+    // Flags
     private boolean driveFieldRelative = true; // default
+    private boolean firstToggleDriveRelative = true; // used to ensure proper toggling behavior (see usage under logic section)
+    private boolean firstToggleRunEncoders = true; // used to ensure proper toggling behavior (see usage under logic section)
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -75,13 +81,23 @@ public class TeleOp2020 extends LinearOpMode{
 
             // Logic (figuring out what the robot should do)
 
-            if(gamepad1.dpad_up){ // toggle driving realtive to field if dpad up is pressed
+            if(gamepad1.dpad_up && firstToggleDriveRelative){ // toggle driving realtive to field if dpad up is pressed
                 driveFieldRelative = !driveFieldRelative; // toggle the value
+
+                firstToggleDriveRelative = false; // set the variable false so that it cannot toggle again
+            }
+            else{
+                firstToggleDriveRelative = true; // until the button is released
             }
 
-            if(gamepad1.dpad_down){ // toggle driving using encoders on the press of dpad down
+            if(gamepad1.dpad_down && firstToggleRunEncoders){ // toggle driving using encoders on the press of dpad down
                 robot.driveUsingEncoders = !robot.driveUsingEncoders; // toggle the value
                 robot.setEncoderActive(robot.driveUsingEncoders); //update the encoder mode
+
+                firstToggleRunEncoders = false; // set the variable false so that it cannot toggle again
+            }
+            else{
+                firstToggleRunEncoders = true; // until the button is released
             }
 
             //setup a dead zone for the controllers
@@ -94,6 +110,7 @@ public class TeleOp2020 extends LinearOpMode{
             if(Math.abs(rotatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
                rotatePower = stopSpeed;
             }
+
 
             // Hardware instruction (telling the hardware what to do)
             if(driveFieldRelative){
