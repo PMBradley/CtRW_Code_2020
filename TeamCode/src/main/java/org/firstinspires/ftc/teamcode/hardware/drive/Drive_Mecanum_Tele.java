@@ -7,8 +7,8 @@ public class Drive_Mecanum_Tele {
 
     // Create and initialize speed modifier variables - using default values (then can be set via a constructor)
     private double turnDivisor      = DEFAULT_TURN_DIVISOR; // what percentage of maximum turning speed should be used as a base turning speed (50% = 0.5, etc) - a multiplier
-    private double translateDivisor = DEFAULT_TRANSLATE_DIVISOR; // what percentage of maximum translational speed should be used as a base translational speed (50% = 0.5, etc) - a multiplier
-    private double boostingDivisor  = DEFAULT_BOOSTING_DIVISOR; // what percentage of maximum translational speed should be used as a boost translational speed (50% = 0.5, etc) - a multiplier
+    private double translateMultiplier = DEFAULT_TRANSLATE_DIVISOR; // what percentage of maximum translational speed should be used as a base translational speed (50% = 0.5, etc) - a multiplier
+    private double boostingMultiplier  = DEFAULT_BOOSTING_DIVISOR; // what percentage of maximum translational speed should be used as a boost translational speed (50% = 0.5, etc) - a multiplier
 
     // Default speed modifier values
     private static final double DEFAULT_TURN_DIVISOR = 0.6; // default values to use in the event no custom values are passed
@@ -40,8 +40,8 @@ public class Drive_Mecanum_Tele {
 
         // set custom values to the speed divisors
         turnDivisor = turnSpeed;
-        translateDivisor = translateSpeed;
-        boostingDivisor = boostingSpeed;
+        translateMultiplier = translateSpeed;
+        boostingMultiplier = boostingSpeed;
     }
 
 
@@ -52,12 +52,12 @@ public class Drive_Mecanum_Tele {
         // if boosting is true, the robot will use the boostingDivisor instead of translateDivisor for speed setting
 
         if(isBoosting){ // if boosting, use the boosting divisor
-            x = x * boostingDivisor; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
-            y = y * boostingDivisor;
+            x = x * boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
+            y = y * boostingMultiplier;
         }
         else{ // if moving regularly, use the regular translate divisor
-            x = x * translateDivisor; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
-            y = y * translateDivisor;
+            x = x * translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
+            y = y * translateMultiplier;
         }
 
 
@@ -113,12 +113,12 @@ public class Drive_Mecanum_Tele {
         // if boosting is true, the robot will use the boostingDivisor instead of translateDivisor for speed setting
 
         if(isBoosting){ // if boosting, use the boosting divisor
-            x = x * boostingDivisor; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
-            y = y * boostingDivisor;
+            x = x * boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
+            y = y * boostingMultiplier;
         }
         else{ // if moving regularly, use the regular translate divisor
-            x = x * translateDivisor; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
-            y = y * translateDivisor;
+            x = x * translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
+            y = y * translateMultiplier;
         }
 
 
