@@ -85,22 +85,22 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
             //setup a dead zone for the controllers
-            if(Math.abs(xTranslatePower) < DEAD_ZONE_RADIUS){
+            if(Math.abs(xTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
                 xTranslatePower = stopSpeed;
             }
-            if(Math.abs(yTranslatePower) < DEAD_ZONE_RADIUS){
+            if(Math.abs(yTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
                 yTranslatePower = stopSpeed;
             }
-            if(Math.abs(rotatePower) < DEAD_ZONE_RADIUS){
+            if(Math.abs(rotatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
                rotatePower = stopSpeed;
             }
 
             // Hardware instruction (telling the hardware what to do)
             if(driveFieldRelative){
-                mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting);
+                mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
             }
             else{
-                mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive field relative method
+                mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
             }
 
 
