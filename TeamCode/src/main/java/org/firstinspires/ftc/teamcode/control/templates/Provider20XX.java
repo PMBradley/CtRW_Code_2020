@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -113,6 +114,11 @@ public class Provider20XX {
         motorIntakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         */
+
+        // Reverse motor direction as needed
+        driveFR.setDirection(DcMotor.Direction.REVERSE);
+        driveFR.setDirection(DcMotor.Direction.REVERSE);
+
 
         // Grabbing servos from hardware map (uncomment if you are using them, comment out if you are not)
         /*

@@ -35,7 +35,7 @@ public class Test_TeleOp extends LinearOpMode{
     double stopSpeed = 0;
 
     // Robot Classes
-    private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
+    private Provider20XX robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
     Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
 
@@ -45,7 +45,7 @@ public class Test_TeleOp extends LinearOpMode{
     public void runOpMode() throws InterruptedException {
         /* INCLUDE ANY ROBOT SETUP CODE HERE */
         // Call class constructors here (so that nothing major happens before init)
-        robot = new Provider2020(hardwareMap);
+        robot = new Provider20XX(hardwareMap);
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed);
 
@@ -83,7 +83,7 @@ public class Test_TeleOp extends LinearOpMode{
                 robot.driveFL.setPower(stopSpeed);
             }
             if(gamepad1.b == true){ // if a is pressed, move FR at testSpeed
-                robot.driveFR.setPower(-testSpeed);
+                robot.driveFR.setPower(testSpeed);
             }
             else{
                 robot.driveFR.setPower(stopSpeed);
@@ -95,7 +95,7 @@ public class Test_TeleOp extends LinearOpMode{
                 robot.driveBL.setPower(stopSpeed);
             }
             if(gamepad1.y == true){ // if a is pressed, move BR at testSpeed
-                robot.driveBR.setPower(-testSpeed);
+                robot.driveBR.setPower(testSpeed);
             }
             else{
                 robot.driveBR.setPower(stopSpeed);

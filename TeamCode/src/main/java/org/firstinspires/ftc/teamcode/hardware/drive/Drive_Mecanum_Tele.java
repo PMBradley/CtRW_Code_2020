@@ -85,9 +85,9 @@ public class Drive_Mecanum_Tele {
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
         powerFL = (field_y + (r * turnDivisor) + field_x);
-        powerFR = -(field_y - (r * turnDivisor) - field_x);
+        powerFR = (field_y - (r * turnDivisor) - field_x);
         powerBL = (field_y + (r * turnDivisor) - field_x);
-        powerBR = -(field_y - (r * turnDivisor) + field_x);
+        powerBR = (field_y - (r * turnDivisor) + field_x);
 
 
        // Unit Vector Normalization - Normalizes the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the ratio between them)
@@ -124,9 +124,9 @@ public class Drive_Mecanum_Tele {
 
         // do math to get powers set according to the cartesian mecanum formula
         powerFL = (y + (r * turnDivisor) + x);
-        powerFR = -(y - (r * turnDivisor) - x);
+        powerFR = (y - (r * turnDivisor) - x);
         powerBL = (y + (r * turnDivisor) - x);
-        powerBR = -(y - (r * turnDivisor) + x);
+        powerBR = (y - (r * turnDivisor) + x);
 
 
         // Unit Vector Normalization - Normalizes the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the ratio between them)
