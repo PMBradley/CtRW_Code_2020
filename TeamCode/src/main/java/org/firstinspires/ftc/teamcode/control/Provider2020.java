@@ -72,9 +72,23 @@ public class Provider2020 {
     // The all important hardware map (basically a log of what devices are plugged into what ports. Setup on the FTC Robot Controller app)
     HardwareMap mainMap;
 
+    // Flag values
+    boolean driveUsingEncoders = true;
 
-    // Default constructor
+
+    // Hardware map only Contructor
     public Provider2020(HardwareMap hMap){
+        driveUsingEncoders = true; // update the flag to be the default constructor
+
+        init_map(hMap); // pull information from the hardware map - MUST BE DONE BEFORE
+
+        init_imu(); // setup the IMU and calibrate the current position as 0
+    }
+
+    // Hardware map and encoder Constructor
+    public Provider2020(HardwareMap hMap, boolean runUsingEncoders){
+        driveUsingEncoders = runUsingEncoders; // update the flag from the constructor
+
         init_map(hMap); // pull information from the hardware map - MUST BE DONE BEFORE
 
         init_imu(); // setup the IMU and calibrate the current position as 0
@@ -105,11 +119,14 @@ public class Provider2020 {
         // motorIntakeL = mainMap.get(DcMotor.class, "intakeL");
         // motorIntakeR = mainMap.get(DcMotor.class, "intakeR");
 
-        // Set motors to run with encoders (uncomment if you are, comment out if you are not)
-        /*driveFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // Set motors to run with encoders (if the flag is true)
+        if(driveUsingEncoders){
+            driveFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
 
        /* motorIntakeL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorIntakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -175,6 +192,23 @@ public class Provider2020 {
 
     public double getHeading(){
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle; // get the current heading of the robot in degrees
+    }
+
+    public void setEncoderActive(boolean usingEncoders){ // sets encoder mode based off of boolean parameter
+        driveUsingEncoders = usingEncoders;
+
+        if(driveUsingEncoders){ // enable controllers if true
+            driveFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        else{ // disable controllers if false
+            driveFL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            driveFR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            driveBL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            driveBR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 }
 

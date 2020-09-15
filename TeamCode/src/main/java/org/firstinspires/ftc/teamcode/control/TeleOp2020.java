@@ -32,13 +32,18 @@ public class TeleOp2020 extends LinearOpMode{
     // Robot Speed variables
     double turnSpeed = 0.5; // Speed multiplier for turning (1 being 100% of power going in)
     double translateSpeed = 0.4; // Speed multiplier for translation (1 being 100% of power going in)
-    double boostSpeed = 1; // Speed multiplier for BOOSTING (1 being 100% of power going in)
+    double boostSpeed = 1.0; // Speed multiplier for BOOSTING (1 being 100% of power going in)
+    double stopSpeed = 0.0; // the motor speed for stopping the robot
+
+    // Constants
+    static final double DEAD_ZONE_RADIUS = 0.05; // the minimum value that can be passed into the drive function
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
     Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
 
+    private boolean driveFieldRelative = true; // default
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -62,20 +67,66 @@ public class TeleOp2020 extends LinearOpMode{
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
             // Variables
-
-            boolean isBoosting = false; // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
+            boolean isBoosting = gamepad1.right_bumper;  // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
+            double xTranslatePower = gamepad1.left_stick_x; // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
+            double yTranslatePower = -gamepad1.left_stick_y; // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double rotatePower = gamepad1.right_stick_x;
 
 
             // Logic (figuring out what the robot should do)
 
-            if(gamepad1.right_bumper == true){ // Figure out if the robot should be boosting
-                isBoosting = true;
+            if(gamepad1.dpad_up){ // toggle driving realtive to field if dpad up is pressed
+                driveFieldRelative = !driveFieldRelative; // toggle the value
+            }
+
+            if(gamepad1.dpad_down){ // toggle driving using encoders on the press of dpad down
+                robot.driveUsingEncoders = !robot.driveUsingEncoders; // toggle the value
+                robot.setEncoderActive(robot.driveUsingEncoders); //update the encoder mode
+            }
+
+            //setup a dead zone for the controllers
+            if(Math.abs(xTranslatePower) < DEAD_ZONE_RADIUS){
+                xTranslatePower = stopSpeed;
+            }
+            if(Math.abs(yTranslatePower) < DEAD_ZONE_RADIUS){
+                yTranslatePower = stopSpeed;
+            }
+            if(Math.abs(rotatePower) < DEAD_ZONE_RADIUS){
+               rotatePower = stopSpeed;
+            }
+
+            // Hardware instruction (telling the hardware what to do)
+            if(driveFieldRelative){
+                mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting);
+            }
+            else{
+                mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive field relative method
             }
 
 
-            // Hardware instruction (telling the hardware what to do)
+            // Telemetry
+            if(driveFieldRelative){ // add telemetry relating to robot drive mode
+                telemetry.addLine("Driving field relative");
+            }
+            else{
+                telemetry.addLine("Driving robot relative");
+            }
 
-            mecanum_drive.drive_field_relative(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x, robot.getHeading(), isBoosting);
+            if(robot.driveUsingEncoders){
+                telemetry.addLine("Driving using encoders");
+
+                telemetry.addData("Drive FL Encoder: ", robot.driveFL.getCurrentPosition()); // add telemetry data for motor encoders
+                telemetry.addData("Drive FR Encoder: ", robot.driveFR.getCurrentPosition());
+                telemetry.addData("Drive BL Encoder: ", robot.driveBL.getCurrentPosition());
+                telemetry.addData("Drive BR Encoder: ", robot.driveBR.getCurrentPosition());
+            }
+            else{
+                telemetry.addLine("Driving without encoders");
+            }
+
+            telemetry.addData("Boosting: ", isBoosting);
+
+            telemetry.update();
         }
     }
 

@@ -117,7 +117,7 @@ public class Provider20XX {
 
         // Reverse motor direction as needed
         driveFR.setDirection(DcMotor.Direction.REVERSE);
-        driveFR.setDirection(DcMotor.Direction.REVERSE);
+        driveBR.setDirection(DcMotor.Direction.REVERSE);
 
 
         // Grabbing servos from hardware map (uncomment if you are using them, comment out if you are not)
