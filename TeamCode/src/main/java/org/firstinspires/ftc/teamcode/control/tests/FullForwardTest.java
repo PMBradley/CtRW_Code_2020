@@ -91,16 +91,21 @@ public class FullForwardTest extends LinearOpMode{
 
             //telemetry
             if(isRunning){
-                driveFL.setPower(testSpeed);
-                driveFR.setPower(testSpeed);
-                driveBL.setPower(testSpeed);
-                driveBR.setPower(testSpeed);
+                driveFL.setPower(stopSpeed);
+                driveFR.setPower(stopSpeed);
+                driveBL.setPower(stopSpeed);
+                driveBR.setPower(stopSpeed);
 
 
 
                 telemetry.addLine("Running motors");
             }
             else{
+                driveFL.setPower(testSpeed);
+                driveFR.setPower(testSpeed);
+                driveBL.setPower(testSpeed);
+                driveBR.setPower(testSpeed);
+
                 telemetry.addLine("Press the right bumper on Gamepad1 to run motors.");
             }
 
