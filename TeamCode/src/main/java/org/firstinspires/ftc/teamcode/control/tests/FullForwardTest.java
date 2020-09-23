@@ -1,8 +1,10 @@
-package org.firstinspires.ftc.teamcode.control;
+package org.firstinspires.ftc.teamcode.control.tests;
+
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.templates.Provider20XX;
@@ -19,10 +21,10 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 
 
 
-@TeleOp(name = "Test_TeleOp", group = "@@T")
+@TeleOp(name = "FullForwardTest", group = "@@T")
 //@Disabled
 
-public class Test_TeleOp extends LinearOpMode{
+public class FullForwardTest extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
@@ -34,12 +36,9 @@ public class Test_TeleOp extends LinearOpMode{
     double boostSpeed = 1; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0;
 
-    double testSpeed = 1.0;
-
     // Robot Classes
-    private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
-    Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
+
 
 
     // The "Main" for TeleOp (the place where the main code is run)
@@ -47,15 +46,23 @@ public class Test_TeleOp extends LinearOpMode{
     public void runOpMode() throws InterruptedException {
         /* INCLUDE ANY ROBOT SETUP CODE HERE */
         // Call class constructors here (so that nothing major happens before init)
-        robot = new Provider2020(hardwareMap);
         runtime = new ElapsedTime();
-        mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed);
+        double testSpeed = 1.0;
 
 
-        telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
+                telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
 
-        robot.setEncoderActive(false);
+
+        DcMotor driveFL = hardwareMap.get(DcMotor.class, "driveFL");
+        DcMotor driveFR = hardwareMap.get(DcMotor.class, "driveFR");
+        DcMotor driveBL = hardwareMap.get(DcMotor.class, "driveBL");
+        DcMotor driveBR = hardwareMap.get(DcMotor.class, "driveBR");
+
+
+        driveFL.setDirection(DcMotor.Direction.REVERSE);
+        driveBL.setDirection(DcMotor.Direction.REVERSE);
+
 
         waitForStart(); // Wait for the start button to be pressed before continuing further
 
@@ -67,42 +74,14 @@ public class Test_TeleOp extends LinearOpMode{
         while (opModeIsActive()) {
             // Variables
 
-            boolean isBoosting = false; // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
+            boolean isRunning = false; // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
 
 
             // Logic (figuring out what the robot should do)
-            if(gamepad1.dpad_down == true){ // if the dpad down is pressed, set the testSpeed to be negative, otherwise keep it positive
-                testSpeed *= -1;
-            }
 
 
             if(gamepad1.right_bumper == true){ // Figure out if the robot should be boosting
-                isBoosting = true;
-            }
-
-            if(gamepad1.a == true){ // if a is pressed, move FL at testSpeed
-                robot.driveFL.setPower(testSpeed);
-            }
-            else{
-                robot.driveFL.setPower(stopSpeed);
-            }
-            if(gamepad1.b == true){ // if a is pressed, move FR at testSpeed
-                robot.driveFR.setPower(testSpeed);
-            }
-            else{
-                robot.driveFR.setPower(stopSpeed);
-            }
-            if(gamepad1.x == true){ // if a is pressed, move BL at testSpeed
-                robot.driveBL.setPower(testSpeed);
-            }
-            else{
-                robot.driveBL.setPower(stopSpeed);
-            }
-            if(gamepad1.y == true){ // if a is pressed, move BR at testSpeed
-                robot.driveBR.setPower(testSpeed);
-            }
-            else{
-                robot.driveBR.setPower(stopSpeed);
+                isRunning = true;
             }
 
 
@@ -111,10 +90,19 @@ public class Test_TeleOp extends LinearOpMode{
             //mecanum_drive.drive_field_relative(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x, robot.getHeading(), isBoosting);
 
             //telemetry
-            telemetry.addData("Drive FL: ", robot.driveFL.getCurrentPosition()); // add telemetry data for motor encoders
-            telemetry.addData("Drive FR: ", robot.driveFR.getCurrentPosition());
-            telemetry.addData("Drive BL: ", robot.driveBL.getCurrentPosition());
-            telemetry.addData("Drive BR: ", robot.driveBR.getCurrentPosition());
+            if(isRunning){
+                driveFL.setPower(testSpeed);
+                driveFR.setPower(testSpeed);
+                driveBL.setPower(testSpeed);
+                driveBR.setPower(testSpeed);
+
+
+
+                telemetry.addLine("Running motors");
+            }
+            else{
+                telemetry.addLine("Press the right bumper on Gamepad1 to run motors.");
+            }
 
             telemetry.update(); // send the queued telemetry to the output
         }
