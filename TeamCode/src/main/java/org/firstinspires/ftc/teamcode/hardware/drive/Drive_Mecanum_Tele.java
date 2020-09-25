@@ -70,7 +70,7 @@ public class Drive_Mecanum_Tele {
             x /= magnitude;
             y /= magnitude;
         }
-        
+
 
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
         double sin = Math.sin(Math.toRadians(heading));
