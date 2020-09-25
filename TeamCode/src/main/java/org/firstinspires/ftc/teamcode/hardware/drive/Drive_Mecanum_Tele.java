@@ -63,6 +63,14 @@ public class Drive_Mecanum_Tele {
             }
         }
 
+        // Unit Vector Normalization - Normalizes the translational inputs (ensure that all motor values are between -1 and 1, while maintaining the ratio between inputs)
+        double magnitude = Math.abs(x) + Math.abs(y); // get the total magnitude of the inputs by adding their absolute values
+
+        if(magnitude > 1.0){  // if the magnitude is over the max motor power, divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
+            x /= magnitude;
+            y /= magnitude;
+        }
+        
 
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
         double sin = Math.sin(Math.toRadians(heading));
@@ -71,6 +79,7 @@ public class Drive_Mecanum_Tele {
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
         double field_x = (x * cos) - (y * sin);
         double field_y = (x * sin) + (y * cos);
+
 
         // if boosting is true, the robot will use the boostingMultiplier instead of translateMultiplier for speed setting
         if(isBoosting){ // if boosting, use the boosting speed
@@ -90,17 +99,6 @@ public class Drive_Mecanum_Tele {
         powerBR = (field_y - (r * turnMultiplier) + field_x);
 
 
-       // Unit Vector Normalization - Normalizes the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the ratio between them)
-       double magnitude = Math.sqrt(Math.pow(powerFL, 2) + Math.pow(powerFR, 2) + Math.pow(powerBL, 2) + Math.pow(powerBR, 2)); // get the total magnitude of the powers (square each one, add them, then get that square root)
-
-       if(magnitude > 1.0){  // if the magnitude is over the max speed, divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
-           powerFL /= magnitude;
-           powerFR /= magnitude;
-           powerBL /= magnitude;
-           powerBR /= magnitude;
-       }
-
-
         // set the motor powers based off of the math done previously
         driveFL.setPower(powerFL);
         driveFR.setPower(powerFR);
@@ -110,43 +108,6 @@ public class Drive_Mecanum_Tele {
 
     public void drive_robot_relative(double x, double y, double r, boolean isBoosting) { // use with controller only - this drives relative to the robot
         drive_field_relative(x, y, r, 0, isBoosting); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative)
-
-        /*// if using controller inputs, reverse y in the arguments because down on the stick is positive and up is negative, and we need that to be the opposite way
-        // if boosting is true, the robot will use the boostingDivisor instead of translateDivisor for speed setting
-
-        if(isBoosting){ // if boosting, use the boosting divisor
-            x = x * boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
-            y = y * boostingMultiplier;
-        }
-        else{ // if moving regularly, use the regular translate divisor
-            x = x * translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
-            y = y * translateMultiplier;
-        }
-
-
-        // do math to get powers set according to the cartesian mecanum formula
-        powerFL = (y + (r * turnDivisor) + x);
-        powerFR = (y - (r * turnDivisor) - x); //-
-        powerBL = (y + (r * turnDivisor) - x);
-        powerBR = (y - (r * turnDivisor) + x); //-
-
-
-        // Unit Vector Normalization - Normalizes the translational inputs (ensure that all absolute values are less than or equal to 1, while maintaining the ratio between them)
-        double magnitude = Math.sqrt(Math.pow(powerFL, 2) + Math.pow(powerFR, 2) + Math.pow(powerBL, 2) + Math.pow(powerBR, 2)); // get the total magnitude of the powers (square each one, add them, then get that square root)
-
-        if(magnitude > 1.0){  // if the magnitude is over the max speed, divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
-            powerFL /= magnitude;
-            powerFR /= magnitude;
-            powerBL /= magnitude;
-            powerBR /= magnitude;
-        }
-
-
-        // set the motor powers based off of the math done previously
-        driveFL.setPower(powerFL);
-        driveFR.setPower(powerFR);
-        driveBL.setPower(powerBL);
-        driveBR.setPower(powerBR);*/
     }
 
 }

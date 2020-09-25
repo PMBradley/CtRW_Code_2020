@@ -87,24 +87,21 @@ public class FullForwardTest extends LinearOpMode{
 
             // Hardware instruction (telling the hardware what to do)
 
-            //mecanum_drive.drive_field_relative(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x, robot.getHeading(), isBoosting);
-
             //telemetry
             if(isRunning){
-                driveFL.setPower(stopSpeed);
-                driveFR.setPower(stopSpeed);
-                driveBL.setPower(stopSpeed);
-                driveBR.setPower(stopSpeed);
-
+                driveFL.setPower(testSpeed);
+                driveFR.setPower(testSpeed);
+                driveBL.setPower(testSpeed);
+                driveBR.setPower(testSpeed);
 
 
                 telemetry.addLine("Running motors");
             }
             else{
-                driveFL.setPower(testSpeed);
-                driveFR.setPower(testSpeed);
-                driveBL.setPower(testSpeed);
-                driveBR.setPower(testSpeed);
+                driveFL.setPower(stopSpeed);
+                driveFR.setPower(stopSpeed);
+                driveBL.setPower(stopSpeed);
+                driveBR.setPower(stopSpeed);
 
                 telemetry.addLine("Press the right bumper on Gamepad1 to run motors.");
             }
