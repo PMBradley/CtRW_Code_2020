@@ -63,14 +63,6 @@ public class Drive_Mecanum_Tele {
             }
         }
 
-        // Unit Vector Normalization - Normalizes the translational inputs (ensure that all motor values are between -1 and 1, while maintaining the ratio between inputs)
-        double magnitude = Math.abs(x) + Math.abs(y); // get the total magnitude of the inputs by adding their absolute values
-
-        if(magnitude > 1.0){  // if the magnitude is over the max motor power, divide all numbers by the largest number (meaning the largest number will become 1 and the rest scaled appropriately)
-            x /= magnitude;
-            y /= magnitude;
-        }
-
 
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
         double sin = Math.sin(Math.toRadians(heading));
@@ -83,13 +75,14 @@ public class Drive_Mecanum_Tele {
 
         // if boosting is true, the robot will use the boostingMultiplier instead of translateMultiplier for speed setting
         if(isBoosting){ // if boosting, use the boosting speed
-            field_x = field_x * boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
-            field_y = field_y * boostingMultiplier;
+            field_x *= boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
+            field_y *= boostingMultiplier;
         }
         else{ // if moving regularly, use the regular translate speed
-            field_x = field_x * translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
-            field_y = field_y * translateMultiplier;
+            field_x *= translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
+            field_y *= translateMultiplier;
         }
+        r *= turnMultiplier;  // also multiply the r value by the turn speed modifier, but do it outside of the if statement because it happens the same either way
 
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
@@ -99,7 +92,18 @@ public class Drive_Mecanum_Tele {
         powerBR = (field_y - (r * turnMultiplier) + field_x);
 
 
-        // set the motor powers based off of the math done previously
+        // Normalize the powers before we pass them into the motors (so that no power is outside of the range when passed in, preserving the intended slope)
+        double largest_power = Math.max( Math.max(powerFL, powerFR), Math.max(powerBL, powerBR) ); // first find the largest of all the powers (get the max of the first two, max of the second two, then get the max of the two maxes)
+
+        if(largest_power > 1.0){ // if the largest power value is greater than 1
+            powerFL /= largest_power; // divide each power by the largest one
+            powerFR /= largest_power; // resulting in the largest power being 1 (x/x = 1)
+            powerBL /= largest_power; // and the rest scaled appropriately
+            powerBR /= largest_power;
+        }
+
+
+        // set the motor powers based off of the math done previously - Make that robot go VROOOOM
         driveFL.setPower(powerFL);
         driveFR.setPower(powerFR);
         driveBL.setPower(powerBL);
@@ -109,6 +113,5 @@ public class Drive_Mecanum_Tele {
     public void drive_robot_relative(double x, double y, double r, boolean isBoosting) { // use with controller only - this drives relative to the robot
         drive_field_relative(x, y, r, 0, isBoosting); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative)
     }
-
 }
 

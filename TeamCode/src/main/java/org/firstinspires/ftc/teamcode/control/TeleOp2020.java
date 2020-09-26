@@ -34,7 +34,7 @@ public class TeleOp2020 extends LinearOpMode{
 
     // Robot Speed variables
     double turnSpeed = 0.5; // Speed multiplier for turning (1 being 100% of power going in)
-    double translateSpeed = 0.4; // Speed multiplier for translation (1 being 100% of power going in)
+    double translateSpeed = 0.5; // Speed multiplier for translation (1 being 100% of power going in)
     double boostSpeed = 1.0; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0.0; // the motor speed for stopping the robot
 
@@ -60,6 +60,8 @@ public class TeleOp2020 extends LinearOpMode{
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed); // pass in the drive motors and the speed variables to setup properly
 
+
+        robot.setEncoderActive(false); // start the game without running encoders
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
