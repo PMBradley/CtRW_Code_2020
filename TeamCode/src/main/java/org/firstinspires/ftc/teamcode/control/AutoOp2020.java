@@ -11,9 +11,12 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 /*
  * This is an example of a more complex path to really test the tuning.
  */
-@Autonomous(name = "Test_AutoOp", group = "@@T")
+@Autonomous(name = "Test_AutoOp", group = "@@@")
 
-public class Test_AutoOp extends LinearOpMode {
+public class AutoOp2020 extends LinearOpMode {
+    // TODO: Create an array that holds all drive points
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         Drive_Mecanum_Auto drive = new Drive_Mecanum_Auto(hardwareMap, true);
@@ -64,4 +67,6 @@ public class Test_AutoOp extends LinearOpMode {
 
         drive.followTrajectory(traj2);
     }
+
+    // TODO: Create a state machine function that follows the trajectories asynchronously
 }

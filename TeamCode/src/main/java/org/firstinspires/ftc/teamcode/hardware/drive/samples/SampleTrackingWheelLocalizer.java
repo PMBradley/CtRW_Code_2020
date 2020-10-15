@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.hardware.drive;
+package org.firstinspires.ftc.teamcode.hardware.drive.samples;
 
 import android.support.annotation.NonNull;
 
@@ -25,17 +25,17 @@ import java.util.List;
  *
  */
 @Config
-public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer {
-    public static double TICKS_PER_REV = 0; // the number of encoder tics per revolution of the encoder - should be available on the encoder's manufacture's website
-    public static double WHEEL_RADIUS = 0.7480315; // in inches - the radius of the dead (odometry) wheels
-    public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed - if the dead (odometry) wheel is directly attached to the encoder, just ingore this
+public class SampleTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer {
+    public static double TICKS_PER_REV = 0;
+    public static double WHEEL_RADIUS = 0.7480315; // in
+    public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
     public static double LATERAL_DISTANCE = 15.0669291 ; // in; distance between the left and right odometry wheels - update with physical robot changes to distance
     public static double FORWARD_OFFSET = -2.20472441 ; // in; offset of the lateral odometry wheel - update with physical robot changes to distance
 
     private DcMotor leftEncoder, rightEncoder, frontEncoder;
 
-    public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
+    public SampleTrackingWheelLocalizer(HardwareMap hardwareMap) {
         super(Arrays.asList(
                 new Pose2d(0, LATERAL_DISTANCE / 2, 0), // left
                 new Pose2d(0, -LATERAL_DISTANCE / 2, 0), // right

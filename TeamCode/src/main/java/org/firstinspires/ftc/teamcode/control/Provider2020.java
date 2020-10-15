@@ -139,14 +139,17 @@ public class Provider2020 {
 
 
         // Grabbing servos from hardware map (uncomment if you are using them, comment out if you are not)
-        /*
-        armPivot = mainMap.get(Servo.class, "armPivot");
+
+        /*armPivot = mainMap.get(Servo.class, "armPivot");
         armGrab = mainMap.get(Servo.class, "armGrab");
         intakeDropL = mainMap.get(Servo.class, "intakeDropL");
         intakeDropR = mainMap.get(Servo.class, "intakeDropR");
         pullerDropL = mainMap.get(Servo.class, "pullerDropL");
         pullerDropR = mainMap.get(Servo.class, "pullerDropR");
         */
+
+
+
 
         // Grabbing sensors from hardware map (uncomment if you are using them, comment out if you are not)
         /*

@@ -72,6 +72,7 @@ public class TeleOp2020 extends LinearOpMode{
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
 
 
+
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
             // Variables
@@ -88,7 +89,7 @@ public class TeleOp2020 extends LinearOpMode{
 
                 firstToggleDriveRelative = false; // set the variable false so that it cannot toggle again
             }
-            else{
+            else if (!gamepad1.dpad_up){ // wait to set the flag back to true until the button is released
                 firstToggleDriveRelative = true; // until the button is released
             }
 
@@ -98,7 +99,7 @@ public class TeleOp2020 extends LinearOpMode{
 
                 firstToggleRunEncoders = false; // set the variable false so that it cannot toggle again
             }
-            else{
+            else if (!gamepad1.dpad_down){ // wait to set the flag back to true until the button is released
                 firstToggleRunEncoders = true; // until the button is released
             }
 
@@ -118,7 +119,7 @@ public class TeleOp2020 extends LinearOpMode{
             if(driveFieldRelative){
                 mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
             }
-            else{
+            else {
                 mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
             }
 
