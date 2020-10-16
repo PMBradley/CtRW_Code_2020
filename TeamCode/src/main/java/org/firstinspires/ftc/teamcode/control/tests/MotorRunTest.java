@@ -47,7 +47,7 @@ public class MotorRunTest extends LinearOpMode{
     private ElapsedTime runtime; // internal clock
 
     // Flags
-    private boolean reversed = true; // default
+    private boolean reversed = false; // default
     private boolean firstIncreaseSpeed = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstDecreaseSpeed = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstReverseToggle = true;
@@ -59,7 +59,7 @@ public class MotorRunTest extends LinearOpMode{
         // Call class constructors here (so that nothing major happens before init)
         runtime = new ElapsedTime();
 
-        DcMotor mainMotor = hardwareMap.get(DcMotor.class, "driveBR");
+        DcMotor mainMotor = hardwareMap.get(DcMotor.class, "driveFR");
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
@@ -100,17 +100,7 @@ public class MotorRunTest extends LinearOpMode{
             else if (!gamepad1.dpad_down){ // wait to set the flag back to true until the button is released
                 firstDecreaseSpeed = true; // until the button is released
             }
-
-            if(gamepad1.dpad_down && firstDecreaseSpeed){ // toggle driving using encoders on the press of dpad down
-                motorSpeed -= changeAmount;
-
-                motorSpeed = Math.max(motorSpeed, 0);
-
-                firstDecreaseSpeed = false; // set the variable false so that it cannot toggle again
-            }
-            else if (!gamepad1.dpad_down){ // wait to set the flag back to true until the button is released
-                firstDecreaseSpeed = true; // until the button is released
-            }
+            
 
             if(gamepad1.dpad_left && firstReverseToggle){ // toggle driving using encoders on the press of dpad down
                 reversed = !reversed;
@@ -125,16 +115,17 @@ public class MotorRunTest extends LinearOpMode{
 
             // Telemetry
             if(isRunning){ // add telemetry relating to robot drive mode
-                telemetry.addLine("Running motors at " + motorSpeed * 100.0 + " % of max speed");
-                telemetry.addLine("Press D-Pad Up to increase speed by " + changeAmount * 100);
-                telemetry.addLine("Press D-Pad Down to decrease speed by " +( -changeAmount * 100));
+                telemetry.addLine("Running motors at " + motorSpeed * 100.0 + "% of max speed");
+                telemetry.addLine("Press D-Pad Up to increase speed by " + (changeAmount * 100) + "%");
+                telemetry.addLine("Press D-Pad Down to decrease speed by " +( -changeAmount * 100) + "%");
                 telemetry.addLine("Is Reversed: " + reversed + " (press D-Pad left to toggle direction)");
 
                 if(reversed){
-                    motorSpeed *= -1;
+                    mainMotor.setPower(-motorSpeed);
                 }
-
-                mainMotor.setPower(motorSpeed);
+                else {
+                    mainMotor.setPower(motorSpeed);
+                }
             }
             else{
                 telemetry.addLine("Motor not running, hold the Right Bumper (on gamepad1) to run the motor.");
@@ -142,7 +133,7 @@ public class MotorRunTest extends LinearOpMode{
                 mainMotor.setPower(stopSpeed);
             }
 
-            
+
             telemetry.update();
         }
     }
