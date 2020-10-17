@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.RingStackHeightPipeline;
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.Vision_OpenCV_ExternalCam;
 
 /*
  * This is an example of a more complex path to really test the tuning.
@@ -40,18 +42,8 @@ public class Test_AutoOp extends LinearOpMode {
                 //.forward(10)
                 .build();
 
-   /*     Trajectory traj = drive.trajectoryBuilder(startPos)
-                .lineToLinearHeading(new Vector2d(30, 30), Math.toRadians(-90)) // line to startPose1 with linear heading
-                .build();
 
-        Trajectory traj1 = drive.trajectoryBuilder(traj.end())
-                .splineTo(startPos2)
-                .build();
-
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                .lineTo(new Vector2d(0, 0))
-                .build();
-*/
+        Vision_OpenCV_ExternalCam vision = new Vision_OpenCV_ExternalCam(hardwareMap, new RingStackHeightPipeline());
 
 
         drive.followTrajectory(traj);

@@ -36,9 +36,9 @@ public class MotorRunTest extends LinearOpMode{
     String robotName = "TestBot";
 
     // Robot Speed variables
-    double stopSpeed = 0.0; // the motor speed for stopping the robot
-    double motorSpeed = 0.70;
-    double changeAmount = 0.05;
+    private double stopSpeed = 0.0; // the motor speed for stopping the robot
+    private double motorSpeed = 0.70;
+    private double changeAmount = 0.05;
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.05; // the minimum value that can be passed into the drive function
@@ -100,7 +100,7 @@ public class MotorRunTest extends LinearOpMode{
             else if (!gamepad1.dpad_down){ // wait to set the flag back to true until the button is released
                 firstDecreaseSpeed = true; // until the button is released
             }
-            
+
 
             if(gamepad1.dpad_left && firstReverseToggle){ // toggle driving using encoders on the press of dpad down
                 reversed = !reversed;
