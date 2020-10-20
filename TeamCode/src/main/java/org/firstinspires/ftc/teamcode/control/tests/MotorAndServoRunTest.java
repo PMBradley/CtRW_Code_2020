@@ -4,12 +4,8 @@ package org.firstinspires.ftc.teamcode.control.tests;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.control.Provider2020;
-import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
-
-import java.nio.channels.DatagramChannel;
 
 
 /*
@@ -19,27 +15,32 @@ import java.nio.channels.DatagramChannel;
  */
 
 
-@TeleOp(name = "Single Motor Run Test", group = "@@T")
+@TeleOp(name = "Single Motor/Servo Run Test", group = "@@T")
 
-public class MotorRunTest extends LinearOpMode{
+public class MotorAndServoRunTest extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     String robotName = "TestBot";
 
-    // Robot Speed variables
-    private double stopSpeed = 0.0; // the motor speed for stopping the robot
-    private double motorSpeed = 0.70;
-    private double changeAmount = 0.05;
-
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.05; // the minimum value that can be passed into the drive function
+    private static final double MOTOR_STOP_SPEED = 0.0; // the motor speed for stopping the robot
+    private static final double MOTOR_CHANGE_AMOUNT = 0.1;
+    private static final double SERVO_FORWARD_POWER = 1.0;
+    private static final double SERVO_STOP_SPEED = 0.5;
+
+    // Robot Speed variables
+    private double motorSpeed = 0.70;
+    private double servoSpeed = SERVO_STOP_SPEED;
+
+
 
     // Robot Classes
     private ElapsedTime runtime; // internal clock
 
     // Flags
-    private boolean reversed = false; // default
+    private boolean motorReversed = false; // default
     private boolean firstIncreaseSpeed = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstDecreaseSpeed = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstReverseToggle = true;
@@ -54,6 +55,9 @@ public class MotorRunTest extends LinearOpMode{
         runtime = new ElapsedTime();
 
         DcMotor mainMotor = hardwareMap.get(DcMotor.class, "driveFR");
+        Servo mainServo = hardwareMap.get(Servo.class, "servoTest0");
+
+        mainServo.getController().pwmDisable(); // set the servo to continuous mode
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
@@ -69,13 +73,18 @@ public class MotorRunTest extends LinearOpMode{
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
             // Variables
-            boolean isRunning = gamepad1.right_bumper;  // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
+            boolean isMotorRunning = false;
+            servoSpeed = SERVO_STOP_SPEED;
 
 
             // Logic (figuring out what the robot should do)
 
+            if(Math.abs(gamepad1.left_stick_x) > 0.5){ // if stick be pushed far enough, go go power rangers
+                isMotorRunning = true;
+            }
+
             if(gamepad1.dpad_up && firstIncreaseSpeed){ // toggle driving realtive to field if dpad up is pressed
-                motorSpeed += changeAmount;
+                motorSpeed += MOTOR_CHANGE_AMOUNT;
 
                 motorSpeed = Math.min(motorSpeed, 1);
 
@@ -86,7 +95,7 @@ public class MotorRunTest extends LinearOpMode{
             }
 
             if(gamepad1.dpad_down && firstDecreaseSpeed){ // toggle driving using encoders on the press of dpad down
-                motorSpeed -= changeAmount;
+                motorSpeed -= MOTOR_CHANGE_AMOUNT;
 
                 motorSpeed = Math.max(motorSpeed, 0);
 
@@ -98,7 +107,7 @@ public class MotorRunTest extends LinearOpMode{
 
 
             if(gamepad1.dpad_left && firstReverseToggle){ // toggle driving using encoders on the press of dpad down
-                reversed = !reversed;
+                motorReversed = !motorReversed;
 
                 firstReverseToggle = false; // set the variable false so that it cannot toggle again
             }
@@ -107,15 +116,23 @@ public class MotorRunTest extends LinearOpMode{
             }
 
 
+            if(gamepad1.x){
+                servoSpeed += SERVO_FORWARD_POWER - SERVO_STOP_SPEED;
+            }
+            if(gamepad1.y){
+                servoSpeed -= SERVO_FORWARD_POWER - SERVO_STOP_SPEED;
+            }
+
+
 
             // Telemetry
-            if(isRunning){ // add telemetry relating to robot drive mode
+            if(isMotorRunning){ // add telemetry relating to robot drive mode
                 telemetry.addLine("Running motors at " + motorSpeed * 100.0 + "% of max speed");
-                telemetry.addLine("Press D-Pad Up to increase speed by " + (changeAmount * 100) + "%");
-                telemetry.addLine("Press D-Pad Down to decrease speed by " +( -changeAmount * 100) + "%");
-                telemetry.addLine("Is Reversed: " + reversed + " (press D-Pad left to toggle direction)");
+                telemetry.addLine("Press D-Pad Up to increase speed by " + (MOTOR_CHANGE_AMOUNT * 100) + "%");
+                telemetry.addLine("Press D-Pad Down to decrease speed by " +( -MOTOR_CHANGE_AMOUNT * 100) + "%");
+                telemetry.addLine("Is Reversed: " + motorReversed + " (press D-Pad left to toggle direction)");
 
-                if(reversed){
+                if(motorReversed){
                     mainMotor.setPower(-motorSpeed);
                 }
                 else {
@@ -123,9 +140,22 @@ public class MotorRunTest extends LinearOpMode{
                 }
             }
             else{
-                telemetry.addLine("Motor not running, hold the Right Bumper (on gamepad1) to run the motor.");
+                telemetry.addLine("Motor not running, push up on the left stick (on gamepad1) to run the motor.");
 
-                mainMotor.setPower(stopSpeed);
+                mainMotor.setPower(MOTOR_STOP_SPEED);
+            }
+
+            
+            mainServo.setPosition(servoSpeed);
+
+            if(servoSpeed < SERVO_STOP_SPEED){ // if the servo be runnin one way
+                telemetry.addLine("The servo be movin one direction!");
+            }
+            else if (servoSpeed > SERVO_STOP_SPEED){
+                telemetry.addLine("The servo be movin the other direction!");
+            }
+            else {
+                telemetry.addLine("Press X or Y to move the servo in different directions");
             }
 
 
@@ -135,5 +165,7 @@ public class MotorRunTest extends LinearOpMode{
 
 
     /* PUT ALL FUNCTIONS HERE */
-
+    double negateServoPower(double inputPower){
+        return (  ( -1*(inputPower - 0.5) ) + 0.5);
+    }
 }

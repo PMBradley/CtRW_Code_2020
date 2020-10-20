@@ -62,7 +62,7 @@ public class RingStackVisionTest extends LinearOpMode {
 
             telemetry.update();
 
-            
+
             sleep(100);
         }
     }
