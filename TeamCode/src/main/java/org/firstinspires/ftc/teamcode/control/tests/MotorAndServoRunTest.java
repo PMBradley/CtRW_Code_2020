@@ -56,7 +56,8 @@ public class MotorAndServoRunTest extends LinearOpMode{
 
         DcMotor mainMotor = hardwareMap.get(DcMotor.class, "driveFR");
         Servo mainServo = hardwareMap.get(Servo.class, "servoTest0");
-
+        
+        mainMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         mainServo.getController().pwmDisable(); // set the servo to continuous mode
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
