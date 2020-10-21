@@ -405,7 +405,11 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         return allComplete; // return
     }
 
-
+    public void endCurrentWait(){ // if the drive is currently performing a wait task, it will stop waiting
+        waitEndTime = runtime.milliseconds(); // set the target end time to the current time, meaning that when checked the wait time will be satisfied
+    }    
+    
+    
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
