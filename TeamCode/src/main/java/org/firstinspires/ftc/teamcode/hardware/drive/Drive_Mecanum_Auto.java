@@ -371,8 +371,10 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
             TrajectoryIntDuoHolder currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
 
             if(currentTask.getTraj() != null){ // if there is a trajector to follow, follow dat trajectory
-                followTrajectoryAsync( currentTask.getTraj() ); // do what we came here to do any follow that trajectory
-                update(); // update any important information, including if we are done following or not
+                if(firstTaskRun){ // only on the first run of the task
+                    followTrajectoryAsync( currentTask.getTraj() ); // set the follower to follow the current task trajectory
+                }
+                update(); // actually do the following of the trajectory, also update any important information, including if we are done following or not
 
                 taskComplete = !isFollowing(); // if isFollowing returns true that means that we are still going and therefore taskComplete will be false, and visa versa
             }
