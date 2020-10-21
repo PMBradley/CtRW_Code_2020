@@ -29,9 +29,11 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
+import org.firstinspires.ftc.teamcode.util.TrajectoryIntDuoHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,6 +84,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
     private int TELEMETRY_TRANSMISSION_INTERVAL = 25; // how often telemetry is sent information (if information to send as per .update()) - in milliseconds
 
+    private ElapsedTime localRuntime;
 
     // Main costructor
     public Drive_Mecanum_Auto(HardwareMap hardwareMap, boolean usingOdometry) { // only set usingOdometry to true if using odometry pods and they are hooked up properly
@@ -109,7 +112,10 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         setupDrive(hardwareMap, false); // setup the drive, including RoadRunner - if not given whether or not we are using odometry, pass in that we are not
     }
 
+
     private void setupDrive(HardwareMap hardwareMap, boolean usingOdometry){
+        localRuntime.reset();
+
         turnController = new PIDFController(HEADING_PID);
         turnController.setInputBounds(0, 2 * Math.PI);
 
@@ -168,6 +174,8 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         }
     }
 
+
+
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
         return new TrajectoryBuilder(startPose, constraints);
     }
@@ -179,6 +187,8 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
         return new TrajectoryBuilder(startPose, startHeading, constraints);
     }
+
+
 
     public void turnAsync(double angle) {
         double heading = getPoseEstimate().getHeading();
@@ -197,6 +207,8 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         turnAsync(angle);
         waitForIdle();
     }
+
+
 
     public void followTrajectoryAsync(Trajectory trajectory) {
         follower.followTrajectory(trajectory);
@@ -305,6 +317,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     public boolean isBusy() {
         return mode != Mode.IDLE;
     }
+    public boolean isFollowing(){ return mode == Mode.FOLLOW_TRAJECTORY; }
 
     public void setMode(DcMotor.RunMode runMode) {
         for (DcMotorEx motor : motors) {
@@ -330,6 +343,66 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
             ));
         }
     }
+
+
+    // State machine controlled asynchronous follow
+    private ArrayList<TrajectoryIntDuoHolder> tasks; // an arraylist that holds the list of tasks for
+    private int taskIndex = 0; // a number that keeps track of where in the task list we are
+
+    private boolean firstTaskRun = true; // first run flag for doing tasks, ensure proper behavior
+
+    private double waitEndTime; // the time that the program designates as the time to go ahead and move to the next task (in milliseconds)
+
+    public void setTasks(ArrayList<TrajectoryIntDuoHolder> newTasks){
+        tasks = newTasks; // set the tasks like promest
+        taskIndex = 0; // reset the task index to ensure that everything goes well with the new job
+    }
+    public ArrayList<TrajectoryIntDuoHolder> getTasks(){ return tasks; } // gets the whole list of tasks
+    public TrajectoryIntDuoHolder getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
+    public TrajectoryIntDuoHolder getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
+    public int getTaskIndex(){ return taskIndex; } // get what the current task is
+
+    public boolean doTasksAsync(){ // the main state machine function that runs through each task - when complete it returns true
+        boolean allComplete = false;
+
+        if( taskIndex < tasks.size() ){ // if still within the bounds of the task list
+            boolean taskComplete = false; // indicates if the current task is complete yet (default is false)
+
+            TrajectoryIntDuoHolder currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
+
+            if(currentTask.getTraj() != null){ // if there is a trajector to follow, follow dat trajectory
+                followTrajectoryAsync( currentTask.getTraj() ); // do what we came here to do any follow that trajectory
+                update(); // update any important information, including if we are done following or not
+
+                taskComplete = !isFollowing(); // if isFollowing returns true that means that we are still going and therefore taskComplete will be false, and visa versa
+            }
+            else if (currentTask.getNum() > 0){ // if there is no trajectory to follow but there is a time, wait
+                if(firstTaskRun){
+                    waitEndTime = localRuntime.milliseconds() + currentTask.getNum(); // set the target time to the current time plus the input number of milliseconds
+                }
+
+                taskComplete = (localRuntime.milliseconds() >= waitEndTime); // if runtime is greater than or equal to the set waitEndTime, taskComplete is set to true, otherwise it is set to false
+            }
+            else {
+                taskComplete = true; // else if there are neither, we just go to the next one and pretend this one didn't happen
+            }
+
+            if(firstTaskRun){ // if it is the end of the first loop run for the new task
+                firstTaskRun = false; // set the flag to no longer show it is the first run of this task
+            }
+            if(taskComplete){ // if the current task is complete
+                taskIndex++; // go to the next task
+
+                firstTaskRun = true;
+            }
+        } // end of task doing if
+        else { // if we are complete, as the task index has exeded the number of tasks we have
+            allComplete = true;
+        }
+
+        return allComplete; // return
+    }
+
 
     @NonNull
     @Override

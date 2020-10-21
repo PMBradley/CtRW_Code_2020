@@ -145,7 +145,7 @@ public class MotorAndServoRunTest extends LinearOpMode{
                 mainMotor.setPower(MOTOR_STOP_SPEED);
             }
 
-            
+
             mainServo.setPosition(servoSpeed);
 
             if(servoSpeed < SERVO_STOP_SPEED){ // if the servo be runnin one way

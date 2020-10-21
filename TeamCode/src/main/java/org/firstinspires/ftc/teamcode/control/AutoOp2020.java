@@ -7,6 +7,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
+import org.firstinspires.ftc.teamcode.util.DuoHolder;
+import org.firstinspires.ftc.teamcode.util.TrajectoryIntDuoHolder;
+
+import java.util.ArrayList;
 
 /*
  * This is an example of a more complex path to really test the tuning.
@@ -14,59 +18,53 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 @Autonomous(name = "Test_AutoOp", group = "@@@")
 
 public class AutoOp2020 extends LinearOpMode {
-    // TODO: Create an array that holds all drive points
+
+    Drive_Mecanum_Auto drive;
+    ArrayList<TrajectoryIntDuoHolder> tasks; // not just a trajectory array list because we want to be able to pause in the state machine for an amount of time
+
+    Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
+
+
 
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Drive_Mecanum_Auto drive = new Drive_Mecanum_Auto(hardwareMap, true);
-        Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
-        Pose2d startPos1 = new Pose2d(30, 30,  Math.toRadians(-90));
-        Pose2d startPos2 = new Pose2d(50, 10,  Math.toRadians(0));
-        Pose2d startPos3 = new Pose2d(0, 0, Math.toRadians(180));
+        drive = new Drive_Mecanum_Auto(hardwareMap, true);
+
+        setupTasks(); // add the list of task objects to the task list
+        drive.setTasks(tasks); // then set the drive to use those tasks when required
 
         waitForStart();
 
-        if (isStopRequested()) return;
+        while (opModeIsActive() && !isStopRequested()){ // while it is ok to keep running in a loop, do so
 
-
-        Trajectory traj = drive.trajectoryBuilder(startPos)
-                .lineToLinearHeading(new Pose2d(30, 30, Math.toRadians(-90)))
-                .build();
-
-        Trajectory traj1 = drive.trajectoryBuilder(traj.end())
-                .splineTo(new Vector2d(50, 10), Math.toRadians(0))
-                .build();
-
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end(), true)
-                .splineTo(new Vector2d(0, 0), 0)
-                //.forward(10)
-                .build();
-
-   /*     Trajectory traj = drive.trajectoryBuilder(startPos)
-                .lineToLinearHeading(new Vector2d(30, 30), Math.toRadians(-90)) // line to startPose1 with linear heading
-                .build();
-
-        Trajectory traj1 = drive.trajectoryBuilder(traj.end())
-                .splineTo(startPos2)
-                .build();
-
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                .lineTo(new Vector2d(0, 0))
-                .build();
-*/
-
-
-        drive.followTrajectory(traj);
-
-        sleep(1000);
-
-        drive.followTrajectory(traj1);
-
-        sleep(1000);
-
-        drive.followTrajectory(traj2);
+            drive.doTasksAsync(); // use the built in drive state machine that decides if/when each task is over, and follows them in order appropriately
+        }
     }
 
-    // TODO: Create a state machine function that follows the trajectories asynchronously
+
+    void setupTasks(){
+        tasks.add( new TrajectoryIntDuoHolder(
+                drive.trajectoryBuilder( startPos )
+                .lineToLinearHeading(new Pose2d(30, 30, Math.toRadians(-90)))
+                .build()
+        ));
+
+        tasks.add( new TrajectoryIntDuoHolder(
+                4000 // wait for 4 seconds
+        ));
+
+        tasks.add( new TrajectoryIntDuoHolder (
+                drive.trajectoryBuilder( tasks.get(0).getTraj().end() )
+                .splineTo(new Vector2d(50, 10), Math.toRadians(0))
+                .build()
+        ));
+
+        tasks.add( new TrajectoryIntDuoHolder(
+                drive.trajectoryBuilder( tasks.get(2).getTraj().end(), 180 )
+                .splineTo(new Vector2d(0, 0), 0)
+                .build()
+        ));
+    }
+
 }
