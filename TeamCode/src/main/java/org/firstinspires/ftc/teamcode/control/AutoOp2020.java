@@ -59,17 +59,30 @@ public class AutoOp2020 extends LinearOpMode {
     void setupTestDriveTasks(){
         driveTasks.add( new DriveFollowerTask(
                 drive.trajectoryBuilder( testStartPos )
-                        .lineTo(new Vector2d(-24, -12))
+                        .lineTo(new Vector2d(36, 12))
                         .build()
         ));
 
         driveTasks.add( new DriveFollowerTask(
-                4000
+                0000
         ));
 
         driveTasks.add( new DriveFollowerTask(
                 drive.trajectoryBuilder(driveTasks.get(0).getTraj().end(), true)
-                        .splineTo(new Vector2d(0, 0), Math.toRadians(0))
+                        .splineTo(new Vector2d(0, 0), Math.toRadians(180))
+                        .build()
+        ));
+
+        driveTasks.add( new DriveFollowerTask(
+                drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
+                        .lineToLinearHeading( new Pose2d(36, 12, Math.toRadians(-90)))
+                        .build()
+        ));
+
+        driveTasks.add( new DriveFollowerTask(
+                drive.trajectoryBuilder(driveTasks.get(0).getTraj().end(), true)
+                        .splineTo(new Vector2d(0, 0), Math.toRadians(180))
+                        //.back(24)
                         .build()
         ));
         /*

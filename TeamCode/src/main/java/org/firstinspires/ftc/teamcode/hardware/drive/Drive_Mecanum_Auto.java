@@ -166,8 +166,8 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // if desired, and told so via the parameter useOdometry, use setLocalizer() to change the localization method
         if (usingOdometry){
@@ -383,7 +383,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
                 if(firstTaskRun){
                     followTrajectoryAsync( currentTask.getTraj() ); // do what we came here to do any follow that trajectory - at least set the trajectory
                 }
-                
+
                 update(); // update any important information, including if we are done following or not, and actually maintaining the following of the trajectory
 
                 taskComplete = !isFollowing(); // if isFollowing returns true that means that we are still going and therefore taskComplete will be false, and visa versa
