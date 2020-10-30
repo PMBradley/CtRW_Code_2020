@@ -93,7 +93,7 @@ public class Drive_Mecanum_Tele {
 
 
         // Normalize the powers before we pass them into the motors (so that no power is outside of the range when passed in, preserving the intended slope)
-        double largest_power = Math.max( Math.max(powerFL, powerFR), Math.max(powerBL, powerBR) ); // first find the largest of all the powers (get the max of the first two, max of the second two, then get the max of the two maxes)
+        double largest_power = Math.max( Math.max( Math.abs(powerFL), Math.abs(powerFR)), Math.max(Math.abs(powerBL), Math.abs(powerBR)) ); // first find the largest of all the powers (get the max of the first two, max of the second two, then get the max of the two maxes)
 
         if(largest_power > 1.0){ // if the largest power value is greater than 1
             powerFL /= largest_power; // divide each power by the largest one

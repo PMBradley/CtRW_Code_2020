@@ -39,8 +39,8 @@ public class DriveConstants {
      * angular distances although most angular parameters are wrapped in Math.toRadians() for
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
-    public static double WHEEL_RADIUS = 1.3; // in
-    public static double GEAR_RATIO = 2; // output (wheel) speed / input (motor) speed
+    public static double WHEEL_RADIUS = 2.0; // in
+    public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
     public static double TRACK_WIDTH = 15.5; // in
 
     /*
@@ -62,7 +62,7 @@ public class DriveConstants {
      * forces acceleration-limited profiling).
      */
     public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(
-            30.0, 30.0, 0.0,
+            30.0, 20.0, 0.0,
             Math.toRadians(180.0), Math.toRadians(180.0), 0.0
     );
 

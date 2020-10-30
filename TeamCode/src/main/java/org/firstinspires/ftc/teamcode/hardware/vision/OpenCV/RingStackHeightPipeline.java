@@ -72,7 +72,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * Working variables
      */
-    Mat region1_Cb, region2_Cb, region3_Cb;
+    Mat region1_Cb, region2_Cb;
     Mat YCrCb = new Mat();
     Mat Cb = new Mat();
     int avg1, avg2;

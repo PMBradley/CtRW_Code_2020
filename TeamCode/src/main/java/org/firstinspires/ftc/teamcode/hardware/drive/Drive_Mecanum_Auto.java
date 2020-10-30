@@ -33,8 +33,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
-import org.firstinspires.ftc.teamcode.util.TrajectoryIntDuoHolder;
+import org.firstinspires.ftc.teamcode.util.FSM.DriveFollowerTask;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,7 +85,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
     private int TELEMETRY_TRANSMISSION_INTERVAL = 25; // how often telemetry is sent information (if information to send as per .update()) - in milliseconds
 
-    private ElapsedTime localRuntime;
+    private ElapsedTime localRuntime = new ElapsedTime();
 
     // Main costructor
     public Drive_Mecanum_Auto(HardwareMap hardwareMap, boolean usingOdometry) { // only set usingOdometry to true if using odometry pods and they are hooked up properly
@@ -346,20 +347,28 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
 
     // State machine controlled asynchronous follow
-    private ArrayList<TrajectoryIntDuoHolder> tasks; // an arraylist that holds the list of tasks for
+    private ArrayList<DriveFollowerTask> tasks = new ArrayList<DriveFollowerTask>(); // an arraylist that holds the list of tasks for the drive
     private int taskIndex = 0; // a number that keeps track of where in the task list we are
 
     private boolean firstTaskRun = true; // first run flag for doing tasks, ensure proper behavior
 
     private double waitEndTime; // the time that the program designates as the time to go ahead and move to the next task (in milliseconds)
 
-    public void setTasks(ArrayList<TrajectoryIntDuoHolder> newTasks){
+    public void setTasks(ArrayList<DriveFollowerTask> newTasks){ // totally resets the task list to the input
         tasks = newTasks; // set the tasks like promest
         taskIndex = 0; // reset the task index to ensure that everything goes well with the new job
     }
-    public ArrayList<TrajectoryIntDuoHolder> getTasks(){ return tasks; } // gets the whole list of tasks
-    public TrajectoryIntDuoHolder getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
-    public TrajectoryIntDuoHolder getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
+    public void addTasks(ArrayList<DriveFollowerTask> newTasks){ // adds an input list of DriveTasks to the current list
+        for (DriveFollowerTask newTask : newTasks){ // loop through each input
+            tasks.add(newTask); // and add it to the list
+        }
+    }
+    public void addTask(DriveFollowerTask newTask){ // adds a single task to the task list
+        tasks.add(newTask);
+    }
+    public ArrayList<DriveFollowerTask> getTasks(){ return tasks; } // gets the whole list of tasks
+    public DriveFollowerTask getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
+    public DriveFollowerTask getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
     public int getTaskIndex(){ return taskIndex; } // get what the current task is
 
     public boolean doTasksAsync(){ // the main state machine function that runs through each task - when complete it returns true
@@ -368,11 +377,14 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         if( taskIndex < tasks.size() ){ // if still within the bounds of the task list
             boolean taskComplete = false; // indicates if the current task is complete yet (default is false)
 
-            TrajectoryIntDuoHolder currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
+            DriveFollowerTask currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
 
             if(currentTask.getTraj() != null){ // if there is a trajector to follow, follow dat trajectory
-                followTrajectoryAsync( currentTask.getTraj() ); // do what we came here to do any follow that trajectory
-                update(); // update any important information, including if we are done following or not
+                if(firstTaskRun){
+                    followTrajectoryAsync( currentTask.getTraj() ); // do what we came here to do any follow that trajectory - at least set the trajectory
+                }
+                
+                update(); // update any important information, including if we are done following or not, and actually maintaining the following of the trajectory
 
                 taskComplete = !isFollowing(); // if isFollowing returns true that means that we are still going and therefore taskComplete will be false, and visa versa
             }
