@@ -28,7 +28,7 @@ public class MotorAndServoRunTest extends LinearOpMode{
     private static final double MOTOR_STOP_SPEED = 0.0; // the motor speed for stopping the robot
     private static final double MOTOR_CHANGE_AMOUNT = 0.1;
     private static final double SERVO_FORWARD_POS = 1.0;
-    private static final double SERVO_STOP_POS = 0.5;
+    private static final double SERVO_STOP_POS = 0.75;
 
     // Robot Speed variables
     private double motorSpeed = 1.00;
@@ -59,7 +59,8 @@ public class MotorAndServoRunTest extends LinearOpMode{
         Servo mainServo = hardwareMap.get(Servo.class, "servoTest0");
         
         mainMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        mainServo.getController().pwmEnable(); // set the servo to continuous mode
+        mainServo.getController().pwmEnable(); // set the servo to limited range mode
+
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
