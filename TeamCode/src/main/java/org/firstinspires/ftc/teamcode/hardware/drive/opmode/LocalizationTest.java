@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 import org.firstinspires.ftc.teamcode.hardware.drive.samples.SampleMecanumDrive;
 
 /**
@@ -27,7 +28,7 @@ public class LocalizationTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        Drive_Mecanum_Auto drive = new Drive_Mecanum_Auto(hardwareMap, true);
 
         waitForStart();
 
@@ -60,7 +61,7 @@ public class LocalizationTest extends LinearOpMode {
             Pose2d poseEstimate = drive.getPoseEstimate();
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("heading", Math.toDegrees(poseEstimate.getHeading()));
             telemetry.update();
         }
     }

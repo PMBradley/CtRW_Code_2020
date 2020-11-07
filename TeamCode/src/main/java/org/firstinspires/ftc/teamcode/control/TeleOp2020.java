@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
+import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
 
 
 /*
@@ -33,8 +34,8 @@ public class TeleOp2020 extends LinearOpMode{
     String robotName = "Robot 2020";
 
     // Robot Speed variables
-    double turnSpeed = 0.5; // Speed multiplier for turning (1 being 100% of power going in)
-    double translateSpeed = 0.5; // Speed multiplier for translation (1 being 100% of power going in)
+    double turnSpeed = 0.8; // Speed multiplier for turning (1 being 100% of power going in)
+    double translateSpeed = 0.4; // Speed multiplier for translation (1 being 100% of power going in)
     double boostSpeed = 1.0; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0.0; // the motor speed for stopping the robot
 
@@ -45,6 +46,7 @@ public class TeleOp2020 extends LinearOpMode{
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
     Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
+    StandardTrackingWheelLocalizer localizer; // the odometry based localizer - uses dead wheels to determine (x, y, r) position on the field
 
     // Flags
     private boolean driveFieldRelative = true; // default
@@ -59,6 +61,7 @@ public class TeleOp2020 extends LinearOpMode{
         robot = new Provider2020(hardwareMap);
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed); // pass in the drive motors and the speed variables to setup properly
+        localizer = new StandardTrackingWheelLocalizer(hardwareMap);
 
 
         robot.setEncoderActive(false); // start the game without running encoders
@@ -75,11 +78,15 @@ public class TeleOp2020 extends LinearOpMode{
 
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
+            if(localizer != null){ // if the localier exists
+                localizer.update(); // update our current position
+            }
+
             // Variables
             boolean isBoosting = gamepad1.right_bumper;  // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
-            double xTranslatePower = gamepad1.left_stick_x; //* Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
-            double yTranslatePower = -gamepad1.left_stick_y; // * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
-            double rotatePower = gamepad1.right_stick_x; // * Math.abs(gamepad1.right_stick_x);
+            double xTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
+            double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double rotatePower = gamepad1.right_stick_x;
 
 
             // Logic (figuring out what the robot should do)
@@ -145,6 +152,10 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
             telemetry.addData("Boosting: ", isBoosting);
+
+            if(localizer != null){ // if we have a localizer that exists, get the position estimate from it
+                telemetry.addData("Field Position", localizer.getPoseEstimate());
+            }
 
             telemetry.update();
         }

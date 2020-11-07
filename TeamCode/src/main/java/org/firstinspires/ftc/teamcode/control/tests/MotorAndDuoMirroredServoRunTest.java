@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.control.tests;
 
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 
 /*
@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 
-@TeleOp(name = "Single Motor/Servo Run Test", group = "@@T")
+@TeleOp(name = "Single Motor + Duo Mirrored Servo Run Test", group = "@@T")
 
-public class MotorAndServoRunTest extends LinearOpMode{
+public class MotorAndDuoMirroredServoRunTest extends LinearOpMode {
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
@@ -27,12 +27,12 @@ public class MotorAndServoRunTest extends LinearOpMode{
     static final double DEAD_ZONE_RADIUS = 0.05; // the minimum value that can be passed into the drive function
     private static final double MOTOR_STOP_SPEED = 0.0; // the motor speed for stopping the robot
     private static final double MOTOR_CHANGE_AMOUNT = 0.1;
-    private static final double SERVO_FORWARD_POS = 1.0;
-    private static final double SERVO_STOP_POS = 0.5;
+    private static final double SERVO_FORWARD_POWER = 1.0;
+    private static final double SERVO_STOP_SPEED = 0.5;
 
     // Robot Speed variables
-    private double motorSpeed = 1.00;
-    private double servoSpeed = SERVO_STOP_POS;
+    private double motorSpeed = 0.70;
+    private double servoSpeed = SERVO_STOP_SPEED;
 
 
 
@@ -44,9 +44,8 @@ public class MotorAndServoRunTest extends LinearOpMode{
     private boolean firstIncreaseSpeed = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstDecreaseSpeed = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstReverseToggle = true;
-    private boolean firstRunToggle = true;
-    private boolean firstServoX = true;
-    private boolean firstServoY;
+
+
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -57,9 +56,13 @@ public class MotorAndServoRunTest extends LinearOpMode{
 
         DcMotor mainMotor = hardwareMap.get(DcMotor.class, "driveFR");
         Servo mainServo = hardwareMap.get(Servo.class, "servoTest0");
-        
-        mainMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        mainServo.getController().pwmEnable(); // set the servo to continuous mode
+        Servo secondServo = hardwareMap.get(Servo.class, "servoTest1");
+
+        mainMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // run using encoder  mode for the motor
+        mainServo.getController().pwmDisable(); // set the servo to continuous mode
+        secondServo.getController().pwmDisable(); // set the servo to continuous mode
+
+        secondServo.setDirection(Servo.Direction.REVERSE); // reverse the second servo
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
@@ -70,26 +73,18 @@ public class MotorAndServoRunTest extends LinearOpMode{
 
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
 
-        boolean isMotorRunning = false;
 
 
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
             // Variables
+            boolean isMotorRunning = false;
 
 
             // Logic (figuring out what the robot should do)
 
             if(Math.abs(gamepad1.left_stick_x) > 0.5){ // if stick be pushed far enough, go go power rangers
                 isMotorRunning = true;
-            }
-            if(gamepad1.right_bumper && firstRunToggle){ // toggle driving realtive to field if dpad up is pressed
-                isMotorRunning = !isMotorRunning;
-
-                firstIncreaseSpeed = false; // set the variable false so that it cannot toggle again
-            }
-            else if (!gamepad1.right_bumper){ // wait to set the flag back to true until the button is released
-                firstIncreaseSpeed = true; // until the button is released
             }
 
             if(gamepad1.dpad_up && firstIncreaseSpeed){ // toggle driving realtive to field if dpad up is pressed
@@ -126,21 +121,19 @@ public class MotorAndServoRunTest extends LinearOpMode{
 
 
             if(gamepad1.x){
-                servoSpeed = SERVO_FORWARD_POS;
+                servoSpeed = SERVO_FORWARD_POWER;
             }
             if(gamepad1.y){
-                servoSpeed = negateServoPower(SERVO_FORWARD_POS);
+                servoSpeed = negateServoPower(SERVO_FORWARD_POWER);
             }
-            else {
-                servoSpeed = SERVO_STOP_POS;
-            }
+
 
 
             // Telemetry
             if(isMotorRunning){ // add telemetry relating to robot drive mode
                 telemetry.addLine("Running motors at " + motorSpeed * 100.0 + "% of max speed");
                 telemetry.addLine("Press D-Pad Up to increase speed by " + (MOTOR_CHANGE_AMOUNT * 100) + "%");
-                telemetry.addLine("Press D-Pad Down to decrease speed by " +( -MOTOR_CHANGE_AMOUNT * 100) + "%");
+                telemetry.addLine("Press D-Pad Down to decrease speed by " + (-MOTOR_CHANGE_AMOUNT * 100) + "%");
                 telemetry.addLine("Is Reversed: " + motorReversed + " (press D-Pad left to toggle direction)");
 
                 if(motorReversed){
@@ -158,15 +151,16 @@ public class MotorAndServoRunTest extends LinearOpMode{
 
 
             mainServo.setPosition(servoSpeed);
+            secondServo.setPosition(servoSpeed);
 
-            if(servoSpeed < SERVO_STOP_POS){ // if the servo be runnin one way
-                telemetry.addLine("The servo be movin one direction!");
+            if(servoSpeed < SERVO_STOP_SPEED){ // if the servo be runnin one way
+                telemetry.addLine("The servos be movin one direction!");
             }
-            else if (servoSpeed > SERVO_STOP_POS){
-                telemetry.addLine("The servo be movin the other direction!");
+            else if (servoSpeed > SERVO_STOP_SPEED){
+                telemetry.addLine("The servos be movin the other direction!");
             }
             else {
-                telemetry.addLine("Press X or Y to move the servo in different directions");
+                telemetry.addLine("Press X or Y to move the servos in different directions");
             }
 
 

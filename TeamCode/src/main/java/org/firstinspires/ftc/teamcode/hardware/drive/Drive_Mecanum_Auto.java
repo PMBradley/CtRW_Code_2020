@@ -133,10 +133,10 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+     /*   imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+        imu.initialize(parameters);*/
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points upward (normal to the floor) using a command like the following:
         // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
@@ -358,6 +358,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     private boolean firstTaskRun = true; // first run flag for doing tasks, ensure proper behavior
 
     private double waitEndTime; // the time that the program designates as the time to go ahead and move to the next task (in milliseconds)
+    private double followStartTime;
 
     public void setTasks(ArrayList<DriveFollowerTask> newTasks){ // totally resets the task list to the input
         tasks = newTasks; // set the tasks like promest
@@ -373,8 +374,15 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     }
     public ArrayList<DriveFollowerTask> getTasks(){ return tasks; } // gets the whole list of tasks
     public DriveFollowerTask getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
-    public DriveFollowerTask getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
+    public DriveFollowerTask getCurrentTask(){ if(taskIndex < tasks.size()) return tasks.get(taskIndex); return new DriveFollowerTask();} // gets the current task (not the variable, but what it is according to the index)
     public int getTaskIndex(){ return taskIndex; } // get what the current task is
+    public double getRemainingWaitMSecs(){ // returns the amount of time remaining for the current task, in milliseconds
+        return (waitEndTime - localRuntime.milliseconds()); // so return the difference between the wait end time and the current time
+    }
+    public double getCurrentTrajElapsedTime(){return localRuntime.milliseconds() -  followStartTime;} // return the total time run for the current trajectory
+    public boolean currentTaskHasTrajectory(){ // returns true if the current task has a trajectory in it
+        return (getCurrentTask().getTraj() != null); // meaning the current task's trajectory value is not null
+    }
 
     public boolean doTasksAsync(){ // the main state machine function that runs through each task - when complete it returns true
         boolean allComplete = false;
@@ -387,6 +395,8 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
             if(currentTask.getTraj() != null){ // if there is a trajector to follow, follow dat trajectory
                 if(firstTaskRun){
                     followTrajectoryAsync( currentTask.getTraj() ); // do what we came here to do any follow that trajectory - at least set the trajectory
+
+                    followStartTime = localRuntime.milliseconds(); // also update the start time for the current trajectory
                 }
 
                 update(); // update any important information, including if we are done following or not, and actually maintaining the following of the trajectory
@@ -397,6 +407,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
                 if(firstTaskRun){
                     waitEndTime = localRuntime.milliseconds() + currentTask.getNum(); // set the target time to the current time plus the input number of milliseconds
                 }
+
 
                 taskComplete = (localRuntime.milliseconds() >= waitEndTime); // if runtime is greater than or equal to the set waitEndTime, taskComplete is set to true, otherwise it is set to false
             }
@@ -447,8 +458,14 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         rightFront.setPower(v3);
     }
 
-    @Override
+   /* @Override
     public double getRawExternalHeading() {
         return imu.getAngularOrientation().firstAngle;
-    }
+    }*/
+   @Override
+   public double getRawExternalHeading() {
+       return 0;
+   }
+
+
 }

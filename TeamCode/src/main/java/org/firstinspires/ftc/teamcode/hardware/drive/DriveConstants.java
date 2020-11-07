@@ -29,7 +29,7 @@ public class DriveConstants {
      * Set the first flag appropriately. If using the built-in motor velocity PID, update
      * MOTOR_VELO_PID with the tuned coefficients from DriveVelocityPIDTuner.
      */
-    public static final boolean RUN_USING_ENCODER = true;
+    public static final boolean RUN_USING_ENCODER = false;
     public static PIDFCoefficients MOTOR_VELO_PID =  new PIDFCoefficients(11.05, 0, 0.42295, 10.61); // old f code: getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV)
 
     /*
@@ -42,7 +42,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.93; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 15.76; // in
+    public static double TRACK_WIDTH = 14.4; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -62,8 +62,8 @@ public class DriveConstants {
      * acceleration values are required, and the jerk values are optional (setting a jerk of 0.0
      * forces acceleration-limited profiling).
      */
-    public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(
-            35.0, 20.0, 0.0,
+    public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints( // og was 35, 20, 0
+            30.0, 15.0, 0.0,
             Math.toRadians(180.0), Math.toRadians(180.0), 0.0
     );
 
