@@ -10,7 +10,6 @@ public class Intake_Ring_Drop {
     private Servo lockServo;
 
     private static final double INTAKE_RUN_SPEED = 1.0;
-
     private static final double UNLOCK_POSITION = 1.0;
 
 

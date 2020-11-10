@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.hardware.wobble;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -36,9 +37,9 @@ public class Arm_Wobble_Grabber {
     private static final double MARGIN_OF_ERROR = 0.5; // margin of error for position setting
 
 
-    private double lastError = 0;
-    private double lastRuntime = 0;
-    private double integral = 0;
+    private double lastError = 0.0;
+    private double lastRuntime = 0.0;
+    private double integral = 0.0;
 
 
 
@@ -66,42 +67,49 @@ public class Arm_Wobble_Grabber {
     }
 
     public boolean setArmPosition( double targetPosition ){
+        double position = encoderTicsToDegrees( armMotor.getCurrentPosition() ); // set our current position to be the encoder position in tics converted to degrees
 
-        double position = 0;
-        position = encoderTicsToDegrees( armMotor.getCurrentPosition() );
+        double error = targetPosition - position; // the error is the difference between where we want to be and where we are right now
+        double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
 
-        double error = targetPosition - position;
-        double timeDifference = localRuntime.milliseconds() - lastRuntime;
-        integral += error * timeDifference;
-
-        double motorPower = (Kp * error) + (Ki * integral) + (Kd * ((error - lastError)/timeDifference) );
-        armMotor.setPower(motorPower);
-
-
-        lastError = error;
-        lastRuntime = localRuntime.milliseconds();
+        integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
+                                            // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
+        double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
+        
+        double motorPower = (Kp * error) + (Ki * integral) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
+        armMotor.setPower(motorPower); // the actually set the power
 
 
-        return withinMarginOfError( position, targetPosition );
+        lastError = error; // update the last error to be the current error
+        lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
+
+        return withinMarginOfError( targetPosition, position ); // returns true if close enough to the target to be within the margin of error
     }
-    public boolean goToIdlePos(){ // sets the arm to go to the idle position, returns true when there (within the margin of error
+    public boolean goToIdlePos(){ // sets the arm to go to the idle position, returns true when there (within the margin of error)
         return setArmPosition(IDLE_POSITION);
     }
-    public boolean goToUpPos(){ // sets the arm to go to the up position, returns true when there (within the margin of error
+    public boolean goToUpPos(){ // sets the arm to go to the up position, returns true when there (within the margin of error)
         return setArmPosition(UP_POSITION);
     }
-    public boolean goToGrabPos(){ // sets the arm to go to the grab position, returns true when there (within the margin of error
+    public boolean goToGrabPos(){ // sets the arm to go to the grab position, returns true when there (within the margin of error)
         return setArmPosition(GRAB_POSITION);
     }
 
-    private static double encoderTicsToDegrees(double tics){ // converts tics of the encoder to degrees of arm rotation (used for getting position from the arm)
-        return tics * ENCODER_TICS_PER_DEGREE;// aka tics * 360 / encoder tics per revolution
+
+    public double getArmPosition(){ // returns the current arm position in degrees
+        return encoderTicsToDegrees( armMotor.getCurrentPosition() ); // get the current encoder tics position, then convert that to degrees
+    }
+    public double getArmError(){ // returns the last known error to the target position
+        return lastError;
     }
 
-    private static boolean withinMarginOfError(double position, double targetPosition) { // returns true if the current position is within the margin of error of the target position
+
+    private static double encoderTicsToDegrees( double tics ){ // converts tics of the encoder to degrees of arm rotation (used for getting position from the arm)
+        return tics * ENCODER_TICS_PER_DEGREE;// aka tics * (360 / encoder tics per revolution)
+    }
+    private static boolean withinMarginOfError( double targetPosition, double position ) { // returns true if the current position is within the margin of error of the target position
         return (Math.abs(targetPosition - position) < MARGIN_OF_ERROR);
     }
-
 
 
 }
