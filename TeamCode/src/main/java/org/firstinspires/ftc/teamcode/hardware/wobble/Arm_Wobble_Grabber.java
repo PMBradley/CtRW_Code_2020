@@ -10,9 +10,9 @@ public class Arm_Wobble_Grabber {
     Servo leftServo;
     Servo rightServo;
 
-    private static final double UP_POSITION = 0.0;
-    private static final double IDLE_POSITION = 0.0;
-    private static final double GRAB_POSITION = 0.0;
+    private static final double INTAKE_POWER = 1.0;
+    private static final double OUTTAKE_POWER = 0.0;
+    private static final double STOP_POWER = 0.5;
 
 
     Arm_Wobble_Grabber( DcMotor armMotor, Servo leftServo, Servo rightServo ){
@@ -23,6 +23,19 @@ public class Arm_Wobble_Grabber {
 
     // sets the intake run direction for the grabber
     public void setIntakeDirection( int direction ){ // 0 for direction is no motion, positive moves the intake wheels to intake, negative moves the intake wheels to outake
+            if(direction==0){
+                leftServo.setPosition(STOP_POWER);
+                rightServo.setPosition(STOP_POWER);
+            }
+            if (direction==1) {
+                leftServo.setPosition(INTAKE_POWER);
+                rightServo.setPosition(INTAKE_POWER);
+            }
+            if (direction==-1) {
+                leftServo.setPosition(OUTTAKE_POWER);
+                rightServo.setPosition(OUTTAKE_POWER);
+            }
+
 
     }
 
