@@ -6,8 +6,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class Shooter_Ring_ServoFed {
-    DcMotor shooterMotor;
-    Servo feederServo;
+    private DcMotor shooterMotor;
+    private Servo feederServo;
+
+
 
     Shooter_Ring_ServoFed( DcMotor shooterMotor, Servo feederServo){
         this.shooterMotor = shooterMotor;
@@ -25,7 +27,7 @@ public class Shooter_Ring_ServoFed {
 
     }
 
-    public void dropIntake(){
+    public void fire(){
 
     }
 

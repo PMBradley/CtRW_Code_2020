@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
 
 
 /*
@@ -74,7 +75,7 @@ public class TeleOp2020 extends LinearOpMode{
 
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
 
-
+        Intake_Ring_Drop intake;
 
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
@@ -87,6 +88,8 @@ public class TeleOp2020 extends LinearOpMode{
             double xTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
             double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
             double rotatePower = gamepad1.right_stick_x;
+
+
 
 
             // Logic (figuring out what the robot should do)

@@ -6,8 +6,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class Intake_Ring_Drop {
-    DcMotor intakeMotor;
-    Servo lockServo;
+    private DcMotor intakeMotor;
+    private Servo lockServo;
+
+    private static final double INTAKE_RUN_SPEED = 1.0;
+
+    private static final double UNLOCK_POSITION = 1.0;
+
 
     Intake_Ring_Drop( DcMotor intakeMotor, Servo lockServo){
         this.intakeMotor = intakeMotor;
@@ -15,24 +20,26 @@ public class Intake_Ring_Drop {
     }
 
 
-    public void spinUp(){
-        intakeMotor.setPower(1);
+    public void spinUp(){ // sets the motor to run at the spinning speed (will continue to run at that speed until set otherwise
+        intakeMotor.setPower(INTAKE_RUN_SPEED);
     }
 
     public void spinDown(){
-        intakeMotor.setPower(0);
+        intakeMotor.setPower(0.0);
     }
 
     public void setRunning( boolean isRunning ){
         if (isRunning == true) {
             spinUp();
-        } else  {
+        }
+        else {
             spinDown();
         }
     }
 
+
     public void dropIntake(){
-        lockServo.setPosition(1);
+        lockServo.setPosition(UNLOCK_POSITION);
     }
 
 
