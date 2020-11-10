@@ -16,17 +16,23 @@ public class Intake_Ring_Drop {
 
 
     public void spinUp(){
-
+        intakeMotor.setPower(1);
     }
+
     public void spinDown(){
-
+        intakeMotor.setPower(0);
     }
+
     public void setRunning( boolean isRunning ){
-
+        if (isRunning == true) {
+            spinUp();
+        } else  {
+            spinDown();
+        }
     }
 
-    public void fire(){
-
+    public void dropIntake(){
+        lockServo.setPosition(1);
     }
 
 
