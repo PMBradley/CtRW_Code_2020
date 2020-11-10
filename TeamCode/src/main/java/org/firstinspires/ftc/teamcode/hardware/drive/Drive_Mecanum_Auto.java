@@ -33,9 +33,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
-import org.firstinspires.ftc.teamcode.util.FSM.DriveFollowerTask;
+import org.firstinspires.ftc.teamcode.util.TrajectoryIntDuoHolder;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,11 +57,6 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1;
-
-    public static double VX_WEIGHT = 1;
-    public static double VY_WEIGHT = 1;
-    public static double OMEGA_WEIGHT = 1;
 
     public enum Mode {
         IDLE,
@@ -90,7 +84,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
     private int TELEMETRY_TRANSMISSION_INTERVAL = 25; // how often telemetry is sent information (if information to send as per .update()) - in milliseconds
 
-    private ElapsedTime localRuntime = new ElapsedTime();
+    private ElapsedTime localRuntime;
 
     // Main costructor
     public Drive_Mecanum_Auto(HardwareMap hardwareMap, boolean usingOdometry) { // only set usingOdometry to true if using odometry pods and they are hooked up properly
@@ -138,10 +132,10 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-     /*   imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);*/
+        imu.initialize(parameters);
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points upward (normal to the floor) using a command like the following:
         // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
@@ -167,12 +161,12 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
-            setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
+            setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // if desired, and told so via the parameter useOdometry, use setLocalizer() to change the localization method
         if (usingOdometry){
@@ -237,7 +231,6 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         }
         throw new AssertionError();
     }
-
 
     public void update() {
         updatePoseEstimate();
@@ -350,63 +343,24 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
             ));
         }
     }
-    public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
-        for (DcMotorEx motor : motors) {
-            motor.setPIDFCoefficients(runMode, coefficients);
-        }
-    }
-    public void setWeightedDrivePower(Pose2d drivePower) {
-        Pose2d vel = drivePower;
 
-        if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
-                + Math.abs(drivePower.getHeading()) > 1) {
-            // re-normalize the powers according to the weights
-            double denom = VX_WEIGHT * Math.abs(drivePower.getX())
-                    + VY_WEIGHT * Math.abs(drivePower.getY())
-                    + OMEGA_WEIGHT * Math.abs(drivePower.getHeading());
-
-            vel = new Pose2d(
-                    VX_WEIGHT * drivePower.getX(),
-                    VY_WEIGHT * drivePower.getY(),
-                    OMEGA_WEIGHT * drivePower.getHeading()
-            ).div(denom);
-        }
-
-        setDrivePower(vel);
-    }
 
     // State machine controlled asynchronous follow
-    private ArrayList<DriveFollowerTask> tasks = new ArrayList<DriveFollowerTask>(); // an arraylist that holds the list of tasks for the drive
+    private ArrayList<TrajectoryIntDuoHolder> tasks; // an arraylist that holds the list of tasks for
     private int taskIndex = 0; // a number that keeps track of where in the task list we are
 
     private boolean firstTaskRun = true; // first run flag for doing tasks, ensure proper behavior
 
     private double waitEndTime; // the time that the program designates as the time to go ahead and move to the next task (in milliseconds)
-    private double followStartTime;
 
-    public void setTasks(ArrayList<DriveFollowerTask> newTasks){ // totally resets the task list to the input
+    public void setTasks(ArrayList<TrajectoryIntDuoHolder> newTasks){
         tasks = newTasks; // set the tasks like promest
         taskIndex = 0; // reset the task index to ensure that everything goes well with the new job
     }
-    public void addTasks(ArrayList<DriveFollowerTask> newTasks){ // adds an input list of DriveTasks to the current list
-        for (DriveFollowerTask newTask : newTasks){ // loop through each input
-            tasks.add(newTask); // and add it to the list
-        }
-    }
-    public void addTask(DriveFollowerTask newTask){ // adds a single task to the task list
-        tasks.add(newTask);
-    }
-    public ArrayList<DriveFollowerTask> getTasks(){ return tasks; } // gets the whole list of tasks
-    public DriveFollowerTask getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
-    public DriveFollowerTask getCurrentTask(){ if(taskIndex < tasks.size()) return tasks.get(taskIndex); return new DriveFollowerTask();} // gets the current task (not the variable, but what it is according to the index)
+    public ArrayList<TrajectoryIntDuoHolder> getTasks(){ return tasks; } // gets the whole list of tasks
+    public TrajectoryIntDuoHolder getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
+    public TrajectoryIntDuoHolder getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
     public int getTaskIndex(){ return taskIndex; } // get what the current task is
-    public double getRemainingWaitMSecs(){ // returns the amount of time remaining for the current task, in milliseconds
-        return (waitEndTime - localRuntime.milliseconds()); // so return the difference between the wait end time and the current time
-    }
-    public double getCurrentTrajElapsedTime(){return localRuntime.milliseconds() -  followStartTime;} // return the total time run for the current trajectory
-    public boolean currentTaskHasTrajectory(){ // returns true if the current task has a trajectory in it
-        return (getCurrentTask().getTraj() != null); // meaning the current task's trajectory value is not null
-    }
 
     public boolean doTasksAsync(){ // the main state machine function that runs through each task - when complete it returns true
         boolean allComplete = false;
@@ -414,16 +368,13 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         if( taskIndex < tasks.size() ){ // if still within the bounds of the task list
             boolean taskComplete = false; // indicates if the current task is complete yet (default is false)
 
-            DriveFollowerTask currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
+            TrajectoryIntDuoHolder currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
 
             if(currentTask.getTraj() != null){ // if there is a trajector to follow, follow dat trajectory
-                if(firstTaskRun){
-                    followTrajectoryAsync( currentTask.getTraj() ); // do what we came here to do any follow that trajectory - at least set the trajectory
-
-                    followStartTime = localRuntime.milliseconds(); // also update the start time for the current trajectory
+                if(firstTaskRun){ // only on the first run of the task
+                    followTrajectoryAsync( currentTask.getTraj() ); // set the follower to follow the current task trajectory
                 }
-
-                update(); // update any important information, including if we are done following or not, and actually maintaining the following of the trajectory
+                update(); // actually do the following of the trajectory, also update any important information, including if we are done following or not
 
                 taskComplete = !isFollowing(); // if isFollowing returns true that means that we are still going and therefore taskComplete will be false, and visa versa
             }
@@ -431,7 +382,6 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
                 if(firstTaskRun){
                     waitEndTime = localRuntime.milliseconds() + currentTask.getNum(); // set the target time to the current time plus the input number of milliseconds
                 }
-
 
                 taskComplete = (localRuntime.milliseconds() >= waitEndTime); // if runtime is greater than or equal to the set waitEndTime, taskComplete is set to true, otherwise it is set to false
             }
@@ -455,7 +405,11 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         return allComplete; // return
     }
 
-
+    public void endCurrentWait(){ // if the drive is currently performing a wait task, it will stop waiting
+        waitEndTime = runtime.milliseconds(); // set the target end time to the current time, meaning that when checked the wait time will be satisfied
+    }    
+    
+    
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
@@ -482,14 +436,8 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         rightFront.setPower(v3);
     }
 
-   /* @Override // uncomment this if you are using an IMU for heading
+    @Override
     public double getRawExternalHeading() {
         return imu.getAngularOrientation().firstAngle;
-    }*/
-   @Override
-   public double getRawExternalHeading() {
-       return 0;
-   }
-
-
+    }
 }
