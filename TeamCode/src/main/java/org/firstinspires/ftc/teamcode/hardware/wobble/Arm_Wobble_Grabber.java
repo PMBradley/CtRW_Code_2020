@@ -3,19 +3,29 @@ package org.firstinspires.ftc.teamcode.hardware.wobble;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 public class Arm_Wobble_Grabber {
     private DcMotor armMotor;
     private Servo leftServo;
     private Servo rightServo;
+    private ElapsedTime localRuntime;
+
 
     // constants for setting arm position
     private static final double IDLE_POSITION = 0.0; // target position for idling, in degrees (all degree values are relative to the starting position)
     private static final double UP_POSITION = 90.0;  // target position for going over the wall, in degrees
     private static final double GRAB_POSITION = 190.0;  // target position for grabbing, in degrees
     private static final double ENCODER_TICS_PER_REVOLUTION = 537.0; // the number of encoder tics measured per revolution of the motor used (see the manufacturer website for info)
+
+
+    private static final double ENCODER_TICS_PER_DEGREE = 360 / ENCODER_TICS_PER_REVOLUTION;
+
+
+    private static double Ki = 1;
+    private static double Kp = 1;
+    private static double Kd = 1;
 
 
     // constants for setting intake power
@@ -26,10 +36,17 @@ public class Arm_Wobble_Grabber {
     private static final double MARGIN_OF_ERROR = 0.5; // margin of error for position setting
 
 
+    private double lastError = 0;
+    private double lastRuntime = 0;
+    private double integral = 0;
+
+
+
     Arm_Wobble_Grabber( DcMotor armMotor, Servo leftServo, Servo rightServo ){
         this.armMotor = armMotor;
         this.leftServo = leftServo;
         this.rightServo = rightServo;
+        this.localRuntime = new ElapsedTime();
     }
 
     // sets the intake run direction for the grabber
@@ -48,12 +65,24 @@ public class Arm_Wobble_Grabber {
             }
     }
 
-    public boolean setArmPosition( double position ){
-        boolean atPosition = false;
+    public boolean setArmPosition( double targetPosition ){
+
+        double position = 0;
+        position = encoderTicsToDegrees( armMotor.getCurrentPosition() );
+
+        double error = targetPosition - position;
+        double timeDifference = localRuntime.milliseconds() - lastRuntime;
+        integral += error * timeDifference;
+
+        double motorPower = (Kp * error) + (Ki * integral) + (Kd * ((error - lastError)/timeDifference) );
+        armMotor.setPower(motorPower);
 
 
+        lastError = error;
+        lastRuntime = localRuntime.milliseconds();
 
-        return atPosition;
+
+        return withinMarginOfError( position, targetPosition );
     }
     public boolean goToIdlePos(){ // sets the arm to go to the idle position, returns true when there (within the margin of error
         return setArmPosition(IDLE_POSITION);
@@ -66,13 +95,11 @@ public class Arm_Wobble_Grabber {
     }
 
     private static double encoderTicsToDegrees(double tics){ // converts tics of the encoder to degrees of arm rotation (used for getting position from the arm)
-
-
-        return tics;// some math before this
+        return tics * ENCODER_TICS_PER_DEGREE;// aka tics * 360 / encoder tics per revolution
     }
 
     private static boolean withinMarginOfError(double position, double targetPosition) { // returns true if the current position is within the margin of error of the target position
-    return (Math.abs(targetPosition - position) < MARGIN_OF_ERROR);
+        return (Math.abs(targetPosition - position) < MARGIN_OF_ERROR);
     }
 
 
