@@ -18,8 +18,8 @@ public class Shooter_Ring_ServoFed {
     private double spinUpEndTime = 0;
 
 
-    private static final double FEEDER_EXTENDED_POSITION = 0.75;
-    private static final double FEEDER_RETRACTED_POSITION = 0.25;
+    private static final double FEEDER_EXTENDED_POSITION = 0.66;
+    private static final double FEEDER_RETRACTED_POSITION = 0.50;
     private static final double FEEDER_EXTENSION_TIME = 700; // in milliseconds
 
     private boolean isFiring = false;
@@ -72,7 +72,8 @@ public class Shooter_Ring_ServoFed {
 
             switch (firingState){
                 case 0:
-                    if(spinUp() == true){
+                    spinUp();
+                    if(isSpunUp()){
                         moveStartTime = localRuntime.milliseconds();
                         firingState = 1;
                     }
