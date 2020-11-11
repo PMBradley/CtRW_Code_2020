@@ -58,6 +58,11 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
+    public static final double VX_WEIGHT = 1.0;
+    public static final double VY_WEIGHT = 1.0;
+    public static final double OMEGA_WEIGHT = 1.0;
+
+
 
     public enum Mode {
         IDLE,
@@ -209,6 +214,25 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         waitForIdle();
     }
 
+    public void setWeightedDrivePower(Pose2d drivePower) {
+        Pose2d vel = drivePower;
+
+        if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
+                + Math.abs(drivePower.getHeading()) > 1) {
+            // re-normalize the powers according to the weights
+            double denom = VX_WEIGHT * Math.abs(drivePower.getX())
+                    + VY_WEIGHT * Math.abs(drivePower.getY())
+                    + OMEGA_WEIGHT * Math.abs(drivePower.getHeading());
+
+            vel = new Pose2d(
+                    VX_WEIGHT * drivePower.getX(),
+                    VY_WEIGHT * drivePower.getY(),
+                    OMEGA_WEIGHT * drivePower.getHeading()
+            ).div(denom);
+        }
+
+        setDrivePower(vel);
+    }
 
 
     public void followTrajectoryAsync(Trajectory trajectory) {
