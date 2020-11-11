@@ -61,7 +61,7 @@ public class Manipulator_Test extends LinearOpMode{
        // intake = new Intake_Ring_Drop(hardwareMap.get(DcMotor.class, "intakeMotor"), hardwareMap.get(Servo.class, "intakeLockServo"));
         DcMotor shooterMoter = hardwareMap.get(DcMotor.class, "shooterMotor");
         Servo feederServo = hardwareMap.get(Servo.class, "feederServo");
-        
+
         shooter = new Shooter_Ring_ServoFed(shooterMoter, feederServo);
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
@@ -102,6 +102,8 @@ public class Manipulator_Test extends LinearOpMode{
             }
 
             shooter.setFlywheelMode(isSpinningUp);
+
+            shooter.updateFeeder();
 
             //telemetry
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
