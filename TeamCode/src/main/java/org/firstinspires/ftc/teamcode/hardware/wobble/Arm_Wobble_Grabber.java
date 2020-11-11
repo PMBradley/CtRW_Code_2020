@@ -43,7 +43,7 @@ public class Arm_Wobble_Grabber {
 
 
 
-    Arm_Wobble_Grabber( DcMotor armMotor, Servo leftServo, Servo rightServo ){
+    public Arm_Wobble_Grabber( DcMotor armMotor, Servo leftServo, Servo rightServo ){
         this.armMotor = armMotor;
         this.leftServo = leftServo;
         this.rightServo = rightServo;
@@ -75,7 +75,7 @@ public class Arm_Wobble_Grabber {
         integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
                                             // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
         double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
-        
+
         double motorPower = (Kp * error) + (Ki * integral) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
         armMotor.setPower(motorPower); // the actually set the power
 

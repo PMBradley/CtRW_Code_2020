@@ -13,7 +13,7 @@ public class Intake_Ring_Drop {
     private static final double UNLOCK_POSITION = 1.0;
 
 
-    Intake_Ring_Drop( DcMotor intakeMotor, Servo lockServo){
+    public Intake_Ring_Drop( DcMotor intakeMotor, Servo lockServo){
         this.intakeMotor = intakeMotor;
         this.lockServo = lockServo;
     }
