@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.control;
+package org.firstinspires.ftc.teamcode.control.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,11 +15,10 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
 
 /*
-    Welcome to the template TeleOp class!
-    To use it just make a copy of this class, and change all appearances of "20XX" with the starting year of the current season
-    (for example, for the 2020-2021 season, the class would be named TeleOp2020 and all code within would have to reflect that change)
+    Control scheme:
+        Shooter fire - Gamepad 2 x
+        Shooter spin up toggle -
 
-    Happy coding!
  */
 
 

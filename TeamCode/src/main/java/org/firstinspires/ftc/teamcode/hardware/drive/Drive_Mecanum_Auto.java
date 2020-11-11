@@ -32,6 +32,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.util.FSM.DriveFollowerTask;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.util.TrajectoryIntDuoHolder;
 
@@ -161,7 +162,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
-            setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
+            setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDCoefficients(MOTOR_VELO_PID.p, MOTOR_VELO_PID.i, MOTOR_VELO_PID.d));
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
@@ -346,20 +347,21 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
 
     // State machine controlled asynchronous follow
-    private ArrayList<TrajectoryIntDuoHolder> tasks; // an arraylist that holds the list of tasks for
+    private ArrayList<DriveFollowerTask> tasks; // an arraylist that holds the list of tasks for
     private int taskIndex = 0; // a number that keeps track of where in the task list we are
 
     private boolean firstTaskRun = true; // first run flag for doing tasks, ensure proper behavior
 
     private double waitEndTime; // the time that the program designates as the time to go ahead and move to the next task (in milliseconds)
+    private double currentTaskStartTime;
 
-    public void setTasks(ArrayList<TrajectoryIntDuoHolder> newTasks){
+    public void setTasks(ArrayList<DriveFollowerTask> newTasks){
         tasks = newTasks; // set the tasks like promest
         taskIndex = 0; // reset the task index to ensure that everything goes well with the new job
     }
-    public ArrayList<TrajectoryIntDuoHolder> getTasks(){ return tasks; } // gets the whole list of tasks
-    public TrajectoryIntDuoHolder getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
-    public TrajectoryIntDuoHolder getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
+    public ArrayList<DriveFollowerTask> getTasks(){ return tasks; } // gets the whole list of tasks
+    public DriveFollowerTask getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
+    public DriveFollowerTask getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
     public int getTaskIndex(){ return taskIndex; } // get what the current task is
 
     public boolean doTasksAsync(){ // the main state machine function that runs through each task - when complete it returns true
@@ -368,11 +370,12 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         if( taskIndex < tasks.size() ){ // if still within the bounds of the task list
             boolean taskComplete = false; // indicates if the current task is complete yet (default is false)
 
-            TrajectoryIntDuoHolder currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
+            DriveFollowerTask currentTask = getTaskAt(taskIndex); // get the current task and set the currentTask variable to it
 
             if(currentTask.getTraj() != null){ // if there is a trajector to follow, follow dat trajectory
                 if(firstTaskRun){ // only on the first run of the task
                     followTrajectoryAsync( currentTask.getTraj() ); // set the follower to follow the current task trajectory
+                    currentTaskStartTime = localRuntime.milliseconds();
                 }
                 update(); // actually do the following of the trajectory, also update any important information, including if we are done following or not
 
@@ -381,6 +384,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
             else if (currentTask.getNum() > 0){ // if there is no trajectory to follow but there is a time, wait
                 if(firstTaskRun){
                     waitEndTime = localRuntime.milliseconds() + currentTask.getNum(); // set the target time to the current time plus the input number of milliseconds
+                    currentTaskStartTime = localRuntime.milliseconds();
                 }
 
                 taskComplete = (localRuntime.milliseconds() >= waitEndTime); // if runtime is greater than or equal to the set waitEndTime, taskComplete is set to true, otherwise it is set to false
@@ -406,8 +410,17 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     }
 
     public void endCurrentWait(){ // if the drive is currently performing a wait task, it will stop waiting
-        waitEndTime = runtime.milliseconds(); // set the target end time to the current time, meaning that when checked the wait time will be satisfied
-    }    
+        waitEndTime = localRuntime.milliseconds(); // set the target end time to the current time, meaning that when checked the wait time will be satisfied
+    }
+    public boolean currentTaskHasTrajectory(){
+        return (getCurrentTask().getTraj() != null);
+    }
+    public double getRemainingWaitMSecs(){
+        return waitEndTime - localRuntime.milliseconds();
+    }
+    public double getTaskElapsedTime(){
+        return localRuntime.milliseconds() - currentTaskStartTime;
+    }
     
     
     @NonNull

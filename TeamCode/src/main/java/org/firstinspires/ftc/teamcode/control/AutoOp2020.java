@@ -54,7 +54,7 @@ public class AutoOp2020 extends LinearOpMode {
 
             telemetry.addData("Drive task index", drive.getTaskIndex()); // print out what the current drive task index is
             if(drive.currentTaskHasTrajectory()) { // if current task has a trajectory to follow
-                telemetry.addLine("Currently following a trajectory. Elapsed time: " + changePrecision( mSecToSec(drive.getCurrentTrajElapsedTime()), 2) + " seconds"); // print the projected remaining time on that trajectory
+                telemetry.addLine("Currently following a trajectory. Elapsed time: " + changePrecision( mSecToSec(drive.getTaskElapsedTime()), 2) + " seconds"); // print the projected remaining time on that trajectory
                 telemetry.addData("Target position", drive.getCurrentTask().getTraj().end()); // print the end position of the trajectory
             }
             else {
