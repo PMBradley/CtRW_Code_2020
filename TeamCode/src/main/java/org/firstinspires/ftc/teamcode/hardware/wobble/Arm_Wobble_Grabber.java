@@ -41,6 +41,7 @@ public class Arm_Wobble_Grabber {
     private double lastRuntime = 0.0;
     private double integral = 0.0;
 
+    private double lastTargetPosition = 0.0;
 
 
     public Arm_Wobble_Grabber( DcMotor armMotor, Servo leftServo, Servo rightServo ){
@@ -82,6 +83,7 @@ public class Arm_Wobble_Grabber {
 
         lastError = error; // update the last error to be the current error
         lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
+        lastTargetPosition = targetPosition; //update the last target position to be the current target position
 
         return withinMarginOfError( targetPosition, position ); // returns true if close enough to the target to be within the margin of error
     }
@@ -96,6 +98,9 @@ public class Arm_Wobble_Grabber {
     }
 
 
+    public double getArmTargetPosition(){
+        return lastTargetPosition;
+    }
     public double getArmPosition(){ // returns the current arm position in degrees
         return encoderTicsToDegrees( armMotor.getCurrentPosition() ); // get the current encoder tics position, then convert that to degrees
     }

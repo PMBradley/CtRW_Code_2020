@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants;
 
 
 /*
@@ -30,42 +31,31 @@ public class Provider2020 {
     // Motor and servo variables
 
     // Drive motors
-    public DcMotor driveFL = null;
-    public DcMotor driveFR = null;
-    public DcMotor driveBL = null;
-    public DcMotor driveBR = null;
+    public DcMotor driveFL;
+    public DcMotor driveFR;
+    public DcMotor driveBL;
+    public DcMotor driveBR;
 
     // Manipulator motors (motors for other things, not driving) - names are example names, they can be set for whatever application you have
-    public DcMotor motorLift = null;
-    public DcMotor motorIntakeL = null;
-    public DcMotor motorIntakeR = null;
+    public DcMotor shooterMotor;
+    public DcMotor intakeMotor;
+    public DcMotor wobbleArmMotor;
 
     // Servo Variables - names are example names, they can be set for whatever application you have
-    public Servo armPivot = null;
-    public Servo armGrab = null;
-    public Servo intakeDropL = null;
-    public Servo intakeDropR = null;
-    public Servo pullerDropL = null;
-    public Servo pullerDropR = null;
-
+    public Servo intakeLockServo;
+    public Servo shooterFeederServo;
+    public Servo wobbleLeftServo;
+    public Servo wobbleRightServo;
 
     // Sensor Variables
 
     // Touch Sensor variables - it is recommended to change the word "SensorX" in the names with a basic descriptor of what they are for, for example "touchBumper"
     public DigitalChannel touchSensor0;
-    public DigitalChannel touchSensor1;
-    public DigitalChannel touchSensor2;
-    public DigitalChannel touchSensor3;
-    public DigitalChannel touchSensor4;
-    public DigitalChannel touchSensor5;
-    public DigitalChannel touchSensor6;
-    public DigitalChannel touchSensor7;
 
     // Distance Sensor Variables - names are just examples, feel free to change to whatever you like. Just note that "flight" represents the fact that they are Time of Flight sensors (think radar, but with lasers)
     public Rev2mDistanceSensor flightFront0;
     public Rev2mDistanceSensor flightLeft1;
-    public Rev2mDistanceSensor flightRight2;
-    public Rev2mDistanceSensor flightBack3;
+
 
     public BNO055IMU imu; // the IMU class instance
 
@@ -73,21 +63,18 @@ public class Provider2020 {
     HardwareMap mainMap;
 
     // Flag values
-    boolean driveUsingEncoders = true;
+    public boolean driveUsingEncoders = false;
+    private boolean oneHubMode;
 
 
     // Hardware map only Contructor
     public Provider2020(HardwareMap hMap){
-        driveUsingEncoders = true; // update the flag to be the default constructor
-
-        init_map(hMap); // pull information from the hardware map - MUST BE DONE BEFORE
-
-        init_imu(); // setup the IMU and calibrate the current position as 0
+        this(hMap, false); // call the specific constructor setting oneHubMode to false
     }
 
     // Hardware map and encoder Constructor
-    public Provider2020(HardwareMap hMap, boolean runUsingEncoders){
-        driveUsingEncoders = runUsingEncoders; // update the flag from the constructor
+    public Provider2020(HardwareMap hMap, boolean oneHubMode){
+        this.oneHubMode = oneHubMode;
 
         init_map(hMap); // pull information from the hardware map - MUST BE DONE BEFORE
 
@@ -115,9 +102,6 @@ public class Provider2020 {
         driveFR = mainMap.get(DcMotor.class, "driveFR");
         driveBL = mainMap.get(DcMotor.class, "driveBL");
         driveBR = mainMap.get(DcMotor.class, "driveBR");
-        // motorLift = mainMap.get(DcMotor.class, "motorLift");
-        // motorIntakeL = mainMap.get(DcMotor.class, "intakeL");
-        // motorIntakeR = mainMap.get(DcMotor.class, "intakeR");
 
         // Set motors to run with encoders (if the flag is true)
         if(driveUsingEncoders){
@@ -128,47 +112,40 @@ public class Provider2020 {
         }
 
 
-       /* motorIntakeL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorIntakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        */
-
-       // Reverse motor direction as needed
+       // Reverse drive motor directions as needed
         driveFL.setDirection(DcMotor.Direction.REVERSE);
         driveBL.setDirection(DcMotor.Direction.REVERSE);
 
 
-        // Grabbing servos from hardware map (uncomment if you are using them, comment out if you are not)
+        if(!oneHubMode){ // if using more than one hub, setup the other motors and servos
+            // Grabbing the motors from the hardware map
+            shooterMotor = mainMap.get(DcMotor.class, "shooterMotor");
+            intakeMotor = mainMap.get(DcMotor.class, "intakeMotor");
+            wobbleArmMotor = mainMap.get(DcMotor.class, "wobbleArmMotor");
 
-        /*armPivot = mainMap.get(Servo.class, "armPivot");
-        armGrab = mainMap.get(Servo.class, "armGrab");
-        intakeDropL = mainMap.get(Servo.class, "intakeDropL");
-        intakeDropR = mainMap.get(Servo.class, "intakeDropR");
-        pullerDropL = mainMap.get(Servo.class, "pullerDropL");
-        pullerDropR = mainMap.get(Servo.class, "pullerDropR");
-        */
+            shooterMotor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT ); // don't halt the motor actively for the shooter
 
+            shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+            // Grabbing the servos from the hardware map
+            intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
+            shooterFeederServo = mainMap.get(Servo.class, "shooterFeederServo");
+            wobbleLeftServo = mainMap.get(Servo.class, "wobbleLeftServo");
+            wobbleRightServo = mainMap.get(Servo.class, "wobbleRightServo");
+        }
 
 
 
         // Grabbing sensors from hardware map (uncomment if you are using them, comment out if you are not)
         /*
         touchSensor0 = mainMap.get(DigitalChannel.class, "touchLift0");
-        touchSensor1 = mainMap.get(DigitalChannel.class, "touchArm1");
-        touchSensor2 = mainMap.get(DigitalChannel.class, "touchBlock2");
-        touchSensor3 = mainMap.get(DigitalChannel.class, "touchLiftUp3");
-        touchSensor4 = mainMap.get(DigitalChannel.class, "touchLeft4");
-        touchSensor5 = mainMap.get(DigitalChannel.class, "touchRight5");
-        touchSensor6 = mainMap.get(DigitalChannel.class, "touchBack6");
-        touchSensor7 = mainMap.get(DigitalChannel.class, "touchClamp7");
         */
 
         // Time of flight sensor setup (uncomment if you are using them, comment out if you are not)
         /*
         flightFront0 = (Rev2mDistanceSensor)mainMap.get(DistanceSensor.class, "flightFront0");
-        flightLeft1  = (Rev2mDistanceSensor)mainMap.get(DistanceSensor.class, "flightLeft1");
-        flightRight2 = (Rev2mDistanceSensor)mainMap.get(DistanceSensor.class, "flightRight2");
-        flightBack3  = (Rev2mDistanceSensor)mainMap.get(DistanceSensor.class, "flightBack3");
         */
 
         imu = mainMap.get(BNO055IMU.class, "imu");   // get Internal Measurement Unit from the hardware map

@@ -43,6 +43,7 @@ import java.util.List;
 import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.BASE_CONSTRAINTS;
 import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.RUN_USING_ODO;
 import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.encoderTicksToInches;
 import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.getMotorVelocityF;
@@ -93,18 +94,6 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     private ElapsedTime localRuntime;
 
     // Main costructor
-    public Drive_Mecanum_Auto(HardwareMap hardwareMap, boolean usingOdometry) { // only set usingOdometry to true if using odometry pods and they are hooked up properly
-        super(kV, kA, kStatic, TRACK_WIDTH); // call the superclass constructor (MecanumDrive) and pass it important setup variables
-
-        dashboard = FtcDashboard.getInstance(); // setup the dashboard
-        dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
-
-        clock = NanoClock.system(); // setup the clock
-
-        mode = Mode.IDLE; // have the default drive mode be idle, ensure it is that
-
-        setupDrive(hardwareMap, usingOdometry); // setup the drive systems
-    }
     public Drive_Mecanum_Auto(HardwareMap hardwareMap){
         super(kV, kA, kStatic, TRACK_WIDTH); // call the superclass constructor (MecanumDrive) and pass it important setup variables
 
@@ -115,11 +104,11 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
         mode = Mode.IDLE; // have the default drive mode be idle, ensure it is that
 
-        setupDrive(hardwareMap, false); // setup the drive, including RoadRunner - if not given whether or not we are using odometry, pass in that we are not
+        setupDrive(hardwareMap); // setup the drive, including RoadRunner - if not given whether or not we are using odometry, pass in that we are not
     }
 
 
-    private void setupDrive(HardwareMap hardwareMap, boolean usingOdometry){
+    private void setupDrive(HardwareMap hardwareMap){
         localRuntime.reset();
 
         turnController = new PIDFController(HEADING_PID);
@@ -175,7 +164,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // if desired, and told so via the parameter useOdometry, use setLocalizer() to change the localization method
-        if (usingOdometry){
+        if (RUN_USING_ODO){
             setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap)); // feed (pass) it the hardwareMap - nom nom nom
         }
     }

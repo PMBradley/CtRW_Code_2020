@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 @TeleOp(name = "Manipulator Test (shooter/intake/wobble)", group = "@@T")
 
 
-public class Manipulator_Test extends LinearOpMode{
+public class ManipulatorTest extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)

@@ -1,15 +1,14 @@
-package org.firstinspires.ftc.teamcode.control;
+package org.firstinspires.ftc.teamcode.control.tests;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.control.Provider2020;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
-import org.firstinspires.ftc.teamcode.hardware.shooter.Shooter_Ring_ServoFed;
-import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
 
 /*
@@ -17,30 +16,19 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
     Robot control scheme:
         Main Drive:
-        - Controller 1 Left Stick = translation
-        - Controller 1 Right Stick (x axis only) = rotation
-        - Controller 1 Right Bumper = boost button
-        - Controller 1 D-Pad Up = toggle drive relative to field
+        - Gamepad1 left stick = translation
+        - Gamepad1 right stick (x axis only) = rotation
+        - Gamepad1 right bumbper = boost button
 
-        Ring Shooter:
-        - Controller 2 X button = start a firing sequence (spins up if not spun up, then shoots a ring. can be held to fire rapidly)
-        - Controller 2 Right Bumper = toggle if the shooter motor is spun up
-
-        Ring Intake:
-        - Controller 2 Left Bumper = toggle if the ring intake is active
-
-        Wobble Intake/Arm:
-        - Controller 2 Right Stick (y axis) = up moves the intake wheels to outtake the wobble goal, down moves the intake wheels to intake the wobble goal
-        - Controller 2 D-Pad Up = Move the wobble arm to the lifted position (for going over the wall)
-        - Controller 2 D-Pad Down = Move the wobble arm to the grab position (for grabbing the wobble goal)
-        - Controller 2 D-Pad Right = Move the wobble arm to the folded position (NOT recommended while holding the wobble goal)
+        Mode toggling:
+        - Gamepad1 dpad_up = toggle drive relative to field
+        - Gamepad1 dpad_down = toggle drive using encoders
  */
 
 
+@TeleOp(name = "TeleOpDriveTest", group = "@@T")
 
-@TeleOp(name = "TeleOp2020", group = "@@@")
-
-public class TeleOp2020 extends LinearOpMode{
+public class TeleOpDriveTest extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
@@ -58,35 +46,23 @@ public class TeleOp2020 extends LinearOpMode{
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
-    private Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
-    private StandardTrackingWheelLocalizer localizer; // the odometry based localizer - uses dead wheels to determine (x, y, r) position on the field
-    private Intake_Ring_Drop intake; // the intake class instance
-    private Shooter_Ring_ServoFed shooter; // the shooter class instance
-    private Arm_Wobble_Grabber wobble; // the wobble intake/arm class instance
+    Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
+    StandardTrackingWheelLocalizer localizer; // the odometry based localizer - uses dead wheels to determine (x, y, r) position on the field
 
     // Flags
+    private boolean driveFieldRelative = true; // default
     private boolean firstToggleDriveRelative = true; // used to ensure proper toggling behavior (see usage under logic section)
-    private boolean firstSpinUpToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
-    private boolean firstIntakeRunToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
-
-    private boolean driveFieldRelative = true; // default is driving relative to field
-    private boolean isSpinningUp = false;
-    private int wobbleArmPosition = 0; // 0 = folded pos, 1 = up pos, 2 = grab position
-    private int wobbleIntakeDirection = 0; // 0 = stopped, 1 = intaking, -1 = outtaking
-    private boolean intakeIsRunning = false; // holds if the intake should be running or not
+    private boolean firstToggleRunEncoders = true; // used to ensure proper toggling behavior (see usage under logic section)
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
     public void runOpMode() throws InterruptedException {
         /* INCLUDE ANY ROBOT SETUP CODE HERE */
         // Call class constructors here (so that nothing major happens before init)
-        robot = new Provider2020(hardwareMap);
+        robot = new Provider2020(hardwareMap, true);
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed); // pass in the drive motors and the speed variables to setup properly
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
-        intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
-        shooter = new Shooter_Ring_ServoFed(robot.shooterMotor, robot.shooterFeederServo);
-        wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftServo, robot.wobbleRightServo);
 
 
         robot.setEncoderActive(false); // start the game without running encoders
@@ -94,12 +70,12 @@ public class TeleOp2020 extends LinearOpMode{
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
 
-
         waitForStart(); // Wait for the start button to be pressed before continuing further
 
 
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
 
+        Intake_Ring_Drop intake;
 
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
@@ -112,10 +88,13 @@ public class TeleOp2020 extends LinearOpMode{
             double xTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
             double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
             double rotatePower = gamepad1.right_stick_x;
-            boolean instructFire = gamepad2.x; // if pressing the second gamepad x, instruct a fire event
+
+
+
 
             // Logic (figuring out what the robot should do)
-            if(gamepad1.dpad_up && firstToggleDriveRelative){ // toggle driving relative to field if dpad up is pressed
+
+            if(gamepad1.dpad_up && firstToggleDriveRelative){ // toggle driving realtive to field if dpad up is pressed
                 driveFieldRelative = !driveFieldRelative; // toggle the value
 
                 firstToggleDriveRelative = false; // set the variable false so that it cannot toggle again
@@ -124,44 +103,15 @@ public class TeleOp2020 extends LinearOpMode{
                 firstToggleDriveRelative = true; // until the button is released
             }
 
-            if( gamepad2.right_bumper && firstSpinUpToggle ){ // code to toggle if the shooter is spinning up
-                isSpinningUp = !isSpinningUp;
+            if(gamepad1.dpad_down && firstToggleRunEncoders){ // toggle driving using encoders on the press of dpad down
+                robot.driveUsingEncoders = !robot.driveUsingEncoders; // toggle the value
+                robot.setEncoderActive(robot.driveUsingEncoders); //update the encoder mode
 
-                firstSpinUpToggle = false;
+                firstToggleRunEncoders = false; // set the variable false so that it cannot toggle again
             }
-            else if (!gamepad2.right_bumper){
-                firstSpinUpToggle = true;
+            else if (!gamepad1.dpad_down){ // wait to set the flag back to true until the button is released
+                firstToggleRunEncoders = true; // until the button is released
             }
-
-            if( gamepad2.left_bumper && firstIntakeRunToggle ){ // code to toggle if the intake is running
-                intakeIsRunning = !intakeIsRunning;
-
-                firstSpinUpToggle = false;
-            }
-            else if (gamepad2.left_bumper){
-                firstSpinUpToggle = true;
-            }
-
-            if(gamepad2.dpad_up){ // if pressing up
-                wobbleArmPosition = 1; // tell it to go to up position
-            }
-            else if(gamepad2.dpad_down){ // if pressing down
-                wobbleArmPosition = 2; // tell it to go to down position
-            }
-            else if(gamepad2.dpad_right){ // if pressing right
-                wobbleArmPosition = 0; // tell it to go to the idle position
-            }
-
-            if(gamepad2.right_stick_y > DEAD_ZONE_RADIUS){ // if pulling down on the stick enough, intake
-                wobbleIntakeDirection = 1;
-            }
-            else if(gamepad2.right_stick_y < -DEAD_ZONE_RADIUS){ // if pusing up on the stick enough, outtake
-                wobbleIntakeDirection = -1;
-            }
-            else { // default state is 0
-                wobbleIntakeDirection = 0;
-            }
-
 
             //setup a dead zone for the controllers
             if(Math.abs(xTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
@@ -175,32 +125,12 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
 
-
             // Hardware instruction (telling the hardware what to do)
-            if(driveFieldRelative) {
+            if(driveFieldRelative){
                 mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
             }
             else {
                 mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
-            }
-
-            if(instructFire) {
-                shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
-            }
-            shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
-            shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
-
-            intake.setRunning(intakeIsRunning); // make sure the intake intakin is set to the proper intake mode
-
-            wobble.setIntakeDirection(wobbleIntakeDirection); // make sure it is intaking properly
-            if(wobbleArmPosition == 1) { // set the wobble arm position
-                wobble.goToUpPos();
-            }
-            else if(wobbleArmPosition == 2) {
-                wobble.goToGrabPos();
-            }
-            else{
-                wobble.goToIdlePos();
             }
 
 
@@ -221,20 +151,17 @@ public class TeleOp2020 extends LinearOpMode{
                 telemetry.addData("Drive BR Encoder: ", robot.driveBR.getCurrentPosition());
             }
             else{
-                telemetry.addLine("Driving without drive encoders");
+                telemetry.addLine("Driving without encoders");
             }
 
-            telemetry.addData("Robot is Boosting?", isBoosting);
+            telemetry.addData("Boosting: ", isBoosting);
 
             if(localizer != null){ // if we have a localizer that exists, get the position estimate from it
                 telemetry.addData("Field Position", localizer.getPoseEstimate());
             }
 
-            telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
-            telemetry.addData("Firing state", shooter.getFiringState());
-
             telemetry.update();
-        }  // end of running while loop
+        }
     }
 
 
