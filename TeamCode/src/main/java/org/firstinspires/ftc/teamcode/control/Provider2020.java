@@ -40,12 +40,15 @@ public class Provider2020 {
     public DcMotor shooterMotor;
     public DcMotor intakeMotor;
     public DcMotor wobbleArmMotor;
+    public DcMotor wobbleArmMotor2;
 
     // Servo Variables - names are example names, they can be set for whatever application you have
     public Servo intakeLockServo;
     public Servo shooterFeederServo;
-    public Servo wobbleLeftServo;
-    public Servo wobbleRightServo;
+    public Servo wobbleLeftWheelServo;
+    public Servo wobbleRightWheelServo;
+    public Servo wobbleLeftClampServo;
+    public Servo wobbleRightClampServo;
 
     // Sensor Variables
 
@@ -132,8 +135,20 @@ public class Provider2020 {
             // Grabbing the servos from the hardware map
             intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
             shooterFeederServo = mainMap.get(Servo.class, "shooterFeederServo");
-            wobbleLeftServo = mainMap.get(Servo.class, "wobbleLeftServo");
-            wobbleRightServo = mainMap.get(Servo.class, "wobbleRightServo");
+            wobbleLeftWheelServo = mainMap.get(Servo.class, "wobbleLeftWheelServo");
+            wobbleRightWheelServo = mainMap.get(Servo.class, "wobbleRightWheelServo");
+            wobbleLeftClampServo = mainMap.get(Servo.class, "wobbleLeftClampServo");
+            wobbleRightClampServo = mainMap.get(Servo.class, "wobbleLeftClampServo");
+
+            wobbleLeftWheelServo.getController().pwmDisable();
+            wobbleRightWheelServo.getController().pwmDisable();
+
+            wobbleLeftClampServo.getController().pwmEnable();
+            wobbleRightClampServo.getController().pwmEnable();
+
+            wobbleRightWheelServo.setDirection(Servo.Direction.REVERSE);
+
+            wobbleRightClampServo.setDirection(Servo.Direction.REVERSE);
         }
 
 

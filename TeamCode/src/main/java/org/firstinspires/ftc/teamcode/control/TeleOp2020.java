@@ -64,6 +64,8 @@ public class TeleOp2020 extends LinearOpMode{
     private Shooter_Ring_ServoFed shooter; // the shooter class instance
     private Arm_Wobble_Grabber wobble; // the wobble intake/arm class instance
 
+    private Arm_Wobble_Grabber wobbleClamp; // wobble intake, but clamp
+
     // Flags
     private boolean firstToggleDriveRelative = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstSpinUpToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
@@ -86,8 +88,8 @@ public class TeleOp2020 extends LinearOpMode{
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
         shooter = new Shooter_Ring_ServoFed(robot.shooterMotor, robot.shooterFeederServo);
-        wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftServo, robot.wobbleRightServo);
-
+        wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo);
+        wobbleClamp = new Arm_Wobble_Grabber(robot.wobbleArmMotor2, robot.wobbleLeftClampServo, robot.wobbleRightClampServo);
 
         robot.setEncoderActive(false); // start the game without running encoders
 
@@ -193,14 +195,18 @@ public class TeleOp2020 extends LinearOpMode{
             intake.setRunning(intakeIsRunning); // make sure the intake intakin is set to the proper intake mode
 
             wobble.setIntakeDirection(wobbleIntakeDirection); // make sure it is intaking properly
+            wobbleClamp.setIntakeDirection(wobbleIntakeDirection);
             if(wobbleArmPosition == 1) { // set the wobble arm position
                 wobble.goToUpPos();
+                wobbleClamp.goToUpPos();
             }
             else if(wobbleArmPosition == 2) {
                 wobble.goToGrabPos();
+                wobbleClamp.goToGrabPos();
             }
             else{
                 wobble.goToIdlePos();
+                wobbleClamp.goToIdlePos();
             }
 
 

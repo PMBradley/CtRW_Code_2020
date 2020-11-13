@@ -24,9 +24,9 @@ public class Arm_Wobble_Grabber {
     private static final double ENCODER_TICS_PER_DEGREE = 360 / ENCODER_TICS_PER_REVOLUTION;
 
 
-    private static double Ki = 1;
-    private static double Kp = 1;
-    private static double Kd = 1;
+    private static double Ki = 0.1;
+    private static double Kp = 0.001;
+    private static double Kd = 0.01;
 
 
     // constants for setting intake power
