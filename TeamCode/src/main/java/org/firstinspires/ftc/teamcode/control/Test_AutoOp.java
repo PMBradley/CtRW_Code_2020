@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.Vision_OpenCV_Exter
 public class Test_AutoOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Drive_Mecanum_Auto drive = new Drive_Mecanum_Auto(hardwareMap, false);
+        Drive_Mecanum_Auto drive = new Drive_Mecanum_Auto(hardwareMap);
         Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
         Pose2d startPos1 = new Pose2d(24.5, 00,  Math.toRadians(0));
         Pose2d startPos2 = new Pose2d(50, 10,  Math.toRadians(0));

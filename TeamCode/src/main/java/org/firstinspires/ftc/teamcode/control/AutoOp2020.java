@@ -38,7 +38,7 @@ public class AutoOp2020 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new Drive_Mecanum_Auto(hardwareMap, true);
+        drive = new Drive_Mecanum_Auto(hardwareMap);
 
         setupTestDriveTasks(); // add the list of task objects to the task list
         drive.setTasks(driveTasks); // then set the drive to use those tasks when required
