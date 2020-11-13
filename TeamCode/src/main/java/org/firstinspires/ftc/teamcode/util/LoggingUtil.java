@@ -27,7 +27,7 @@ public class LoggingUtil {
     }
 
     private static void pruneLogsIfNecessary() {
-        List<File> logFiles = new ArrayList<>();
+       /* List<File> logFiles = new ArrayList<>();
         buildLogList(logFiles, ROAD_RUNNER_FOLDER);
         Collections.sort(logFiles, (lhs, rhs) ->
                 Long.compare(lhs.lastModified(), rhs.lastModified()));
@@ -43,7 +43,7 @@ public class LoggingUtil {
             dirSize -= fileToRemove.length();
             //noinspection ResultOfMethodCallIgnored
             fileToRemove.delete();
-        }
+        } */
     }
 
     /**
