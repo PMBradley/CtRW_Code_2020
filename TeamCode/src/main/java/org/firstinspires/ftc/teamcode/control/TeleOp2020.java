@@ -105,7 +105,7 @@ public class TeleOp2020 extends LinearOpMode{
 
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
-            if(localizer != null){ // if the localier exists
+            if(localizer != null){ // if the localizer exists
                 localizer.update(); // update our current position
             }
 
@@ -238,6 +238,11 @@ public class TeleOp2020 extends LinearOpMode{
 
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
             telemetry.addData("Firing state", shooter.getFiringState());
+
+            telemetry.addData("Arm target position", wobble.getArmTargetPosition());
+            telemetry.addData("Wheel arm position", wobble.getArmPosition());
+            telemetry.addData("Claw arm position", wobbleClamp.getArmPosition());
+            
 
             telemetry.update();
         }  // end of running while loop
