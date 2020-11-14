@@ -25,7 +25,7 @@ public class Arm_Wobble_Grabber {
 
 
     private static double Kp = 0.01;
-    private static double Ki = 0.000;
+    private static double Ki = 0.0;
     private static double Kd = 0.001;
 
 

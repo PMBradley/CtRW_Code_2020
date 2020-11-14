@@ -382,7 +382,7 @@ public class FtcRobotControllerActivity extends Activity
 
     FtcAboutActivity.setBuildTimeFromBuildConfig(BuildConfig.BUILD_TIME);
 
-    //FtcDashboard.start(); // start the dashboard
+    FtcDashboard.start(); // start the dashboard
   }
 
   protected UpdateUI createUpdateUI() {
