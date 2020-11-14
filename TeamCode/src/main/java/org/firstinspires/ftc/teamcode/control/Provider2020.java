@@ -134,7 +134,7 @@ public class Provider2020 {
 
             // Grabbing the servos from the hardware map
             intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
-            shooterFeederServo = mainMap.get(Servo.class, "shooterFeederServo");
+            shooterFeederServo = mainMap.get(Servo.class, "feederServo");
             wobbleLeftWheelServo = mainMap.get(Servo.class, "wobbleLeftWheelServo");
             wobbleRightWheelServo = mainMap.get(Servo.class, "wobbleRightWheelServo");
             wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
