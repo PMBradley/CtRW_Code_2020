@@ -21,3 +21,9 @@ repositories {
 dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 }
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}

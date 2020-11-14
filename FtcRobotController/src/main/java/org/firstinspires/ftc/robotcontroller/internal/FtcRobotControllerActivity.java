@@ -382,7 +382,7 @@ public class FtcRobotControllerActivity extends Activity
 
     FtcAboutActivity.setBuildTimeFromBuildConfig(BuildConfig.BUILD_TIME);
 
-    FtcDashboard.start(); // start the dashboard
+    //FtcDashboard.start(); // start the dashboard
   }
 
   protected UpdateUI createUpdateUI() {
@@ -699,8 +699,6 @@ public class FtcRobotControllerActivity extends Activity
           }
         : null);
     }
-
-    FtcDashboard.attachEventLoop(eventLoop);
   }
 
   private void requestRobotSetup(@Nullable Runnable runOnComplete) {
@@ -725,6 +723,7 @@ public class FtcRobotControllerActivity extends Activity
 
     passReceivedUsbAttachmentsToEventLoop();
     AndroidBoard.showErrorIfUnknownControlHub();
+    FtcDashboard.attachEventLoop(eventLoop);
   }
 
   protected OpModeRegister createOpModeRegister() {
