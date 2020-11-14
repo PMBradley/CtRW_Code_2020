@@ -124,6 +124,8 @@ public class Provider2020 {
             shooterMotor = mainMap.get(DcMotor.class, "shooterMotor");
             intakeMotor = mainMap.get(DcMotor.class, "intakeMotor");
             wobbleArmMotor = mainMap.get(DcMotor.class, "wobbleArmMotor");
+            wobbleArmMotor2 = mainMap.get(DcMotor.class, "wobbleArmMotor2");
+
 
             shooterMotor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT ); // don't halt the motor actively for the shooter
 
