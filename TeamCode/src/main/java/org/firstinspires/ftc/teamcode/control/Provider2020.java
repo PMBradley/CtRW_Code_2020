@@ -148,7 +148,7 @@ public class Provider2020 {
 
             wobbleClampServo.getController().pwmEnable();
 
-            wobbleRightWheelServo.setDirection(Servo.Direction.REVERSE);
+            //wobbleRightWheelServo.setDirection(Servo.Direction.REVERSE);
         }
 
 

@@ -55,15 +55,15 @@ public class Arm_Wobble_Grabber {
     public void setIntakeDirection( int direction ){ // 0 for direction is no motion, 1 moves the intake wheels to intake, -1 moves the intake wheels to outake
             if(direction == 0){
                 leftServo.setPosition(STOP_POWER);
-                rightServo.setPosition(STOP_POWER);
+                rightServo.setPosition(leftToRight(STOP_POWER));
             }
             if (direction == 1) {
                 leftServo.setPosition(INTAKE_POWER);
-                rightServo.setPosition(INTAKE_POWER);
+                rightServo.setPosition(leftToRight(INTAKE_POWER));
             }
             if (direction == -1) {
                 leftServo.setPosition(OUTTAKE_POWER);
-                rightServo.setPosition(OUTTAKE_POWER);
+                rightServo.setPosition(leftToRight(OUTTAKE_POWER));
             }
     }
 
@@ -116,5 +116,10 @@ public class Arm_Wobble_Grabber {
         return (Math.abs(targetPosition - position) < MARGIN_OF_ERROR);
     }
 
+
+    private double leftToRight(double input)
+    {
+        return ((-1*(input-0.5)) + 0.5);
+    }
 
 }
