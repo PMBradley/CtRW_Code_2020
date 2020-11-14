@@ -75,7 +75,8 @@ public class TeleOpDriveTest extends LinearOpMode{
 
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
 
-        Intake_Ring_Drop intake;
+
+
 
         // The main run loop - write the main robot run code here
         while (opModeIsActive()) {
@@ -160,6 +161,8 @@ public class TeleOpDriveTest extends LinearOpMode{
                 telemetry.addData("Field Position", localizer.getPoseEstimate());
                 telemetry.addData("Current Velocity", localizer.getPoseVelocity());
             }
+
+            robot.driveFL.getCurrentPosition();
 
             telemetry.update();
         }
