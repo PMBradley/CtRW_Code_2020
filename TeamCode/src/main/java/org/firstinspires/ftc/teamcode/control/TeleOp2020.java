@@ -241,6 +241,7 @@ public class TeleOp2020 extends LinearOpMode{
 
             telemetry.addData("Arm target position", wobble.getArmTargetPosition());
             telemetry.addData("Wheel arm position", wobble.getArmPosition());
+            telemetry.addData("Wheel arm encoder position", robot.wobbleArmMotor.getCurrentPosition());
             telemetry.addData("Claw arm position", wobbleClamp.getArmPosition());
 
 
