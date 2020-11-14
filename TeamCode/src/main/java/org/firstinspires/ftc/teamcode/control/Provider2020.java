@@ -47,8 +47,7 @@ public class Provider2020 {
     public Servo shooterFeederServo;
     public Servo wobbleLeftWheelServo;
     public Servo wobbleRightWheelServo;
-    public Servo wobbleLeftClampServo;
-    public Servo wobbleRightClampServo;
+    public Servo wobbleClampServo;
 
     // Sensor Variables
 
@@ -137,18 +136,14 @@ public class Provider2020 {
             shooterFeederServo = mainMap.get(Servo.class, "shooterFeederServo");
             wobbleLeftWheelServo = mainMap.get(Servo.class, "wobbleLeftWheelServo");
             wobbleRightWheelServo = mainMap.get(Servo.class, "wobbleRightWheelServo");
-            wobbleLeftClampServo = mainMap.get(Servo.class, "wobbleLeftClampServo");
-            wobbleRightClampServo = mainMap.get(Servo.class, "wobbleLeftClampServo");
+            wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
 
             wobbleLeftWheelServo.getController().pwmDisable();
             wobbleRightWheelServo.getController().pwmDisable();
 
-            wobbleLeftClampServo.getController().pwmEnable();
-            wobbleRightClampServo.getController().pwmEnable();
+            wobbleClampServo.getController().pwmEnable();
 
             wobbleRightWheelServo.setDirection(Servo.Direction.REVERSE);
-
-            wobbleRightClampServo.setDirection(Servo.Direction.REVERSE);
         }
 
 

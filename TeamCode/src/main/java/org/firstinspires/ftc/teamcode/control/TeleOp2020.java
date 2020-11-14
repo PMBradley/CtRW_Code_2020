@@ -89,7 +89,7 @@ public class TeleOp2020 extends LinearOpMode{
         intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
         shooter = new Shooter_Ring_ServoFed(robot.shooterMotor, robot.shooterFeederServo);
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo);
-        wobbleClamp = new Arm_Wobble_Grabber(robot.wobbleArmMotor2, robot.wobbleLeftClampServo, robot.wobbleRightClampServo);
+        wobbleClamp = new Arm_Wobble_Grabber(robot.wobbleArmMotor2, robot.wobbleClampServo, robot.wobbleClampServo);
 
         robot.setEncoderActive(false); // start the game without running encoders
 
@@ -242,7 +242,7 @@ public class TeleOp2020 extends LinearOpMode{
             telemetry.addData("Arm target position", wobble.getArmTargetPosition());
             telemetry.addData("Wheel arm position", wobble.getArmPosition());
             telemetry.addData("Claw arm position", wobbleClamp.getArmPosition());
-            
+
 
             telemetry.update();
         }  // end of running while loop
