@@ -158,6 +158,7 @@ public class TeleOpDriveTest extends LinearOpMode{
 
             if(localizer != null){ // if we have a localizer that exists, get the position estimate from it
                 telemetry.addData("Field Position", localizer.getPoseEstimate());
+                telemetry.addData("Current Velocity", localizer.getPoseVelocity());
             }
 
             telemetry.update();

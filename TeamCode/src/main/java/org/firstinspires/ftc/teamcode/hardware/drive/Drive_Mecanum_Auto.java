@@ -98,10 +98,13 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     public Drive_Mecanum_Auto(HardwareMap hardwareMap){
         super(kV, kA, kStatic, TRACK_WIDTH); // call the superclass constructor (MecanumDrive) and pass it important setup variables
 
-        dashboard = FtcDashboard.getInstance(); // setup the dashboard
-        dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
+       // dashboard = FtcDashboard.getInstance(); // setup the dashboard
+       // dashboard = new FtcDashboard();
+       // dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
 
         clock = NanoClock.system(); // setup the clock
+        localRuntime = new ElapsedTime();
+        localRuntime.reset();
 
         mode = Mode.IDLE; // have the default drive mode be idle, ensure it is that
 
@@ -110,8 +113,6 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
 
     private void setupDrive(HardwareMap hardwareMap){
-        localRuntime.reset();
-
         turnController = new PIDFController(HEADING_PID);
         turnController.setInputBounds(0, 2 * Math.PI);
 
@@ -320,7 +321,9 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
             }
         }
 
-        dashboard.sendTelemetryPacket(packet);
+        if(dashboard != null){
+            dashboard.sendTelemetryPacket(packet);
+        }
     }
 
     public void waitForIdle() {
