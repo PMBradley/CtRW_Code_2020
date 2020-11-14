@@ -132,7 +132,7 @@ public class Provider2020 {
        //     shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
             wobbleArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             wobbleArmMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            
+
             wobbleArmMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
