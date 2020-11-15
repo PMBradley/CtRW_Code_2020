@@ -24,9 +24,9 @@ public class Arm_Wobble_Grabber {
     private static final double ENCODER_TICS_PER_DEGREE = 360 / ENCODER_TICS_PER_REVOLUTION;
 
 
-    private static double Kp = 0.01;
-    private static double Ki = 0.0;
-    private static double Kd = 0.001;
+    private static final double Kp = 0.01;
+    private static final double Ki = 0.0;
+    private static final double Kd = 0.001;
 
 
     // constants for setting intake power
@@ -36,6 +36,7 @@ public class Arm_Wobble_Grabber {
 
     private static final double MARGIN_OF_ERROR = 0.5; // margin of error for position setting
 
+    private double gearRatio = 1.0;
 
     private double lastError = 0.0;
     private double lastRuntime = 0.0;
@@ -44,11 +45,15 @@ public class Arm_Wobble_Grabber {
     private double lastTargetPosition = 0.0;
 
 
-    public Arm_Wobble_Grabber( DcMotor armMotor, Servo leftServo, Servo rightServo ){
+    public Arm_Wobble_Grabber(DcMotor armMotor, Servo leftServo, Servo rightServo, double gearRatio){
         this.armMotor = armMotor;
         this.leftServo = leftServo;
         this.rightServo = rightServo;
         this.localRuntime = new ElapsedTime();
+        this.gearRatio = gearRatio;
+    }
+    public Arm_Wobble_Grabber(DcMotor armMotor, Servo leftServo, Servo rightServo){
+        this(armMotor, leftServo, rightServo, 1);
     }
 
     // sets the intake run direction for the grabber
@@ -109,8 +114,8 @@ public class Arm_Wobble_Grabber {
     }
 
 
-    private static double encoderTicsToDegrees( double tics ){ // converts tics of the encoder to degrees of arm rotation (used for getting position from the arm)
-        return tics * ENCODER_TICS_PER_DEGREE;// aka tics * (360 / encoder tics per revolution)
+    private double encoderTicsToDegrees( double tics ){ // converts tics of the encoder to degrees of arm rotation (used for getting position from the arm)
+        return tics * ENCODER_TICS_PER_DEGREE * gearRatio;// aka tics * (360 / encoder tics per revolution) * gear ratio
     }
     private static boolean withinMarginOfError( double targetPosition, double position ) { // returns true if the current position is within the margin of error of the target position
         return (Math.abs(targetPosition - position) < MARGIN_OF_ERROR);
