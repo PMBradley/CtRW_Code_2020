@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.wobble;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
+@Config
 public class Arm_Wobble_Grabber {
     private DcMotor armMotor;
     private Servo leftServo;
@@ -24,9 +26,9 @@ public class Arm_Wobble_Grabber {
     private static final double ENCODER_TICS_PER_DEGREE = 360 / ENCODER_TICS_PER_REVOLUTION;
 
 
-    private static final double Kp = 0.005;
+    private static final double Kp = 0.003;
     private static final double Ki = 0.0;
-    private static final double Kd = 0.00;
+    private static final double Kd = 0.002;
 
 
     // constants for setting intake power
