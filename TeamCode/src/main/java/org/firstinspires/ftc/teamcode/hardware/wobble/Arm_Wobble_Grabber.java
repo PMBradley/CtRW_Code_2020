@@ -26,15 +26,15 @@ public class Arm_Wobble_Grabber {
     private static final double ENCODER_TICS_PER_DEGREE = 360 / ENCODER_TICS_PER_REVOLUTION;
 
 
-    private static final double Kp = 0.003;
-    private static final double Ki = 0.0;
-    private static final double Kd = 0.002;
+    public static final double Kp = 0.003;
+    public static final double Ki = 0.0;
+    public static final double Kd = 0.002;
 
 
     // constants for setting intake power
-    private static final double INTAKE_POWER = 1.0; // the power to set to make the robot intake the wobble goal
-    private static final double OUTTAKE_POWER = 0.0; // the power to set to the servo to make the robot outtake the wobble goal
-    private static final double STOP_POWER = 0.5; // the power to set to the servo to make it stop moving
+    public static final double INTAKE_POWER = 1.0; // the power to set to make the robot intake the wobble goal
+    public static final double OUTTAKE_POWER = 0.0; // the power to set to the servo to make the robot outtake the wobble goal
+    public static final double STOP_POWER = 0.5; // the power to set to the servo to make it stop moving
 
     private static final double MARGIN_OF_ERROR = 0.5; // margin of error for position setting
 
