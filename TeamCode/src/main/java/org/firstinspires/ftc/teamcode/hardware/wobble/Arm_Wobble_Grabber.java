@@ -26,7 +26,7 @@ public class Arm_Wobble_Grabber {
 
     private static final double Kp = 0.01;
     private static final double Ki = 0.0;
-    private static final double Kd = 0.001;
+    private static final double Kd = 0.00;
 
 
     // constants for setting intake power
