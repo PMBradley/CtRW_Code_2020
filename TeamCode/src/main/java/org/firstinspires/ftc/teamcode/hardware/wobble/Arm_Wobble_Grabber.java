@@ -18,7 +18,7 @@ public class Arm_Wobble_Grabber {
 
     // constants for setting arm position
     private static final double IDLE_POSITION = 0.0; // target position for idling, in degrees (all degree values are relative to the starting position)
-    private static final double UP_POSITION = 80.0;  // target position for going over the wall, in degrees
+    private static final double UP_POSITION = 60.0;  // target position for going over the wall, in degrees
     private static final double GRAB_POSITION = 170.0;  // target position for grabbing, in degrees
     private static final double ENCODER_TICS_PER_REVOLUTION = 537.6; // the number of encoder tics measured per revolution of the motor used (see the manufacturer website for info)
 
@@ -26,9 +26,9 @@ public class Arm_Wobble_Grabber {
     private static final double ENCODER_TICS_PER_DEGREE = 360 / ENCODER_TICS_PER_REVOLUTION;
 
 
-    public static final double Kp = 0.00035;
-    public static final double Ki = 0.0;
-    public static final double Kd = 0.0002;
+    public static final double Kp = 0.007;
+    public static final double Ki = 0.000001;
+    public static final double Kd = 0.00001;
 
 
     // constants for setting intake power

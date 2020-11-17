@@ -133,7 +133,7 @@ public class Provider2020 {
             wobbleArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             wobbleArmMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            wobbleArmMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+          //  wobbleArmMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
             // Grabbing the servos from the hardware map
