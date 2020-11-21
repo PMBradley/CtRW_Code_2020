@@ -113,7 +113,7 @@ public class TeleOp2020 extends LinearOpMode{
             boolean isBoosting = gamepad1.right_bumper;  // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
             double xTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
             double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
-            double rotatePower = gamepad1.right_stick_x;
+            double rotatePower = gamepad1.right_stick_x * Math.abs(gamepad1.right_stick_x);
             boolean instructFire = gamepad2.x; // if pressing the second gamepad x, instruct a fire event
 
             // Logic (figuring out what the robot should do)
@@ -155,10 +155,10 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
             if(gamepad2.right_stick_y > DEAD_ZONE_RADIUS){ // if pulling down on the stick enough, intake
-                wobbleIntakeDirection = 1;
-            }
-            else if(gamepad2.right_stick_y < -DEAD_ZONE_RADIUS){ // if pusing up on the stick enough, outtake
                 wobbleIntakeDirection = -1;
+            }
+            else if(gamepad2.right_stick_y < -DEAD_ZONE_RADIUS){ // if pushing up on the stick enough, outtake
+                wobbleIntakeDirection = 1;
             }
             else { // default state is 0
                 wobbleIntakeDirection = 0;
