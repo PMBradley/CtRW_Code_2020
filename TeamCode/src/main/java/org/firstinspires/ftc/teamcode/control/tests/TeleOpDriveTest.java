@@ -163,7 +163,10 @@ public class TeleOpDriveTest extends LinearOpMode{
                 telemetry.addData("Current Velocity", localizer.getPoseVelocity());
             }
 
-          //  telemetry.addData("Encoder reading", robot.driveFL.getCurrentPosition());
+            telemetry.addData("Left Encoder: ", localizer.getWheelPositions().get(0));
+            telemetry.addData("Right Encoder: ", localizer.getWheelPositions().get(1));
+
+            //  telemetry.addData("Encoder reading", robot.driveFL.getCurrentPosition());
 
             telemetry.update();
         }

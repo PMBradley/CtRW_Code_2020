@@ -38,11 +38,11 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
 
     //  1.00495
     //  1.00655
-    public static final double X_MULTIPLIER = 1.00; // a distance multiplier for the x axis - tune as needed (see https://learnroadrunner.com for tuning info)
-    public static final double Y_MULTIPLIER = 1.00; // a distance multiplier for the y axis - tune as needed (see https://learnroadrunner.com for tuning info)
+    public static double X_MULTIPLIER = 1.00; // a distance multiplier for the x axis - tune as needed (see https://learnroadrunner.com for tuning info)
+    public static double Y_MULTIPLIER = 1.00; // a distance multiplier for the y axis - tune as needed (see https://learnroadrunner.com for tuning info)
 
-
-    public static double LATERAL_DISTANCE = 15.47; // in; distance between the left and right odometry wheels - update with physical robot changes to distance
+                        // old 15.47
+    public static double LATERAL_DISTANCE = 15.25768885; // in; distance between the left and right odometry wheels - update with physical robot changes to distance
     public static double LATERAL_POD_FORWARD_OFFSET = 3.25; // in; forward offset of the lateral odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
     public static double RIGHT_POD_FORWARD_OFFSET = 0.0; // in; forward offset of the right odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
     public static double LEFT_POD_FORWARD_OFFSET = 0.0; // in; forward offset of the left odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
@@ -64,7 +64,7 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
        /// lateralEncoder.setDirection(Encoder.Direction.REVERSE); // reverse the encoder direction for the lateral encoder
     }
 
-    public static double encoderTicksToInches(int ticks) {
+    public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
     }
 
@@ -92,9 +92,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         //  compensation method
 
         return Arrays.asList(
-                encoderTicksToInches((int)leftEncoder.getCorrectedVelocity()) * X_MULTIPLIER,
-                encoderTicksToInches((int)rightEncoder.getCorrectedVelocity()) * X_MULTIPLIER,
-                encoderTicksToInches((int)lateralEncoder.getCorrectedVelocity()) * Y_MULTIPLIER
+                encoderTicksToInches(leftEncoder.getCorrectedVelocity()) * X_MULTIPLIER,
+                encoderTicksToInches(rightEncoder.getCorrectedVelocity()) * X_MULTIPLIER,
+                encoderTicksToInches(lateralEncoder.getCorrectedVelocity()) * Y_MULTIPLIER
         );
     }
 }

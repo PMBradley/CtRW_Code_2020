@@ -98,9 +98,8 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     public Drive_Mecanum_Auto(HardwareMap hardwareMap){
         super(kV, kA, kStatic, TRACK_WIDTH); // call the superclass constructor (MecanumDrive) and pass it important setup variables
 
-       // dashboard = FtcDashboard.getInstance(); // setup the dashboard
-       // dashboard = new FtcDashboard();
-       // dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
+        dashboard = FtcDashboard.getInstance(); // setup the dashboard
+        dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
 
         clock = NanoClock.system(); // setup the clock
         localRuntime = new ElapsedTime();
@@ -263,7 +262,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
 
         packet.put("x", currentPose.getX());
         packet.put("y", currentPose.getY());
-        packet.put("heading", currentPose.getHeading());
+        packet.put("heading", Math.toDegrees(currentPose.getHeading()));
 
         packet.put("xError", lastError.getX());
         packet.put("yError", lastError.getY());
