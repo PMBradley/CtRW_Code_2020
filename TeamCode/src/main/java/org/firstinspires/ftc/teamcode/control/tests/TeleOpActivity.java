@@ -12,12 +12,7 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 
 /*
     Welcome to the template TeleOp class!
-    To use it just make a copy of this class, and change all appearances of "20XX" with the starting year of the current season
-    (for example, for the 2020-2021 season, the class would be named TeleOp2020 and all code within would have to reflect that change).
-    It is recommended that somewhere near the top you have a comment block that describes your robot control scheme for easy reference.
-    Also, don't forget to remove or comment out the "@Disabled" line, so that it will show up in the list of opmodes on the driver station.
-
-
+    
     Happy coding!
  */
 
