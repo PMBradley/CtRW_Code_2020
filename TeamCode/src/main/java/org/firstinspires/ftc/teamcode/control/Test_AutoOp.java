@@ -19,10 +19,13 @@ public class Test_AutoOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Drive_Mecanum_Auto drive = new Drive_Mecanum_Auto(hardwareMap);
+
         Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
-        Pose2d startPos1 = new Pose2d(24.5, 00,  Math.toRadians(0));
-        Pose2d startPos2 = new Pose2d(50, 10,  Math.toRadians(0));
-        Pose2d startPos3 = new Pose2d(0, 0, Math.toRadians(0));
+        Pose2d startPos1 = new Pose2d(30, 30,  Math.toRadians(0));
+        Pose2d startPos2 = new Pose2d(0, 0,  Math.toRadians(0));
+        Pose2d startPos3 = new Pose2d(30, 30, Math.toRadians(90));
+        Pose2d startPos4 = new Pose2d(0, 0, Math.toRadians(180));
+
 
         waitForStart();
 
@@ -33,12 +36,16 @@ public class Test_AutoOp extends LinearOpMode {
                 .lineToLinearHeading(startPos1)
                 .build();
 
-        Trajectory traj1 = drive.trajectoryBuilder(traj.end())
-                .splineTo(new Vector2d(startPos2.getX(), startPos2.getY()), startPos2.getHeading())
+        Trajectory traj1 = drive.trajectoryBuilder(traj.end(), true)
+                .splineTo(new Vector2d(startPos2.getX(), startPos2.getY()), startPos4.getHeading())
                 .build();
 
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end(), true)
-                .splineTo(new Vector2d(startPos3.getX(), startPos3.getY()), startPos3.getHeading())
+        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+                .lineToSplineHeading(startPos3)
+                .build();
+
+        Trajectory traj3 = drive.trajectoryBuilder(traj2.end(), true)
+                .splineToSplineHeading(startPos4, startPos4.getHeading())
                 .build();
 
 
@@ -49,10 +56,14 @@ public class Test_AutoOp extends LinearOpMode {
 
         sleep(1000);
 
-        //drive.followTrajectory(traj1);
+        drive.followTrajectory(traj1);
 
         sleep(1000);
 
-        //drive.followTrajectory(traj2);
+        drive.followTrajectory(traj2);
+
+        sleep(1000);
+
+        drive.followTrajectory(traj3);
     }
 }

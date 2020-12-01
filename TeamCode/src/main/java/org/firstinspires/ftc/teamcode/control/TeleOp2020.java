@@ -47,10 +47,10 @@ public class TeleOp2020 extends LinearOpMode{
     String robotName = "Robot 2020";
 
     // Robot Speed variables
-    double turnSpeed = 0.8; // Speed multiplier for turning (1 being 100% of power going in)
-    double translateSpeed = 0.4; // Speed multiplier for translation (1 being 100% of power going in)
-    double boostSpeed = 1.0; // Speed multiplier for BOOSTING (1 being 100% of power going in)
-    double stopSpeed = 0.0; // the motor speed for stopping the robot
+    double turnSpeed = 0.80; // Speed multiplier for turning (1 being 100% of power going in)
+    double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
+    double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
+    double stopSpeed = 0.00; // the motor speed for stopping the robot
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.05; // the minimum value that can be passed into the drive function
@@ -63,7 +63,6 @@ public class TeleOp2020 extends LinearOpMode{
     private Intake_Ring_Drop intake; // the intake class instance
     private Shooter_Ring_ServoFed shooter; // the shooter class instance
     private Arm_Wobble_Grabber wobble; // the wobble intake/arm class instance
-
     private Arm_Wobble_Grabber wobbleClamp; // wobble intake, but clamp
 
     // Flags
@@ -135,12 +134,12 @@ public class TeleOp2020 extends LinearOpMode{
                 firstSpinUpToggle = true;
             }
 
-            if( gamepad2.left_bumper && firstIntakeRunToggle ){ // code to toggle if the intake is running
+            if( gamepad2.left_bumper == true && firstIntakeRunToggle ){ // code to toggle if the intake is running
                 intakeIsRunning = !intakeIsRunning;
 
                 firstSpinUpToggle = false;
             }
-            else if (gamepad2.left_bumper){
+            else if (!gamepad2.left_bumper){
                 firstSpinUpToggle = true;
             }
 

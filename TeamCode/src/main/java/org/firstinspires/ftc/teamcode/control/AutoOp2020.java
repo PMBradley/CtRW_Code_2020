@@ -71,12 +71,12 @@ public class AutoOp2020 extends LinearOpMode {
     void setupTestDriveTasks(){
         driveTasks.add( new DriveFollowerTask(
                 drive.trajectoryBuilder( testStartPos )
-                        .lineTo(new Vector2d(36, 12))
+                        .lineTo(new Vector2d(41, 41))
                         .build()
         ));
 
         driveTasks.add( new DriveFollowerTask(
-                2500
+                400
         ));
 
         driveTasks.add( new DriveFollowerTask(
@@ -86,22 +86,36 @@ public class AutoOp2020 extends LinearOpMode {
         ));
 
         driveTasks.add( new DriveFollowerTask(
-                2500
+                400
         ));
 
         driveTasks.add( new DriveFollowerTask(
                 drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
-                        .lineToLinearHeading( new Pose2d(36, 12, Math.toRadians(-90)))
+                        .lineToLinearHeading( new Pose2d(41, 41, Math.toRadians(-90)))
                         .build()
         ));
 
         driveTasks.add( new DriveFollowerTask(
-                2500
+                400
         ));
 
         driveTasks.add( new DriveFollowerTask(
                 drive.trajectoryBuilder(driveTasks.get(4).getTraj().end())
-                        .lineToLinearHeading(new Pose2d(0, 12, Math.toRadians(180)))
+                        .lineToLinearHeading(new Pose2d(0, 0, Math.toRadians(180)))
+                        .build()
+        ));
+
+        driveTasks.add( new DriveFollowerTask(
+                400
+        ));
+
+        driveTasks.add( new DriveFollowerTask(
+                drive.trajectoryBuilder(driveTasks.get(6).getTraj().end(), true)
+                        .splineTo(new Vector2d(20, 0), Math.toRadians(0))
+                        .splineTo(new Vector2d(40, 20), Math.toRadians(90))
+                        .splineTo(new Vector2d(20, 40), Math.toRadians(180))
+                        .splineTo(new Vector2d(0, 20), Math.toRadians(270))
+                        .lineToSplineHeading((new Pose2d(0, 0, Math.toRadians(0))))
                         .build()
         ));
         /*

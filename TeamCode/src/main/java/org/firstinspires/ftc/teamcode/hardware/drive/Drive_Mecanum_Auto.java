@@ -9,6 +9,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.control.PIDFController;
+import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
@@ -57,8 +58,8 @@ import static org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants.kV;
 */
 @Config
 public class Drive_Mecanum_Auto extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
     public static final double VX_WEIGHT = 1.0;
     public static final double VY_WEIGHT = 1.0;
@@ -161,8 +162,10 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        //rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        //rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // if desired, and told so via the parameter useOdometry, use setLocalizer() to change the localization method
         if (RUN_USING_ODO){
@@ -376,8 +379,18 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         taskIndex = 0; // reset the task index to ensure that everything goes well with the new job
     }
     public ArrayList<DriveFollowerTask> getTasks(){ return tasks; } // gets the whole list of tasks
-    public DriveFollowerTask getTaskAt(int index){return tasks.get(index); } // gets a specified task from the list
-    public DriveFollowerTask getCurrentTask(){ return tasks.get(taskIndex); } // gets the current task (not the variable, but what it is according to the index)
+    public DriveFollowerTask getTaskAt(int index){
+        if(index < tasks.size())
+            return tasks.get(index);
+        else
+            return new DriveFollowerTask();
+    } // gets a specified task from the list
+    public DriveFollowerTask getCurrentTask(){
+        if (taskIndex < tasks.size() ) // ensure that we don't get an out of bounds error by checking that the current index is less than the size of the list
+            return tasks.get(taskIndex);
+        else
+            return new DriveFollowerTask();
+    } // gets the current task (not the variable, but what it is according to the index)
     public int getTaskIndex(){ return taskIndex; } // get what the current task is
 
     public boolean doTasksAsync(){ // the main state machine function that runs through each task - when complete it returns true
