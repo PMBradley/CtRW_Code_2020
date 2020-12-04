@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware.vision.OpenCV;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.opencv.core.Mat;
@@ -16,6 +19,10 @@ public class Vision_OpenCV_ExternalCam {
 
     private String device_name = "Webcam 1";
 
+    public static final int CAMERA_RESOLUTION_X = 640; // the camera x resolution dimensions that will be used
+    public static final int CAMERA_RESOLUTION_Y = 480; // the camera y resolution dimensions that will be used
+    private static final OpenCvCameraRotation CAMERA_ROTATION = OpenCvCameraRotation.UPSIDE_DOWN; // which direction is up for the camera
+
 
     public Vision_OpenCV_ExternalCam(HardwareMap hardwareMap){ // most basic constructor, just inits the camera, using the default device name
         initWebcam(hardwareMap); // init the webcam
@@ -26,16 +33,15 @@ public class Vision_OpenCV_ExternalCam {
         initWebcam(hardwareMap); // init the webcam
     }
     public Vision_OpenCV_ExternalCam(HardwareMap hardwareMap, CustomPipeline new_pipeline) { // a constructor that also sets a new pipeline, uses the defualt device name
-        setWebcamPipeine(new_pipeline); // set the camera to use the input pipeline
 
         initWebcam(hardwareMap); // init the webcam
+        setWebcamPipeine(new_pipeline); // set the camera to use the input pipeline
     }
     public Vision_OpenCV_ExternalCam(HardwareMap hardwareMap, String device_name, CustomPipeline new_pipeline){ // most complex constructor, uses a custom device name and sets up the pipeline
-        setWebcamPipeine(new_pipeline); // set the camera to use the input pipeline
-
         this.device_name = device_name; // set the class's device name to the passed in device name
 
         initWebcam(hardwareMap); // init the webcam
+        setWebcamPipeine(new_pipeline); // set the camera to use the input pipeline
     }
 
 
@@ -52,9 +58,12 @@ public class Vision_OpenCV_ExternalCam {
         // We set the viewport policy to optimized view so the preview doesn't appear 90 deg
         // out when the RC activity is in portrait. We do our actual image processing assuming
         // landscape orientation, though.
-        webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
+        // webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
-        webcam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT); // start the streaming process
+        webcam.openCameraDevice();
+        webcam.startStreaming(CAMERA_RESOLUTION_X, CAMERA_RESOLUTION_Y, CAMERA_ROTATION); // start the streaming process
+
+        FtcDashboard.getInstance().startCameraStream(webcam, 0); // init the dashboard stream
     }
 
     public void setWebcamPipeine(CustomPipeline new_pipeline){

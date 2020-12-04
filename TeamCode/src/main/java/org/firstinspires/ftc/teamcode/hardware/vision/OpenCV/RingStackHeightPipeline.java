@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.vision.OpenCV;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -19,7 +21,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
         MOST
     }
 
-    private double min_avg = 144; // tune this value to get consistent color comparisons
+    public static double min_avg = 150; // tune this value to get consistent color comparisons
 
     /*
      * Some color constants
@@ -33,10 +35,10 @@ public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * The core values which define the location and size of the sample regions
      */
-    static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(109,98);
-    static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(181,98);
-    static final int REGION_WIDTH = 20;
-    static final int REGION_HEIGHT = 20;
+    static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(100,100);
+    static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(100,350);
+    static final int REGION_WIDTH = 350;
+    static final int REGION_HEIGHT = 60;
 
     /*
      * Points which actually define the sample region rectangles, derived from above values
@@ -77,6 +79,8 @@ public class RingStackHeightPipeline extends CustomPipeline{
     Mat Cb = new Mat();
     int avg1, avg2;
 
+
+
     // Volatile since accessed by OpMode thread w/o synchronization
     private volatile RingAmount amount = RingAmount.NONE;
 
@@ -87,7 +91,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
     void inputToCb(Mat input)
     {
         Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
-        Core.extractChannel(YCrCb, Cb, 2);
+        Core.extractChannel(YCrCb, Cb, 0);
     }
 
     @Override
@@ -165,6 +169,9 @@ public class RingStackHeightPipeline extends CustomPipeline{
          * pixel value of the 3-channel image, and referenced the value
          * at index 2 here.
          */
+       /* full_avg1 = Core.mean(region1_Cb);
+        full_avg2 = Core.mean(region2_Cb);*/
+
         avg1 = (int) Core.mean(region1_Cb).val[0];
         avg2 = (int) Core.mean(region2_Cb).val[0];
 
@@ -196,7 +203,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
          * Now that we found the values, we actually need to go and
          * figure out how they compare to the minimum average color value
          */
-        if(avg1 >= min_avg){ // Is there enough yellow in the top region
+        if(avg2 >= min_avg){ // Is there enough yellow in the top region
             amount = RingAmount.MOST; // Record our analysis
 
             /*
@@ -210,7 +217,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
                     ORANGE, // The color the rectangle is drawn in
                     -1); // Negative thickness means solid fill
         }
-        else if(avg2 >= min_avg) { // Was it from region 2?
+        else if(avg1 >= min_avg) { // Was it from region 2?
             amount = RingAmount.ONE; // Record our analysis
 
             /*
@@ -219,8 +226,8 @@ public class RingStackHeightPipeline extends CustomPipeline{
              */
             Imgproc.rectangle(
                     input, // Buffer to draw on
-                    region2_pointA, // First point which defines the rectangle
-                    region2_pointB, // Second point which defines the rectangle
+                    region1_pointA, // First point which defines the rectangle
+                    region1_pointB, // Second point which defines the rectangle
                     ORANGE, // The color the rectangle is drawn in
                     -1); // Negative thickness means solid fill
         }
@@ -239,10 +246,14 @@ public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * Call this from the OpMode thread to obtain the latest analysis - this is the overriding of the CustomPipeline class
      */
-    @Override
+   /* @Override
     public String getAnalysis()
     {
         return amount.toString();
+    }*/
+    @Override
+    public String getAnalysis()
+    {
+        return amount.toString() + " " + avg1 + ", " + avg2;
     }
-
 }
