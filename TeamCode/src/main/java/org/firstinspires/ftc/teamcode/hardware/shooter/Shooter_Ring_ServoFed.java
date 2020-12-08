@@ -18,7 +18,7 @@ public class Shooter_Ring_ServoFed {
     private double spinUpEndTime = 0;
 
 
-    private static final double FEEDER_EXTENDED_POSITION = 0.72;
+    private static final double FEEDER_EXTENDED_POSITION = 0.76;
     private static final double FEEDER_RETRACTED_POSITION = 0.55;
     private static final double FEEDER_EXTENSION_TIME = 650; // in milliseconds
 
