@@ -33,7 +33,7 @@ public class TeleOp20XX extends LinearOpMode{
 
     // Robot Speed variables
     double turnSpeed = 0.5; // Speed multiplier for turning (1 being 100% of power going in)
-    double translateSpeed = 0.4; // Speed multiplier for translation (1 being 100% of power going in)
+    double translateSpeed = 0.4; // Speed multiplier for transslation (1 being 100% of power going in)
     double boostSpeed = 1; // Speed multiplier for BOOSTING (1 being 100% of power going in)
 
     // Robot Classes
