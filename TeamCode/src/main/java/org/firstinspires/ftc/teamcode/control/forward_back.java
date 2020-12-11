@@ -105,9 +105,9 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
             runtime.reset(); // reset the clock once start has been pressed so runtime is
             intake.setRunning(true);
 
-            mecanum_drive.drive_robot_relative(.85,0,0,false);
+            mecanum_drive.drive_robot_relative(0,-.85,0,false);
             sleep(2000);
-            mecanum_drive.drive_robot_relative(-.85,0,0,false);
+            mecanum_drive.drive_robot_relative(0,-.85,0,false);
             sleep(2000);
             mecanum_drive.drive_robot_relative(0,0,0,false);
 
