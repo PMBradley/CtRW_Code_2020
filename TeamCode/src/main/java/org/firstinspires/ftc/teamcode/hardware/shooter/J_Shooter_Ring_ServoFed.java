@@ -43,7 +43,7 @@ public class J_Shooter_Ring_ServoFed {
 
 
     public J_Shooter_Ring_ServoFed(DcMotor shooterMotorFront, DcMotor shooterMotorBack, Servo feederServo, Servo indexerServo, Servo anglerServo){
-        shooterMotorFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // bad programming practice, do not do this, should set running using encoder mode in provider class
+        //shooterMotorFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // bad programming practice, do not do this, should set running using encoder mode in provider class
 
         this.shooterMotorFront = shooterMotorFront;
         this.shooterMotorBack = shooterMotorBack;

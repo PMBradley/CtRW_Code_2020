@@ -202,7 +202,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 }
                 shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
                 shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
-                
+
                 if(shooterAngledUp){
                     shooter.angleUp();
                 }
