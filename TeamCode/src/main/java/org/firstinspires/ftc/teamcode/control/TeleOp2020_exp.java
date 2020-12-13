@@ -266,6 +266,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
                 telemetry.addData("Arm target position", wobble.getArmTargetPosition());
                 telemetry.addData("Wheel arm position", wobble.getArmPosition());
+
                 // telemetry.addData("Wheel arm encoder position", robot.wobbleArmMotor.getCurrentPosition());
                 //telemetry.addData("Claw arm position", wobbleClamp.getArmPosition());
                 //telemetry.addData("Claw arm encoder position", robot.wobbleArmMotor2.getCurrentPosition());
