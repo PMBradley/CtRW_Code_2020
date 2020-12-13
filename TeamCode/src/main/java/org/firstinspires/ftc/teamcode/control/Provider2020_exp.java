@@ -46,6 +46,8 @@ public class Provider2020_exp {
     // Servo Variables - names are example names, they can be set for whatever application you have
     public Servo intakeLockServo;
     public Servo shooterFeederServo;
+    public Servo shooterIndexerServo;
+    public Servo shooterAnglerServo;
     public Servo wobbleLeftWheelServo;
     public Servo wobbleRightWheelServo;
     public Servo wobbleClampServo;
@@ -148,16 +150,22 @@ public class Provider2020_exp {
             // Grabbing the servos from the hardware map
             intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
             shooterFeederServo = mainMap.get(Servo.class, "feederServo");
+            shooterIndexerServo = mainMap.get(Servo.class, "indexerServo");
+            shooterFeederServo = mainMap.get(Servo.class, "anglerServo");
             wobbleLeftWheelServo = mainMap.get(Servo.class, "wobbleLeftWheelServo");
             wobbleRightWheelServo = mainMap.get(Servo.class, "wobbleRightWheelServo");
             wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
 
-            wobbleLeftWheelServo.getController().pwmDisable();
+
+            wobbleLeftWheelServo.getController().pwmDisable(); // set these servos to continuous mode
             wobbleRightWheelServo.getController().pwmDisable();
 
+            shooterFeederServo.getController().pwmEnable(); // set these servos to discrete mode
+            shooterIndexerServo.getController().pwmEnable();
+            shooterAnglerServo.getController().pwmEnable();
             wobbleClampServo.getController().pwmEnable();
 
-            wobbleLeftWheelServo.setDirection(Servo.Direction.REVERSE);
+            wobbleLeftWheelServo.setDirection(Servo.Direction.REVERSE); // reverse this servo
         }
 
 

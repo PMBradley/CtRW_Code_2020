@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
         Ring Shooter:
         - Controller 2 X button = start a firing sequence (spins up if not spun up, then shoots a ring. can be held to fire rapidly)
         - Controller 2 Right Bumper = toggle if the shooter motor is spun up
+        - Constroller 2
 
         Ring Intake:
         - Controller 2 Left Bumper = toggle if the ring intake is active
@@ -69,9 +70,11 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
         private boolean firstToggleDriveRelative = true; // used to ensure proper toggling behavior (see usage under logic section)
         private boolean firstSpinUpToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
         private boolean firstIntakeRunToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
+        private boolean firstAngleToggle = true;
 
         private boolean driveFieldRelative = true; // default is driving relative to field
         private boolean isSpinningUp = false;
+        private boolean shooterAngledUp = false;
         private int wobbleArmPosition = 0; // 0 = folded pos, 1 = up pos, 2 = grab position
         private int wobbleIntakeDirection = 0; // 0 = stopped, 1 = intaking, -1 = outtaking
         private boolean intakeIsRunning = false; // holds if the intake should be running or not
@@ -87,7 +90,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
             localizer = new StandardTrackingWheelLocalizer(hardwareMap);
             intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
             //shooter = new Shooter_Ring_ServoFed(robot.shooterMotor, robot.shooterFeederServo);
-            shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo);
+            shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
             wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo);
             //wobbleClamp = new Arm_Wobble_Grabber(robot.wobbleArmMotor2, robot.wobbleClampServo, robot.wobbleClampServo, 1.0/6.0);
 
@@ -133,6 +136,14 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 }
                 else if (!gamepad2.right_bumper){
                     firstSpinUpToggle = true;
+                }
+                if( gamepad2.y && firstAngleToggle ){ // code to toggle if the shooter is spinning up
+                    shooterAngledUp = !shooterAngledUp;
+
+                    firstAngleToggle = false;
+                }
+                else if (!gamepad2.y){
+                    firstAngleToggle = true;
                 }
 
                 if( gamepad2.left_bumper == true && firstIntakeRunToggle ){ // code to toggle if the intake is running
@@ -191,8 +202,22 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 }
                 shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
                 shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
+                
+                if(shooterAngledUp){
+                    shooter.angleUp();
+                }
+                else {
+                    shooter.angleDown();
+                }
 
-                intake.setRunning(intakeIsRunning); // make sure the intake intakin is set to the proper intake mode
+                if(intakeIsRunning && !shooter.isFiring()){ // if the intake is set to be running by the user and the shooter isn't firing
+                    shooter.indexerDown(); // move the indexer to the intaking position
+                    intake.spinUp(); // and run the intake
+                }
+                else{ // otherwise disable those for safety
+                    shooter.indexerUp();
+                    intake.spinDown();
+                }
 
                 wobble.setIntakeDirection(wobbleIntakeDirection); // make sure it is intaking properly
                 //wobbleClamp.setIntakeDirection(wobbleIntakeDirection);
