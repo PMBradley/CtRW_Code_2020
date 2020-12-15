@@ -157,8 +157,8 @@ public class Provider2020_exp {
             wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
 
 
-            wobbleLeftWheelServo.getController().pwmDisable(); // set these servos to continuous mode
-            wobbleRightWheelServo.getController().pwmDisable();
+           // wobbleLeftWheelServo.getController().pwmDisable(); // set these servos to continuous mode
+           // wobbleRightWheelServo.getController().pwmDisable();
 
             shooterFeederServo.getController().pwmEnable(); // set these servos to discrete mode
             shooterIndexerServo.getController().pwmEnable();
