@@ -122,10 +122,10 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
                 if(bIsDown)
                 {
-                    shooter.angleUp();
+                    shooter.indexerUp();
                 }
                 else{
-                    shooter.angleDown();
+                    shooter.indexerDown();
                 }
 
                 // Logic (figuring out what the robot should do)
