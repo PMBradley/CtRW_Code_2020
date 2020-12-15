@@ -151,7 +151,7 @@ public class Provider2020_exp {
             intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
             shooterFeederServo = mainMap.get(Servo.class, "feederServo");
             shooterIndexerServo = mainMap.get(Servo.class, "indexerServo");
-            shooterFeederServo = mainMap.get(Servo.class, "anglerServo");
+            shooterAnglerServo = mainMap.get(Servo.class, "anglerServo");
             wobbleLeftWheelServo = mainMap.get(Servo.class, "wobbleLeftWheelServo");
             wobbleRightWheelServo = mainMap.get(Servo.class, "wobbleRightWheelServo");
             wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
