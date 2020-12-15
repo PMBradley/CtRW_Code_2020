@@ -90,7 +90,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
             localizer = new StandardTrackingWheelLocalizer(hardwareMap);
             intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
             //shooter = new Shooter_Ring_ServoFed(robot.shooterMotor, robot.shooterFeederServo);
-            shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo);
+            shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
             wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo);
             //wobbleClamp = new Arm_Wobble_Grabber(robot.wobbleArmMotor2, robot.wobbleClampServo, robot.wobbleClampServo, 1.0/6.0);
 
@@ -105,7 +105,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
             runtime.reset(); // reset the clock once start has been pressed so runtime is
             intake.setRunning(true);
 
-            mecanum_drive.drive_robot_relative(0,-.85,0,false);
+            mecanum_drive.drive_robot_relative(0,.85,0,false);
             sleep(2000);
             mecanum_drive.drive_robot_relative(0,-.85,0,false);
             sleep(2000);
