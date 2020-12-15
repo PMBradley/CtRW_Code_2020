@@ -175,6 +175,9 @@ public class J_Shooter_Ring_ServoFed {
     }
     public boolean isIndexerUp(){return indexUp;}
     public boolean isFiring(){return isFiring;}
+    public double getAnglerPos(){
+        return servoPosToDeg(anglerPos);
+    }
 
     private static double servoPosToDeg(double servoPos){
         return servoPos * 180;

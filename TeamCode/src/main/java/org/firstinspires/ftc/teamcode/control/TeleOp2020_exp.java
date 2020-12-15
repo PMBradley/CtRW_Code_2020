@@ -118,15 +118,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
                 double rotatePower = gamepad1.right_stick_x * Math.abs(gamepad1.right_stick_x);
                 boolean instructFire = gamepad2.x; // if pressing the second gamepad x, instruct a fire event
-                boolean bIsDown = false;
 
-                if(bIsDown)
-                {
-                    shooter.indexerUp();
-                }
-                else{
-                    shooter.indexerDown();
-                }
 
                 // Logic (figuring out what the robot should do)
                 if(gamepad1.dpad_up && firstToggleDriveRelative){ // toggle driving relative to field if dpad up is pressed
@@ -220,11 +212,11 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 }
 
                 if(intakeIsRunning && !shooter.isFiring()){ // if the intake is set to be running by the user and the shooter isn't firing
-                    shooter.indexerDown(); // move the indexer to the intaking position
+                    //shooter.indexerDown(); // move the indexer to the intaking position
                     intake.spinUp(); // and run the intake
                 }
                 else{ // otherwise disable those for safety
-                    shooter.indexerUp();
+                   // shooter.indexerUp();
                     intake.spinDown();
                 }
 
@@ -243,12 +235,12 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                     //wobbleClamp.goToIdlePos();
                 }
 
-                if(gamepad2.b)
-                {
-                    bIsDown = true;
+
+                if(gamepad2.b) {
+                    shooter.indexerUp();
                 }
                 else {
-                    bIsDown = false;
+                    shooter.indexerDown();
                 }
 
 
