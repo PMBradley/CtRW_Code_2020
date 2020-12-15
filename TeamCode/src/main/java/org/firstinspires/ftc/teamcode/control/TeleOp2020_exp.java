@@ -212,11 +212,11 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 }
 
                 if(intakeIsRunning && !shooter.isFiring()){ // if the intake is set to be running by the user and the shooter isn't firing
-                    //shooter.indexerDown(); // move the indexer to the intaking position
+                    shooter.indexerDown(); // move the indexer to the intaking position
                     intake.spinUp(); // and run the intake
                 }
                 else{ // otherwise disable those for safety
-                   // shooter.indexerUp();
+                    shooter.indexerUp();
                     intake.spinDown();
                 }
 
@@ -235,13 +235,6 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                     //wobbleClamp.goToIdlePos();
                 }
 
-
-                if(gamepad2.b) {
-                    shooter.indexerUp();
-                }
-                else {
-                    shooter.indexerDown();
-                }
 
 
                 // Telemetry
