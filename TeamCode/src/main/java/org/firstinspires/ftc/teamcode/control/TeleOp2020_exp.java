@@ -150,10 +150,10 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 if( gamepad2.left_bumper == true && firstIntakeRunToggle ){ // code to toggle if the intake is running
                     intakeIsRunning = !intakeIsRunning;
 
-                    firstSpinUpToggle = false;
+                    firstIntakeRunToggle = false;
                 }
                 else if (!gamepad2.left_bumper){
-                    firstSpinUpToggle = true;
+                    firstIntakeRunToggle = true;
                 }
 
                 if(gamepad2.dpad_up){ // if pressing up
