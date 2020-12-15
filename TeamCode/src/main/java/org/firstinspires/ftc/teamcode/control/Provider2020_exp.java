@@ -165,7 +165,8 @@ public class Provider2020_exp {
             shooterAnglerServo.getController().pwmEnable();
             wobbleClampServo.getController().pwmEnable();
 
-            wobbleLeftWheelServo.setDirection(Servo.Direction.REVERSE); // reverse this servo
+            wobbleLeftWheelServo.setDirection(Servo.Direction.REVERSE);
+            shooterFeederServo.setDirection(Servo.Direction.REVERSE);// reverse this servo
         }
 
 

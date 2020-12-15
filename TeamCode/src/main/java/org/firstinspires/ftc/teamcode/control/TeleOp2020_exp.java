@@ -118,6 +118,15 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
                 double rotatePower = gamepad1.right_stick_x * Math.abs(gamepad1.right_stick_x);
                 boolean instructFire = gamepad2.x; // if pressing the second gamepad x, instruct a fire event
+                boolean bIsDown = false;
+
+                if(bIsDown)
+                {
+                    shooter.angleUp();
+                }
+                else{
+                    shooter.angleDown();
+                }
 
                 // Logic (figuring out what the robot should do)
                 if(gamepad1.dpad_up && firstToggleDriveRelative){ // toggle driving relative to field if dpad up is pressed
@@ -232,6 +241,14 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 else{
                     wobble.goToIdlePos();
                     //wobbleClamp.goToIdlePos();
+                }
+
+                if(gamepad2.b)
+                {
+                    bIsDown = true;
+                }
+                else {
+                    bIsDown = false;
                 }
 
 
