@@ -28,7 +28,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double FEEDER_RETRACTED_POSITION = degToServoPos(101.0);// the feeder servo extened position
     private static final double FEEDER_EXTENDED_POSITION = degToServoPos(135.0);
-    private static final double FEEDER_EXTENSION_TIME = 50; // in milliseconds
+    private static final double FEEDER_EXTENSION_TIME = 100; // in milliseconds
 
     private static final double INDEXER_DOWN_POSITION = degToServoPos(134.0); // the little ring lifter down position
     private static final double INDEXER_UP_POSITION = degToServoPos(0.0);
