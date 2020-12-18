@@ -19,7 +19,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double SPIN_UP_TIME = 1000; // in milliseconds
 
-    private static final boolean USING_PID = true;
+    private static final boolean USING_PID = false;
     private static final double Kp = 0.1;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
