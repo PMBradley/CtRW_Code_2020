@@ -84,7 +84,7 @@ public class ManipulatorTest extends LinearOpMode{
                 instructFire = true;
             }
 
-            if( gamepad2.right_trigger >= 0.5 && firstSpinUpToggle ){
+            if( gamepad2.right_bumper && firstSpinUpToggle ){
                 isSpinningUp = !isSpinningUp;
 
                 firstSpinUpToggle = false;

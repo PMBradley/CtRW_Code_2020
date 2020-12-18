@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.hardware.shooter;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 
 public class J_Shooter_Ring_ServoFed {
@@ -12,10 +15,12 @@ public class J_Shooter_Ring_ServoFed {
     private Servo indexerServo;
     private Servo anglerServo;
     private ElapsedTime localRuntime;
+    private Encoder shooterEncoder;
 
-    private static final double SHOOTER_RUN_POWER = 1.0;
     private static final double SPIN_UP_TIME = 1000; // in milliseconds
+    private static final boolean USING_PID = true;
 
+    private double shooterRunSpeed = 1.0;
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -43,7 +48,10 @@ public class J_Shooter_Ring_ServoFed {
 
 
     public J_Shooter_Ring_ServoFed(DcMotor shooterMotorFront, DcMotor shooterMotorBack, Servo feederServo, Servo indexerServo, Servo anglerServo){
-        //shooterMotorFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // bad programming practice, do not do this, should set running using encoder mode in provider class
+
+        if(USING_PID){
+            shooterEncoder = new Encoder((DcMotorEx)shooterMotorBack);
+        }
 
         this.shooterMotorFront = shooterMotorFront;
         this.shooterMotorBack = shooterMotorBack;
@@ -55,9 +63,8 @@ public class J_Shooter_Ring_ServoFed {
 
 
     public boolean spinUp(){
-        shooterMotorFront.setPower( SHOOTER_RUN_POWER );
-        //shooterMotorBack.setPower( SHOOTER_RUN_POWER );
-        shooterMotorBack.setPower(shooterMotorFront.getPower());
+        shooterMotorFront.setPower( shooterRunSpeed );
+        shooterMotorBack.setPower( shooterRunSpeed );
 
         if (firstSpinUp){
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
@@ -85,6 +92,9 @@ public class J_Shooter_Ring_ServoFed {
                 spinDown();
             }
         }
+    }
+    public void setTargetShooterPower(double targetShooterPower){
+        shooterRunSpeed = targetShooterPower;
     }
 
     public boolean indexerUp(){

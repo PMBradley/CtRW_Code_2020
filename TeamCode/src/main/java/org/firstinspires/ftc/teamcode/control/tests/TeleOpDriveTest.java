@@ -33,7 +33,7 @@ public class TeleOpDriveTest extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
-    String robotName = "Robot 2020";
+    String robotName = "Scotty";
 
     // Robot Speed variables
     double turnSpeed = 0.8; // Speed multiplier for turning (1 being 100% of power going in)

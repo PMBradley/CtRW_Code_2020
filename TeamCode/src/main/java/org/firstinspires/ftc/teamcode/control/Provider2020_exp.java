@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 
 /*
@@ -53,6 +55,7 @@ public class Provider2020_exp {
     public Servo wobbleClampServo;
 
     // Sensor Variables
+    public Encoder shooterEncoder;
 
     // Touch Sensor variables - it is recommended to change the word "SensorX" in the names with a basic descriptor of what they are for, for example "touchBumper"
     public DigitalChannel touchSensor0;
@@ -167,6 +170,7 @@ public class Provider2020_exp {
 
             wobbleLeftWheelServo.setDirection(Servo.Direction.REVERSE);
             shooterFeederServo.setDirection(Servo.Direction.REVERSE);// reverse this servo
+
         }
 
 

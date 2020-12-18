@@ -10,17 +10,17 @@ public class Shooter_Ring_ServoFed {
     private Servo feederServo;
     private ElapsedTime localRuntime;
 
-    private static final double SHOOTER_RUN_POWER = 1.0;
     private static final double SPIN_UP_TIME = 1000; // in milliseconds
 
+    private double shooterRunPower = 1.0;
     private boolean firstSpinUp = false;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
 
 
-    private static final double FEEDER_EXTENDED_POSITION = 0.76;
-    private static final double FEEDER_RETRACTED_POSITION = 0.55;
-    private static final double FEEDER_EXTENSION_TIME = 650; // in milliseconds
+    private static final double FEEDER_EXTENDED_POSITION = 0.55;
+    private static final double FEEDER_RETRACTED_POSITION = 0.25;
+    private static final double FEEDER_EXTENSION_TIME = 500; // in milliseconds
 
     private boolean isFiring = false;
     private int firingState = 0;
@@ -35,7 +35,7 @@ public class Shooter_Ring_ServoFed {
 
 
     public boolean spinUp(){
-        shooterMotor.setPower( SHOOTER_RUN_POWER );
+        shooterMotor.setPower( shooterRunPower );
 
         if (firstSpinUp){
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
@@ -62,6 +62,9 @@ public class Shooter_Ring_ServoFed {
                 spinDown();
             }
         }
+    }
+    public void setTargetShooterPower(double targetShooterPower){
+        shooterRunPower = targetShooterPower;
     }
 
 
