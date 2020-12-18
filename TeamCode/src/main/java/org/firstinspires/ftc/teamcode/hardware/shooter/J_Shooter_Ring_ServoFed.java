@@ -18,7 +18,15 @@ public class J_Shooter_Ring_ServoFed {
     private Encoder shooterEncoder;
 
     private static final double SPIN_UP_TIME = 1000; // in milliseconds
+
     private static final boolean USING_PID = true;
+    private static final double Kp = 0.1;
+    private static final double Ki = 0.00;
+    private static final double Kd = 0.00;
+    private double lastRuntime;
+    private double integral;
+    private double lastError;
+    private double lastTargetSpeed;
 
     private double shooterRunSpeed = 1.0;
     private boolean firstSpinUp = true;
@@ -63,8 +71,15 @@ public class J_Shooter_Ring_ServoFed {
 
 
     public boolean spinUp(){
-        shooterMotorFront.setPower( shooterRunSpeed );
-        shooterMotorBack.setPower( shooterRunSpeed );
+        if(USING_PID){
+            double motorPower = getPIDPower(shooterRunSpeed); // calling this only once to mess with timing things less
+            shooterMotorFront.setPower(motorPower);
+            shooterMotorBack.setPower(motorPower);
+        }
+        else{
+            shooterMotorFront.setPower( shooterRunSpeed );
+            shooterMotorBack.setPower( shooterRunSpeed );
+        }
 
         if (firstSpinUp){
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
@@ -95,6 +110,31 @@ public class J_Shooter_Ring_ServoFed {
     }
     public void setTargetShooterPower(double targetShooterPower){
         shooterRunSpeed = targetShooterPower;
+    }
+
+
+
+    private double getPIDPower(double targetSpeed){ // gets the power needed to reach the target velocity based on our current velocity
+        double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
+
+        double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
+        double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
+
+        integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
+        // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
+        double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
+
+        double motorPower = (Kp * error) + (Ki * integral) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
+
+
+        lastError = error; // update the last error to be the current error
+        lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
+        lastTargetSpeed = targetSpeed; //update the last target position to be the current target position
+
+        return motorPower;
+    }
+    public static double encoderVeloToMotorSpeed(double encoderVelo){
+        return encoderVelo * 1.0; // correct this with some conversion rate multiplier
     }
 
     public boolean indexerUp(){
