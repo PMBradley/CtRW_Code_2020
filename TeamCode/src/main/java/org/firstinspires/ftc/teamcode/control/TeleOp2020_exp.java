@@ -266,6 +266,10 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
                 telemetry.addData("Firing state", shooter.getFiringState());
                 telemetry.addData("Flywheel Velocity: ", shooter.getFlywheelVelo());
+                telemetry.addData("Corrected Flywheel Velocity: ", shooter.encoderVeloToMotorSpeed(shooter.getFlywheelVelo()));
+                telemetry.addData("Corrected Flywheel Velocity: ", shooter.encoderVeloToMotorSpeed(shooter.getFlywheelVelo()));
+                telemetry.addData("Target Flywheel Velocity: ", shooter.encoderVeloToMotorSpeed(J_Shooter_Ring_ServoFed.shooterPIDRunSpeed * 0.8));
+
 
                 telemetry.addData("Arm target position", wobble.getArmTargetPosition());
                 telemetry.addData("Wheel arm position", wobble.getArmPosition());

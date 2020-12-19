@@ -20,7 +20,7 @@ public class J_Shooter_Ring_ServoFed {
     private static final double SPIN_UP_TIME = 1000; // in milliseconds
 
     private static final boolean USING_PID = true;
-    private static final double Kp = 0.1;
+    private static final double Kp = 0.3;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
     private double lastRuntime;
@@ -28,8 +28,8 @@ public class J_Shooter_Ring_ServoFed {
     private double lastError;
     private double lastTargetSpeed;
 
-    private double shooterRunSpeed = 0.8;
-    private double shooterPIDRunSpeed = 0.8;
+    public static double shooterRunSpeed = 0.8;
+    public static double shooterPIDRunSpeed = 1.0;
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -121,6 +121,7 @@ public class J_Shooter_Ring_ServoFed {
     }
     private double getPIDPower(double targetSpeed){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
+        targetSpeed *= 0.8;
 
         double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
@@ -139,7 +140,7 @@ public class J_Shooter_Ring_ServoFed {
         return speed + speedChange; // we return the speed change (PID output) plus the current speed because the PID is outputting a rate of change for speed, to reach target speed (just as you would have a rate of change of position to reach a target position)
     }
     public static double encoderVeloToMotorSpeed(double encoderVelo){
-        return encoderVelo * (1.0/VELOCITY_TICS_PER_MOTOR_POWER); // correct this with some conversion rate multiplier
+        return encoderVelo * VELOCITY_TICS_PER_MOTOR_POWER; // correct this with some conversion rate multiplier
     }
 
     public boolean indexerUp(){
