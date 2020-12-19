@@ -19,7 +19,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double SPIN_UP_TIME = 1000; // in milliseconds
 
-    private static final boolean USING_PID = false;
+    private static final boolean USING_PID = true;
     private static final double Kp = 0.1;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
@@ -29,6 +29,7 @@ public class J_Shooter_Ring_ServoFed {
     private double lastTargetSpeed;
 
     private double shooterRunSpeed = 0.8;
+    private double shooterPIDRunSpeed = 1.0;
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -49,6 +50,8 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double ANGLER_DOWN_POSITION = degToServoPos(0.0); // the trajectory angler down position
     private static final double ANGLER_UP_POSITION = degToServoPos(120.0);
+
+    private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2240;
 
     private boolean isFiring = false;
     private int firingState = 0;
@@ -72,7 +75,7 @@ public class J_Shooter_Ring_ServoFed {
 
     public boolean spinUp(){
         if(USING_PID){
-            double motorPower = getPIDPower(shooterRunSpeed); // calling this only once to mess with timing things less
+            double motorPower = getPIDPower(shooterPIDRunSpeed); // calling this only once to mess with timing things less
             shooterMotorFront.setPower(motorPower);
             shooterMotorBack.setPower(motorPower);
         }
@@ -136,7 +139,7 @@ public class J_Shooter_Ring_ServoFed {
         return speed + speedChange; // we return the speed change (PID output) plus the current speed because the PID is outputting a rate of change for speed, to reach target speed (just as you would have a rate of change of position to reach a target position)
     }
     public static double encoderVeloToMotorSpeed(double encoderVelo){
-        return encoderVelo * 1.0; // correct this with some conversion rate multiplier
+        return encoderVelo * (1.0/VELOCITY_TICS_PER_MOTOR_POWER); // correct this with some conversion rate multiplier
     }
 
     public boolean indexerUp(){
