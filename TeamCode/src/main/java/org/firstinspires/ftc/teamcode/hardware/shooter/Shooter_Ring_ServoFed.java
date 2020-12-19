@@ -10,7 +10,7 @@ public class Shooter_Ring_ServoFed {
     private Servo feederServo;
     private ElapsedTime localRuntime;
 
-    private static final double SPIN_UP_TIME = 1000; // in milliseconds
+    private static final double SPIN_UP_TIME = 1500; // in milliseconds
 
     private double shooterRunPower = 1.0;
     private boolean firstSpinUp = false;
@@ -20,7 +20,7 @@ public class Shooter_Ring_ServoFed {
 
     private static final double FEEDER_EXTENDED_POSITION = 0.52;
     private static final double FEEDER_RETRACTED_POSITION = 0.38;
-    private static final double FEEDER_EXTENSION_TIME = 140; // in milliseconds
+    private static final double FEEDER_EXTENSION_TIME = 130; // in milliseconds
 
     private boolean isFiring = false;
     private int firingState = 0;
