@@ -51,6 +51,9 @@ public class TeleOp2020 extends LinearOpMode{
     double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
     double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0.00; // the motor speed for stopping the robot
+    private static final double SHOOTER_HIGH_SPEED = 0.95;
+    private static final double SHOOTER_LOW_SPEED = 0.8;
+
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.05; // the minimum value that can be passed into the drive function
@@ -202,10 +205,10 @@ public class TeleOp2020 extends LinearOpMode{
             shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
 
             if(shooterAngledUp){
-                shooter.setTargetShooterPower(1.0);
+                shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
             }
             else {
-                shooter.setTargetShooterPower(0.8);
+                shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
             }
 
             intake.setRunning(intakeIsRunning); // make sure the intake intakin is set to the proper intake mode
