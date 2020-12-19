@@ -38,7 +38,7 @@ public class ManipulatorTest extends LinearOpMode{
     double boostSpeed = 1; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0;
     double testSpeed = 1.0;
-    private static final double SHOOTER_HIGH_SPEED = 0.95;
+    private static final double SHOOTER_HIGH_SPEED = 0.98;
     private static final double SHOOTER_LOW_SPEED = 0.80;
 
     boolean firstSpinUpToggle = true;
