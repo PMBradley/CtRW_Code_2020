@@ -28,7 +28,7 @@ public class J_Shooter_Ring_ServoFed {
     private double lastError;
     private double lastTargetSpeed;
 
-    private double shooterRunSpeed = 1.0;
+    private double shooterRunSpeed = 0.8;
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -113,7 +113,9 @@ public class J_Shooter_Ring_ServoFed {
     }
 
 
-
+    public double getFlywheelVelo(){
+        return shooterEncoder.getCorrectedVelocity();
+    }
     private double getPIDPower(double targetSpeed){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
 
@@ -124,14 +126,14 @@ public class J_Shooter_Ring_ServoFed {
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
         double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
 
-        double motorPower = (Kp * error) + (Ki * integral) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
+        double speedChange = (Kp * error) + (Ki * integral) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
 
 
         lastError = error; // update the last error to be the current error
         lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
         lastTargetSpeed = targetSpeed; //update the last target position to be the current target position
 
-        return motorPower;
+        return speed + speedChange;
     }
     public static double encoderVeloToMotorSpeed(double encoderVelo){
         return encoderVelo * 1.0; // correct this with some conversion rate multiplier
