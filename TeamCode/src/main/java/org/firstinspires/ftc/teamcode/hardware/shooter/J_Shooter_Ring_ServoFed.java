@@ -57,9 +57,9 @@ public class J_Shooter_Ring_ServoFed {
 
     public J_Shooter_Ring_ServoFed(DcMotor shooterMotorFront, DcMotor shooterMotorBack, Servo feederServo, Servo indexerServo, Servo anglerServo){
 
-        if(USING_PID){
+        //if(USING_PID){
             shooterEncoder = new Encoder((DcMotorEx)shooterMotorBack);
-        }
+        //}
 
         this.shooterMotorFront = shooterMotorFront;
         this.shooterMotorBack = shooterMotorBack;
@@ -131,9 +131,9 @@ public class J_Shooter_Ring_ServoFed {
 
         lastError = error; // update the last error to be the current error
         lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
-        lastTargetSpeed = targetSpeed; //update the last target position to be the current target position
+        lastTargetSpeed = targetSpeed; //update the last target speed to be the current target position
 
-        return speed + speedChange;
+        return speed + speedChange; // we return the speed change (PID output) plus the current speed because the PID is outputting a rate of change for speed, to reach target speed (just as you would have a rate of change of position to reach a target position)
     }
     public static double encoderVeloToMotorSpeed(double encoderVelo){
         return encoderVelo * 1.0; // correct this with some conversion rate multiplier
