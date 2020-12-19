@@ -69,12 +69,14 @@ public class TeleOp2020 extends LinearOpMode{
     private boolean firstToggleDriveRelative = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstSpinUpToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstIntakeRunToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
+    private boolean firstAngleToggle = true;
 
     private boolean driveFieldRelative = true; // default is driving relative to field
     private boolean isSpinningUp = false;
     private int wobbleArmPosition = 0; // 0 = folded pos, 1 = up pos, 2 = grab position
     private int wobbleIntakeDirection = 0; // 0 = stopped, 1 = intaking, -1 = outtaking
     private boolean intakeIsRunning = false; // holds if the intake should be running or not
+    private boolean shooterAngledUp = true;
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -133,6 +135,14 @@ public class TeleOp2020 extends LinearOpMode{
             else if (!gamepad2.right_bumper){
                 firstSpinUpToggle = true;
             }
+            if( gamepad2.y && firstAngleToggle ){ // code to toggle if the shooter is spinning up
+                shooterAngledUp = !shooterAngledUp;
+
+                firstAngleToggle = false;
+            }
+            else if (!gamepad2.y){
+                firstAngleToggle = true;
+            }
 
             if( gamepad2.left_bumper == true && firstIntakeRunToggle ){ // code to toggle if the intake is running
                 intakeIsRunning = !intakeIsRunning;
@@ -190,6 +200,13 @@ public class TeleOp2020 extends LinearOpMode{
             }
             shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
             shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
+
+            if(shooterAngledUp){
+                shooter.setTargetShooterPower(1.0);
+            }
+            else {
+                shooter.setTargetShooterPower(0.8);
+            }
 
             intake.setRunning(intakeIsRunning); // make sure the intake intakin is set to the proper intake mode
 
