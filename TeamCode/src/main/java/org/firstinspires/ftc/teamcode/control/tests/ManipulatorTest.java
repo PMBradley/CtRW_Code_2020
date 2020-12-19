@@ -38,9 +38,13 @@ public class ManipulatorTest extends LinearOpMode{
     double boostSpeed = 1; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0;
     double testSpeed = 1.0;
+    private static final double SHOOTER_HIGH_SPEED = 0.95;
+    private static final double SHOOTER_LOW_SPEED = 0.80;
 
     boolean firstSpinUpToggle = true;
     boolean isSpinningUp = false;
+    boolean firstAngleToggle = true;
+    boolean shooterAngledUp = true;
 
     // Robot Classes
   //  private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -93,7 +97,14 @@ public class ManipulatorTest extends LinearOpMode{
                 firstSpinUpToggle = true;
             }
 
+            if( gamepad2.y && firstAngleToggle ){ // code to toggle if the shooter is spinning up
+                shooterAngledUp = !shooterAngledUp;
 
+                firstAngleToggle = false;
+            }
+            else if (!gamepad2.y){
+                firstAngleToggle = true;
+            }
 
 
             // Hardware instruction (telling the hardware what to do)
