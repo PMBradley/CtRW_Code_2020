@@ -17,10 +17,10 @@ public class J_Shooter_Ring_ServoFed {
     private ElapsedTime localRuntime;
     private Encoder shooterEncoder;
 
-    private static final double SPIN_UP_TIME = 1000; // in milliseconds
+    private static final double SPIN_UP_TIME = 1200; // in milliseconds
 
     private static final boolean USING_PID = true;
-    private static final double Kp = 0.3;
+    private static final double Kp = 2.5;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
     private double lastRuntime;
@@ -29,7 +29,7 @@ public class J_Shooter_Ring_ServoFed {
     private double lastTargetSpeed;
 
     public static double shooterRunSpeed = 0.8;
-    public static double shooterPIDRunSpeed = 1.0;
+    public static double shooterPIDRunSpeed = 0.8;
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -51,7 +51,7 @@ public class J_Shooter_Ring_ServoFed {
     private static final double ANGLER_DOWN_POSITION = degToServoPos(0.0); // the trajectory angler down position
     private static final double ANGLER_UP_POSITION = degToServoPos(120.0);
 
-    private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2240;
+    private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
 
     private boolean isFiring = false;
     private int firingState = 0;
@@ -121,7 +121,6 @@ public class J_Shooter_Ring_ServoFed {
     }
     private double getPIDPower(double targetSpeed){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
-        targetSpeed *= 0.8;
 
         double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
