@@ -29,7 +29,7 @@ public class J_Shooter_Ring_ServoFed {
     private double lastTargetSpeed;
 
     private double shooterRunSpeed = 0.8;
-    private double shooterPIDRunSpeed = 1.0;
+    private double shooterPIDRunSpeed = 0.8;
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
