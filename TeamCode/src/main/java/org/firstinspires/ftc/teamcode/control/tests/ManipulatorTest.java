@@ -126,6 +126,7 @@ public class ManipulatorTest extends LinearOpMode{
             //telemetry
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
             telemetry.addData("Firing state", shooter.getFiringState());
+            telemetry.addData("Running in high power mode: ", shooterAngledUp);
 
             telemetry.update(); // send the queued telemetry to the output
         }
