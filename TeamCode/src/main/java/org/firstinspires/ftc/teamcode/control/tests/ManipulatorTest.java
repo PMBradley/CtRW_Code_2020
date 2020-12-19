@@ -116,6 +116,13 @@ public class ManipulatorTest extends LinearOpMode{
 
             shooter.updateFeeder();
 
+            if(shooterAngledUp){
+                shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
+            }
+            else {
+                shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
+            }
+
             //telemetry
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
             telemetry.addData("Firing state", shooter.getFiringState());
