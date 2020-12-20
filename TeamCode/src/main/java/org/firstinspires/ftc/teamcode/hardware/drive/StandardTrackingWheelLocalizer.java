@@ -41,11 +41,12 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double X_MULTIPLIER = 1.00; // a distance multiplier for the x axis - tune as needed (see https://learnroadrunner.com for tuning info)
     public static double Y_MULTIPLIER = 1.00; // a distance multiplier for the y axis - tune as needed (see https://learnroadrunner.com for tuning info)
 
-                        // old 15.25768885
-    public static double LATERAL_DISTANCE = 15.46205; // in; distance between the left and right odometry wheels - update with physical robot changes to distance
+                        // old 15.4878
+    public static double LATERAL_DISTANCE = 15.51210412; // in; distance between the left and right odometry wheels - update with physical robot changes to distance
     public static double LATERAL_POD_FORWARD_OFFSET = 3.25; // in; forward offset of the lateral odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
-    public static double RIGHT_POD_FORWARD_OFFSET = 0.0; // in; forward offset of the right odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
-    public static double LEFT_POD_FORWARD_OFFSET = 0.0; // in; forward offset of the left odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
+    public static double LATERAL_POD_LEFT_OFFSET = 0.00; // in; left offset of the lataeral odometry wheel - update with physical robot changes to distance - positive is left of center of rotation
+    public static double RIGHT_POD_FORWARD_OFFSET = 2.1; // in; forward offset of the right odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
+    public static double LEFT_POD_FORWARD_OFFSET = 2.1; // in; forward offset of the left odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
 
     private Encoder leftEncoder, rightEncoder, lateralEncoder;
 
@@ -53,7 +54,7 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         super(Arrays.asList(
                 new Pose2d(LEFT_POD_FORWARD_OFFSET, LATERAL_DISTANCE / 2, Math.toRadians(0)), // left
                 new Pose2d(RIGHT_POD_FORWARD_OFFSET, -LATERAL_DISTANCE / 2, Math.toRadians(180)), // right
-                new Pose2d(LATERAL_POD_FORWARD_OFFSET, 0, Math.toRadians(270)) // front
+                new Pose2d(LATERAL_POD_FORWARD_OFFSET, LATERAL_POD_LEFT_OFFSET, Math.toRadians(270)) // front
         ));
 
 
