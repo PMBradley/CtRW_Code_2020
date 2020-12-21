@@ -31,8 +31,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.teamcode.util.DashboardUtil;
-import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
+import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
+import org.firstinspires.ftc.teamcode.util.io.LynxModuleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

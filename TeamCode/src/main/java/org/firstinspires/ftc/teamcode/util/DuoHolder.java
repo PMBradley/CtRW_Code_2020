@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
 
-// TODO: FINISH THIS CLASS. DO NOT USE UNTIL COMPLETE
-
-public class DuoHolder { // this is just a class to hold two objects in one, kinda like a hashmap thing, but with one unit. Good with ArrayLists
+public class DuoHolder { // this is just a class to hold two objects in one, kinda like a dictionary thing, but with one unit. Good with ArrayLists
     private Object obj1;
     private Object obj2;
 

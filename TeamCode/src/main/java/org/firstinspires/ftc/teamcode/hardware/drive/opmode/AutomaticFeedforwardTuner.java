@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
-import org.firstinspires.ftc.teamcode.util.LoggingUtil;
-import org.firstinspires.ftc.teamcode.util.RegressionUtil;
+import org.firstinspires.ftc.teamcode.util.io.LoggingUtil;
+import org.firstinspires.ftc.teamcode.util.Math.RegressionUtil;
 
 import java.util.ArrayList;
 import java.util.List;

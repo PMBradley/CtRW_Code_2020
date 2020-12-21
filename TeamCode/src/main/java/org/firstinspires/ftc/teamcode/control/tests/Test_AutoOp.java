@@ -1,11 +1,14 @@
-package org.firstinspires.ftc.teamcode.control;
+package org.firstinspires.ftc.teamcode.control.tests;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.RingStackHeightPipeline;
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.Vision_OpenCV_ExternalCam;
 import org.firstinspires.ftc.teamcode.util.StateMachine.DriveFollowerTask;
 
 import java.util.ArrayList;
@@ -13,25 +16,13 @@ import java.util.ArrayList;
 /*
  * This is an example of a more complex path to really test the tuning.
  */
-@Autonomous(name = "AutoOp2020", group = "@@@")
+@Autonomous(name = "Test_AutoOp", group = "@@T")
 
-public class AutoOp2020 extends LinearOpMode {
-
+public class Test_AutoOp extends LinearOpMode {
     Drive_Mecanum_Auto drive;
     ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>(); // not just a trajectory array list because we want to be able to pause in the state machine for an amount of time
 
     Pose2d testStartPos = new Pose2d(0, 0, Math.toRadians(0));
-
-
-    private Pose2d startPose = new Pose2d(-50.0, -50.0, Math.toRadians(180));
-    private Pose2d ringPos = new Pose2d(-30.0, -50.0, Math.toRadians(180.0));
-    private Pose2d goalPos = new Pose2d(-7.0, -55.0, Math.toRadians(180.0));
-    private Pose2d pickupPos = new Pose2d(-44.0, -30.0, Math.toRadians(-60.0));
-    private Pose2d shootPos1 = new Pose2d(-7.0, -24.0, Math.toRadians(90.0));
-    private Pose2d shootPos2 = new Pose2d(shootPos1.getX(), shootPos1.getY() + 7.5, Math.toRadians(shootPos1.getHeading()));
-    private Pose2d shootPos3 = new Pose2d(shootPos2.getX(), shootPos2.getY() + 7.5, Math.toRadians(shootPos1.getHeading()));
-    private double goalPosDriveHeading = Math.toRadians(0.0);
-    private double pickupPosDriveHeading = Math.toRadians(120.0);
 
 
     @Override
@@ -39,6 +30,8 @@ public class AutoOp2020 extends LinearOpMode {
         drive = new Drive_Mecanum_Auto(hardwareMap);
 
         setupTestDriveTasks(); // add the list of task objects to the task list
+
+        drive.setPoseEstimate(testStartPos); // set the localizer's start position
         drive.setTasks(driveTasks); // then set the drive to use those tasks when required
 
         waitForStart();
@@ -115,74 +108,6 @@ public class AutoOp2020 extends LinearOpMode {
                         .splineTo(new Vector2d(0, 20), Math.toRadians(270))
                         .lineToSplineHeading((new Pose2d(0, 0, Math.toRadians(0))))
                         .build()
-        ));
-        /*
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder( testStartPos )
-                .lineToLinearHeading(new Pose2d(30, 30, Math.toRadians(-90)))
-                .build()
-        ));
-
-        driveTasks.add( new DriveFollowerTask(
-                4000 // wait for 4 seconds
-        ));
-
-        driveTasks.add( new DriveFollowerTask (
-                drive.trajectoryBuilder( driveTasks.get(0).getTraj().end() )
-                .splineTo(new Vector2d(50, 10), Math.toRadians(0))
-                .build()
-        ));
-
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder( driveTasks.get(2).getTraj().end(), 180 )
-                .splineTo(new Vector2d(0, 0), 0)
-                .build()
-        ));*/
-    }
-
-
-
-    void setupDriveTasks(){
-         driveTasks.add( new DriveFollowerTask(
-                 drive.trajectoryBuilder(startPose, true)
-                .splineTo(new Vector2d(ringPos.getX(), ringPos.getY()), ringPos.getHeading())
-                .build()
-         ));
-
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder(ringPos, true)
-                .splineTo(new Vector2d(goalPos.getX(), goalPos.getY()), goalPos.getHeading())
-                .build()
-        ));
-
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder(goalPos)
-                .splineToSplineHeading(pickupPos, pickupPosDriveHeading)
-                .build()
-        ));
-
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder(pickupPos)
-                .splineToSplineHeading(goalPos, goalPosDriveHeading)
-                .build()
-        ));
-
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder(goalPos)
-                .lineToSplineHeading(shootPos1)
-                .build()
-        ));
-
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder(shootPos1)
-                .lineTo(new Vector2d(shootPos2.getX(), shootPos2.getY()))
-                .build()
-        ));
-
-        driveTasks.add( new DriveFollowerTask(
-                drive.trajectoryBuilder(shootPos2)
-                .lineTo(new Vector2d(shootPos3.getX(), shootPos3.getY()))
-                .build()
         ));
     }
 

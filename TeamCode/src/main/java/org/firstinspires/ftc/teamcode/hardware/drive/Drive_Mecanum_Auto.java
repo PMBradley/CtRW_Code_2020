@@ -9,7 +9,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.control.PIDFController;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
@@ -33,10 +32,9 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.util.DashboardUtil;
-import org.firstinspires.ftc.teamcode.util.FSM.DriveFollowerTask;
-import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
-import org.firstinspires.ftc.teamcode.util.TrajectoryIntDuoHolder;
+import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
+import org.firstinspires.ftc.teamcode.util.StateMachine.DriveFollowerTask;
+import org.firstinspires.ftc.teamcode.util.io.LynxModuleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -187,6 +185,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
         return new TrajectoryBuilder(startPose, startHeading, constraints);
     }
 
+    public DriveConstraints getDriveConstraints(){return constraints;}
 
 
     public void turnAsync(double angle) {
@@ -375,7 +374,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     private double currentTaskStartTime;
 
     public void setTasks(ArrayList<DriveFollowerTask> newTasks){
-        tasks = newTasks; // set the tasks like promest
+        tasks = newTasks; // set the tasks like promised
         taskIndex = 0; // reset the task index to ensure that everything goes well with the new job
     }
     public ArrayList<DriveFollowerTask> getTasks(){ return tasks; } // gets the whole list of tasks
@@ -393,7 +392,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
     } // gets the current task (not the variable, but what it is according to the index)
     public int getTaskIndex(){ return taskIndex; } // get what the current task is
 
-    public boolean doTasksAsync(){ // the main state machine function that runs through each task - when complete it returns true
+    public boolean doTasksAsync(){ // the main state machine function that runs through each task - when all tasks complete it returns true
         boolean allComplete = false;
 
         if( taskIndex < tasks.size() ){ // if still within the bounds of the task list
@@ -431,7 +430,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
                 firstTaskRun = true;
             }
         } // end of task doing if
-        else { // if we are complete, as the task index has exeded the number of tasks we have
+        else { // if we are complete, as the task index has exceeded the number of tasks we have
             allComplete = true;
         }
 

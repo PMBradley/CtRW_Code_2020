@@ -1,4 +1,4 @@
-    package org.firstinspires.ftc.teamcode.control;
+    package org.firstinspires.ftc.teamcode.control.experimental;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,7 +9,6 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
 import org.firstinspires.ftc.teamcode.hardware.shooter.J_Shooter_Ring_ServoFed;
-import org.firstinspires.ftc.teamcode.hardware.shooter.Shooter_Ring_ServoFed;
 import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
 
@@ -39,7 +38,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
  */
 
 
-    @TeleOp(name = "TeleOp2020_EXP", group = "@@@")
+    @TeleOp(name = "TeleOp2020_EXP", group = "@@E")
 
     public class TeleOp2020_exp extends LinearOpMode{
         // TeleOp Variables
