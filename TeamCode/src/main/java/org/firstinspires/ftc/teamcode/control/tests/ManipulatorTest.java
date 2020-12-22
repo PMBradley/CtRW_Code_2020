@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
 import org.firstinspires.ftc.teamcode.hardware.shooter.Shooter_Ring_ServoFed;
 import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 
 /*
@@ -54,7 +56,6 @@ public class ManipulatorTest extends LinearOpMode{
     private Shooter_Ring_ServoFed shooter;
     private Arm_Wobble_Grabber wobble;
 
-
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
     public void runOpMode() throws InterruptedException {
@@ -65,6 +66,9 @@ public class ManipulatorTest extends LinearOpMode{
        // intake = new Intake_Ring_Drop(hardwareMap.get(DcMotor.class, "intakeMotor"), hardwareMap.get(Servo.class, "intakeLockServo"));
         DcMotor shooterMoter = hardwareMap.get(DcMotor.class, "shooterMotor");
         Servo feederServo = hardwareMap.get(Servo.class, "feederServo");
+        Encoder shooterEncoder = new Encoder((DcMotorEx)shooterMoter);
+
+        shooterMoter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         shooter = new Shooter_Ring_ServoFed(shooterMoter, feederServo);
 
@@ -126,7 +130,9 @@ public class ManipulatorTest extends LinearOpMode{
             //telemetry
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
             telemetry.addData("Firing state", shooter.getFiringState());
-            telemetry.addData("Running in high power mode: ", shooterAngledUp);
+            telemetry.addData("Running in high power mode", shooterAngledUp);
+            telemetry.addData("Motor velocity", shooterEncoder.getRawVelocity());
+
 
             telemetry.update(); // send the queued telemetry to the output
         }

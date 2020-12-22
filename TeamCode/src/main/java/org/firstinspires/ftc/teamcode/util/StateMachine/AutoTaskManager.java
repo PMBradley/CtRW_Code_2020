@@ -42,7 +42,7 @@ public class AutoTaskManager {
 
         return new AutoTask( "OUT_OF_BOUNDS", 10, new TargetDrivePosition() ); // else, as a default return an error task
     }
-    public AutoTask getTaskWithName(String name){
+    public AutoTask getTaskWithName(String name){ // go through each task until we find one with the corresponding name, then return it
         for(AutoTask task : autoTasks){
             if( task.getTaskName().equals(name) ){
                 return task;

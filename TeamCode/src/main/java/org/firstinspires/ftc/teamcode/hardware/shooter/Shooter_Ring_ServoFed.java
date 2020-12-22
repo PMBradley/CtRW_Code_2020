@@ -12,7 +12,7 @@ public class Shooter_Ring_ServoFed {
 
     private static final double SPIN_UP_TIME = 1500; // in milliseconds
 
-    private double shooterRunPower = 1.0;
+    private double shooterRunPower = 1.00;
     private boolean firstSpinUp = false;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
