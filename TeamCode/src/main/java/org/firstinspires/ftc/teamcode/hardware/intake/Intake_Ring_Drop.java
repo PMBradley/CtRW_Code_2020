@@ -9,9 +9,10 @@ public class Intake_Ring_Drop {
     private DcMotor intakeMotor;
     private Servo lockServo;
 
-    private static final double INTAKE_RUN_SPEED = 1.0;
+    public static final double DEFAULT_INTAKE_RUN_SPEED = 1.0;
     private static final double UNLOCK_POSITION = 1.0;
 
+    private double intakeRunSpeed = DEFAULT_INTAKE_RUN_SPEED;
 
     public Intake_Ring_Drop( DcMotor intakeMotor, Servo lockServo){
         this.intakeMotor = intakeMotor;
@@ -20,7 +21,7 @@ public class Intake_Ring_Drop {
 
 
     public void spinUp(){ // sets the motor to run at the spinning speed (will continue to run at that speed until set otherwise
-        intakeMotor.setPower(INTAKE_RUN_SPEED);
+        intakeMotor.setPower(intakeRunSpeed);
     }
 
     public void spinDown(){
@@ -36,6 +37,9 @@ public class Intake_Ring_Drop {
         }
     }
 
+    public void setIntakeRunSpeed(double newSpeed){
+        intakeRunSpeed = newSpeed;
+    }
 
     public void dropIntake(){
         lockServo.setPosition(UNLOCK_POSITION);

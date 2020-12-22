@@ -28,8 +28,10 @@ public class J_Shooter_Ring_ServoFed {
     private double lastError;
     private double lastTargetSpeed;
 
-    public static double shooterRunSpeed = 0.8; //probably should be .65 too, but leaving it for now -Avaninder
-    public static double shooterPIDRunSpeed = .65;
+    private double shooterRunSpeed; // the variable that holds the current set shooter speed
+
+    public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
+    public static final double SHOOTER_PID_SPEED = .65; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -60,9 +62,13 @@ public class J_Shooter_Ring_ServoFed {
 
     public J_Shooter_Ring_ServoFed(DcMotor shooterMotorFront, DcMotor shooterMotorBack, Servo feederServo, Servo indexerServo, Servo anglerServo){
 
-        //if(USING_PID){
-            shooterEncoder = new Encoder((DcMotorEx)shooterMotorBack);
-        //}
+        if(USING_PID){ // if using PID
+            shooterEncoder = new Encoder((DcMotorEx)shooterMotorBack); // setup the encoder
+            shooterRunSpeed = SHOOTER_PID_SPEED;  // and set the base runspeed to the shooter PID speed
+        }
+        else {
+            shooterRunSpeed = SHOOTER_SPEED;
+        }
 
         this.shooterMotorFront = shooterMotorFront;
         this.shooterMotorBack = shooterMotorBack;
@@ -75,7 +81,7 @@ public class J_Shooter_Ring_ServoFed {
 
     public boolean spinUp(){
         if(USING_PID){
-            double motorPower = getPIDPower(shooterPIDRunSpeed); // calling this only once to mess with timing things less
+            double motorPower = getPIDPower( shooterRunSpeed ); // calling this only once to mess with timing things less
             shooterMotorFront.setPower(motorPower);
             shooterMotorBack.setPower(motorPower);
         }
@@ -88,7 +94,10 @@ public class J_Shooter_Ring_ServoFed {
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
             firstSpinUp = false;
         }
-        if(localRuntime.milliseconds() >= spinUpEndTime){
+        if(USING_PID && Math.abs(encoderVeloToMotorSpeed(getFlywheelVelo()) - shooterRunSpeed) < 0.05){ // say the motor is spun up if within 0.05 of the target speed
+            spunUp = true;
+        }
+        else if(localRuntime.milliseconds() >= spinUpEndTime){
             spunUp = true;
         }
 
@@ -111,8 +120,16 @@ public class J_Shooter_Ring_ServoFed {
             }
         }
     }
-    public void setTargetShooterPower(double targetShooterPower){
+    public void setTargetShooterSpeed(double targetShooterPower){
         shooterRunSpeed = targetShooterPower;
+    }
+    public double getTargetShooterSpeed() {
+        if(USING_PID){
+            return shooterRunSpeed * 0.8; // because shooter power is scaled for the PID
+        }
+        else {
+            return shooterRunSpeed;
+        }
     }
 
 
