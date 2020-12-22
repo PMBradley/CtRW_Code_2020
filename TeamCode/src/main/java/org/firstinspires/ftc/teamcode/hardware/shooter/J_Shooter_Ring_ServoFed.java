@@ -28,8 +28,8 @@ public class J_Shooter_Ring_ServoFed {
     private double lastError;
     private double lastTargetSpeed;
 
-    public static double shooterRunSpeed = 0.8;
-    public static double shooterPIDRunSpeed = 0.8;
+    public static double shooterRunSpeed = 0.8; //probably should be .65 too, but leaving it for now -Avaninder
+    public static double shooterPIDRunSpeed = .65;
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -40,7 +40,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private double anglerPos = 0;
 
-    private static final double FEEDER_RETRACTED_POSITION = degToServoPos(96.0);// the feeder servo extened position
+    private static final double FEEDER_RETRACTED_POSITION = degToServoPos(86.0);// the feeder servo extened position
     private static final double FEEDER_EXTENDED_POSITION = degToServoPos(135.0);
     private static final double FEEDER_EXTENSION_TIME = 130; // in milliseconds
 
@@ -48,8 +48,8 @@ public class J_Shooter_Ring_ServoFed {
     private static final double INDEXER_UP_POSITION = degToServoPos(0.0);
     private static final double INDEXER_MOVE_TIME = 300; // in milliseconds
 
-    private static final double ANGLER_DOWN_POSITION = degToServoPos(0.0); // the trajectory angler down position
-    private static final double ANGLER_UP_POSITION = degToServoPos(120.0);
+    private static final double ANGLER_DOWN_POSITION = degToServoPos(95.0); // the trajectory angler down position
+    private static final double ANGLER_UP_POSITION = degToServoPos(110.0);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
 
