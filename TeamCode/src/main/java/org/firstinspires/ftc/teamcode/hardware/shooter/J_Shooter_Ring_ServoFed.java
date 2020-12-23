@@ -32,9 +32,9 @@ public class J_Shooter_Ring_ServoFed {
     private double shooterShootSpeed; // the variable
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
-    public static final double SHOOTER_PID_HIGHGOAL_SPEED = .65; // the power the shooter uses as a default for PID mode
-    public static final double SHOOTER_PID_POWERSHOT_SPEED = .65; // the power the shooter uses as a default for PID mode
-    public static final double SHOOTER_PID_LONGGOAL_SPEED = .65; // the power the shooter uses as a default for PID mode
+    public static final double SHOOTER_PID_HIGHGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
+    public static final double SHOOTER_PID_POWERSHOT_SPEED = 0.65; // the power the shooter uses as a default for PID mode
+    public static final double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -53,9 +53,9 @@ public class J_Shooter_Ring_ServoFed {
     private static final double INDEXER_UP_POSITION = degToServoPos(0.0);
     private static final double INDEXER_MOVE_TIME = 300; // in milliseconds
 
-    private static final double ANGLER_DOWN_POSITION = degToServoPos(114.0); // the trajectory angler down position
-    private static final double ANGLER_UP_POSITION = degToServoPos(131.0);
-    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 115.0);
+    private static final double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
+    private static final double ANGLER_HIGHGOAL_POSITION = degToServoPos(110.0);
+    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 90.0);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
 
@@ -211,11 +211,11 @@ public class J_Shooter_Ring_ServoFed {
     }
 
     public void angleUp(){
-        anglerPos = ANGLER_UP_POSITION;
+        anglerPos = ANGLER_HIGHGOAL_POSITION;
         anglerServo.setPosition( anglerPos );
     }
     public void angleDown(){
-        anglerPos = ANGLER_DOWN_POSITION;
+        anglerPos = ANGLER_POWERSHOT_POSITION;
         anglerServo.setPosition( anglerPos );
     }
     public void setAnglerServoDegrees(double servoDegrees){
