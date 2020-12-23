@@ -123,6 +123,9 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 if(gamepad1.dpad_up && firstToggleDriveRelative){ // toggle driving relative to field if dpad up is pressed
                     driveFieldRelative = !driveFieldRelative; // toggle the value
 
+                    if(driveFieldRelative){ // if toggling back to driving field relative
+                        robot.reset_imu(); // reset the robot's imu
+                    }
                     firstToggleDriveRelative = false; // set the variable false so that it cannot toggle again
                 }
                 else if (!gamepad1.dpad_up){ // wait to set the flag back to true until the button is released
