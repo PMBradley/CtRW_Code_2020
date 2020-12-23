@@ -20,7 +20,7 @@ public class Drive_Mecanum_Tele {
     // turn PID coeficients
     public static final double Kp = 4.5;
     public static final double Ki = 0.0;
-    public static final double Kd = 1.0;
+    public static final double Kd = 3.0;
 
     private double lastError = 0.0;
     private double lastRuntime = 0.0;
