@@ -55,7 +55,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
     private static final double ANGLER_HIGHGOAL_POSITION = degToServoPos(110.0);
-    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 100.0);
+    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 110.0);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
 
@@ -219,7 +219,7 @@ public class J_Shooter_Ring_ServoFed {
         anglerServo.setPosition( anglerPos );
     }
     public void setAnglerServoDegrees(double servoDegrees){
-        anglerPos = degToServoPos( servoDegrees );
+        anglerPos = servoDegrees;
         anglerServo.setPosition( anglerPos );
     }
 

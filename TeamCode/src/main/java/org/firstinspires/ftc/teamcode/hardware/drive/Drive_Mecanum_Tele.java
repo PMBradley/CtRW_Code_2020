@@ -18,9 +18,9 @@ public class Drive_Mecanum_Tele {
     private static final double DEFAULT_BOOSTING_MULTIPLIER = 1.0;
 
     // turn PID coeficients
-    public static final double Kp = 4.5;
+    public static final double Kp = 3.0;
     public static final double Ki = 0.0;
-    public static final double Kd = 3.0;
+    public static final double Kd = 20.0;
 
     private double lastError = 0.0;
     private double lastRuntime = 0.0;
