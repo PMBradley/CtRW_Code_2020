@@ -29,9 +29,12 @@ public class J_Shooter_Ring_ServoFed {
     private double lastTargetSpeed;
 
     private double shooterRunSpeed; // the variable that holds the current set shooter speed
+    private double shooterShootSpeed; // the variable
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
-    public static final double SHOOTER_PID_SPEED = .65; // the power the shooter uses as a default for PID mode
+    public static final double SHOOTER_PID_HIGHGOAL_SPEED = .65; // the power the shooter uses as a default for PID mode
+    public static final double SHOOTER_PID_POWERSHOT_SPEED = .65; // the power the shooter uses as a default for PID mode
+    public static final double SHOOTER_PID_LONGGOAL_SPEED = .65; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -52,6 +55,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double ANGLER_DOWN_POSITION = degToServoPos(114.0); // the trajectory angler down position
     private static final double ANGLER_UP_POSITION = degToServoPos(131.0);
+    private static final double ANGLER_LONG_POSITION = degToServoPos( 115.0);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
 
@@ -64,7 +68,8 @@ public class J_Shooter_Ring_ServoFed {
 
         if(USING_PID){ // if using PID
             shooterEncoder = new Encoder((DcMotorEx)shooterMotorBack); // setup the encoder
-            shooterRunSpeed = SHOOTER_PID_SPEED;  // and set the base runspeed to the shooter PID speed
+            shooterRunSpeed = SHOOTER_PID_HIGHGOAL_SPEED;  // and set the base runspeed to the shooter PID speed
+            shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
         }
         else {
             shooterRunSpeed = SHOOTER_SPEED;
@@ -123,7 +128,10 @@ public class J_Shooter_Ring_ServoFed {
     public void setTargetShooterSpeed(double targetShooterPower){
         shooterRunSpeed = targetShooterPower;
     }
-    public double getTargetShooterSpeed() {
+    public double getTargetShooterShootingSpeed() {
+        return shooterShootSpeed;
+    }
+    public double getTargetShootingSpeed() {
         if(USING_PID){
             return shooterRunSpeed * 0.8; // because shooter power is scaled for the PID
         }
@@ -131,6 +139,19 @@ public class J_Shooter_Ring_ServoFed {
             return shooterRunSpeed;
         }
     }
+    public void optimizeForHighgoal(){
+        angleUp();
+        shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
+    }
+    public void optimizeForPowershots(){
+        angleDown();
+        shooterRunSpeed = SHOOTER_PID_POWERSHOT_SPEED;
+    }
+    public void optimizeForLongshots(){
+        setAnglerServoDegrees(ANGLER_LONG_POSITION);
+        shooterRunSpeed = SHOOTER_PID_LONGGOAL_SPEED;
+    }
+
 
 
     public double getFlywheelVelo(){

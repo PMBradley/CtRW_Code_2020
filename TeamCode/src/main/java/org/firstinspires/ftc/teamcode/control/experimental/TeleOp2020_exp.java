@@ -206,7 +206,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 }
 
                 if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
-                    shooter.setTargetShooterSpeed(J_Shooter_Ring_ServoFed.SHOOTER_PID_SPEED);
+                    shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
                     shooter.spinUp();
                     shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
                 }
@@ -221,7 +221,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                     shooter.indexerDown(); // move the indexer to the intaking position
 
                     if(isSpinningUp){ // if the shooter should be spinning up
-                        shooter.setTargetShooterSpeed(J_Shooter_Ring_ServoFed.SHOOTER_PID_SPEED); // set the shooter to its full speed
+                        shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed()); // set the shooter to its full speed
                     }
                     else { // if not supposed to be spinnig up shooter, spin it up to a low speed to help with intaking
                         shooter.setTargetShooterSpeed(0.2);
@@ -239,11 +239,14 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                     intake.spinDown(); // and ensure that the intake is spun down
                 }
 
-                if(shooterAngledUp){
-                    shooter.angleUp();
+                if ( gamepad2.b ) {
+                    shooter.optimizeForLongshots(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                }
+                else if(shooterAngledUp){
+                    shooter.optimizeForHighgoal();
                 }
                 else {
-                    shooter.angleDown();
+                    shooter.optimizeForPowershots();
                 }
 
 
@@ -294,7 +297,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 telemetry.addData("Firing state", shooter.getFiringState());
                 telemetry.addData("Flywheel Velocity: ", shooter.getFlywheelVelo());
                 telemetry.addData("Corrected Flywheel Velocity: ", shooter.encoderVeloToMotorSpeed(shooter.getFlywheelVelo()));
-                telemetry.addData("Target Flywheel Velocity: ", shooter.getTargetShooterSpeed());
+                telemetry.addData("Target Flywheel Velocity: ", shooter.getTargetShootingSpeed());
                 telemetry.addData("Arm target position", wobble.getArmTargetPosition());
                 telemetry.addData("Wheel arm position", wobble.getArmPosition());
 
