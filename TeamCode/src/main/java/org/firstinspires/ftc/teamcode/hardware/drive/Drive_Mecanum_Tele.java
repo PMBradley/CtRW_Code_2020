@@ -146,7 +146,7 @@ public class Drive_Mecanum_Tele {
         lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
         lastTargetHeading = targetHeading; //update the last target head to be the current target heading
 
-        return rotationPower;
+        return -rotationPower;
     }
 }
 
