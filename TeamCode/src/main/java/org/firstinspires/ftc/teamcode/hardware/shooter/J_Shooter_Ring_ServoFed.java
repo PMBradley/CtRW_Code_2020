@@ -147,7 +147,7 @@ public class J_Shooter_Ring_ServoFed {
         angleDown();
         shooterShootSpeed = SHOOTER_PID_POWERSHOT_SPEED;
     }
-    public void optimizeForLonggoals(){
+    public void optimizeForLonggoal(){
         setAnglerServoDegrees(ANGLER_LONGGOAL_POSITION);
         shooterShootSpeed = SHOOTER_PID_LONGGOAL_SPEED;
     }
