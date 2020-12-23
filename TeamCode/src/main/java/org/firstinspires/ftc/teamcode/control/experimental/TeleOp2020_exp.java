@@ -175,6 +175,10 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                     wobbleIntakeDirection = 0;
                 }
 
+                if(gamepad1.left_bumper == true){ // if we want the robot to rotate to 0
+                    rotatePower = mecanum_drive.calcTurnPIDPower(Math.toRadians(0), Math.toRadians(robot.getHeading())); // override the rotation with a PID output
+                }
+
 
                 //setup a dead zone for the controllers
                 if(Math.abs(xTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)

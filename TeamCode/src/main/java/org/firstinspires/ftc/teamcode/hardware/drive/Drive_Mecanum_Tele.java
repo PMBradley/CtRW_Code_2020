@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.hardware.drive;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 public class Drive_Mecanum_Tele {
+    ElapsedTime localRuntime;
 
     // Create and initialize speed modifier variables - using default values (then can be set via a constructor)
     private double turnMultiplier = DEFAULT_TURN_MULTIPLIER; // what percentage of maximum turning speed should be used as a base turning speed (50% = 0.5, etc) - a multiplier
@@ -15,6 +17,16 @@ public class Drive_Mecanum_Tele {
     private static final double DEFAULT_TRANSLATE_MULTIPLIER = 0.6;
     private static final double DEFAULT_BOOSTING_MULTIPLIER = 1.0;
 
+    // turn PID coeficients
+    public static final double Kp = 8.0;
+    public static final double Ki = 0.0;
+    public static final double Kd = 0.0;
+
+    private double lastError = 0.0;
+    private double lastRuntime = 0.0;
+    private double integral = 0.0;
+    private double lastTargetHeading = 0.0;
+
 
     //Motor variables
     private DcMotor driveFL, driveFR, driveBL, driveBR; // motors that are being used for mecanum driving
@@ -23,6 +35,8 @@ public class Drive_Mecanum_Tele {
 
     // Default constructor
     public Drive_Mecanum_Tele(DcMotor driveMotorFL, DcMotor driveMotorFR, DcMotor driveMotorBL, DcMotor driveMotorBR){ // passing of individual motors in a constructor as an alternative to needing a robot class passed with the proper motor names
+        localRuntime = new ElapsedTime();
+
         // setup motors from passed motors
         driveFL = driveMotorFL;
         driveFR = driveMotorFR;
@@ -32,6 +46,8 @@ public class Drive_Mecanum_Tele {
 
     // Secondary constructor that can be used to pass different speed divisor values
     public Drive_Mecanum_Tele(DcMotor driveMotorFL, DcMotor driveMotorFR, DcMotor driveMotorBL, DcMotor driveMotorBR, double turnSpeed, double translateSpeed, double boostingSpeed){ // passing of individual motors in a constructor as an alternative to needing a robot class passed with the proper motor names
+        localRuntime = new ElapsedTime();
+
         // setup motors from passed motors
         driveFL = driveMotorFL;
         driveFR = driveMotorFR;
@@ -112,6 +128,25 @@ public class Drive_Mecanum_Tele {
 
     public void drive_robot_relative(double x, double y, double r, boolean isBoosting) { // use with controller only - this drives relative to the robot
         drive_field_relative(x, y, r, 0, isBoosting); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative)
+    }
+
+    public double calcTurnPIDPower(double targetHeading, double currentHeading){ // ACCEPTS RADIANS
+
+        double error = targetHeading - currentHeading; // the error is the difference between where we want to be and where we are right now
+        double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
+
+        integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
+        // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
+        double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
+
+        double rotationPower = (Kp * error) + (Ki * integral) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
+
+
+        lastError = error; // update the last error to be the current error
+        lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
+        lastTargetHeading = targetHeading; //update the last target head to be the current target heading
+
+        return rotationPower;
     }
 }
 

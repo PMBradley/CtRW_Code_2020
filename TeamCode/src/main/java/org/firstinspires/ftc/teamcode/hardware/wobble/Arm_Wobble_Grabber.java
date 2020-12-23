@@ -43,7 +43,6 @@ public class Arm_Wobble_Grabber {
     private double lastError = 0.0;
     private double lastRuntime = 0.0;
     private double integral = 0.0;
-
     private double lastTargetPosition = 0.0;
 
 
