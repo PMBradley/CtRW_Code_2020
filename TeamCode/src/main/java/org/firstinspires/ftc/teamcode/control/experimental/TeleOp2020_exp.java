@@ -53,7 +53,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
         double stopSpeed = 0.00; // the motor speed for stopping the robot
 
         // Constants
-        static final double DEAD_ZONE_RADIUS = 0.05; // the minimum value that can be passed into the drive function
+        static final double DEAD_ZONE_RADIUS = 0.01; // the minimum value that can be passed into the drive function
 
         // Robot Classes
         private Provider2020_exp robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -175,10 +175,6 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                     wobbleIntakeDirection = 0;
                 }
 
-                if(gamepad1.left_bumper == true){ // if we want the robot to rotate to 0
-                    rotatePower = mecanum_drive.calcTurnPIDPower(Math.toRadians(0), Math.toRadians(robot.getHeading())); // override the rotation with a PID output
-                }
-
 
                 //setup a dead zone for the controllers
                 if(Math.abs(xTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
@@ -191,7 +187,9 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                    rotatePower = stopSpeed;
                 }
 
-
+                if(gamepad1.left_bumper == true){ // if we want the robot to rotate to 0
+                    rotatePower = mecanum_drive.calcTurnPIDPower(Math.toRadians(0), Math.toRadians(robot.getHeading())); // override the rotation with a PID output
+                }
 
                 // Hardware instruction (telling the hardware what to do)
                 if(driveFieldRelative) {

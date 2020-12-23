@@ -55,7 +55,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double ANGLER_DOWN_POSITION = degToServoPos(114.0); // the trajectory angler down position
     private static final double ANGLER_UP_POSITION = degToServoPos(131.0);
-    private static final double ANGLER_LONG_POSITION = degToServoPos( 115.0);
+    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 115.0);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
 
@@ -148,7 +148,7 @@ public class J_Shooter_Ring_ServoFed {
         shooterRunSpeed = SHOOTER_PID_POWERSHOT_SPEED;
     }
     public void optimizeForLongshots(){
-        setAnglerServoDegrees(ANGLER_LONG_POSITION);
+        setAnglerServoDegrees(ANGLER_LONGGOAL_POSITION);
         shooterRunSpeed = SHOOTER_PID_LONGGOAL_SPEED;
     }
 
