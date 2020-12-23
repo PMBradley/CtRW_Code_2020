@@ -34,7 +34,7 @@ public class J_Shooter_Ring_ServoFed {
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
     public static final double SHOOTER_PID_HIGHGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
     public static final double SHOOTER_PID_POWERSHOT_SPEED = 0.65; // the power the shooter uses as a default for PID mode
-    public static final double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
+    public static final double SHOOTER_PID_LONGGOAL_SPEED = 1.0; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -145,11 +145,11 @@ public class J_Shooter_Ring_ServoFed {
     }
     public void optimizeForPowershots(){
         angleDown();
-        shooterRunSpeed = SHOOTER_PID_POWERSHOT_SPEED;
+        shooterShootSpeed = SHOOTER_PID_POWERSHOT_SPEED;
     }
-    public void optimizeForLongshots(){
+    public void optimizeForLonggoals(){
         setAnglerServoDegrees(ANGLER_LONGGOAL_POSITION);
-        shooterRunSpeed = SHOOTER_PID_LONGGOAL_SPEED;
+        shooterShootSpeed = SHOOTER_PID_LONGGOAL_SPEED;
     }
 
 

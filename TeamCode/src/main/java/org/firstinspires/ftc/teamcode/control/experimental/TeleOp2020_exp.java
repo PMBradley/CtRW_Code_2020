@@ -241,7 +241,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                 }
 
                 if ( gamepad2.b ) {
-                    shooter.optimizeForLongshots(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                    shooter.optimizeForLonggoals(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
                 }
                 else if(shooterAngledUp){
                     shooter.optimizeForHighgoal();
