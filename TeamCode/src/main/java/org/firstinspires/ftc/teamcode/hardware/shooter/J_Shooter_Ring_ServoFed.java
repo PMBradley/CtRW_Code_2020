@@ -99,7 +99,7 @@ public class J_Shooter_Ring_ServoFed {
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
             firstSpinUp = false;
         }
-        if(USING_PID && Math.abs(encoderVeloToMotorSpeed(getFlywheelVelo()) - shooterRunSpeed) < 0.05){ // say the motor is spun up if within 0.05 of the target speed
+        if(USING_PID && Math.abs(encoderVeloToMotorSpeed(getFlywheelVelo()) - shooterRunSpeed) < 0.025){ // say the motor is spun up if within 0.05 of the target speed
             spunUp = true;
         }
         else if(localRuntime.milliseconds() >= spinUpEndTime){
