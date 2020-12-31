@@ -20,7 +20,8 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
         - Controller 1 Left Stick = translation
         - Controller 1 Right Stick (x axis only) = rotation
         - Controller 1 Right Bumper = boost button
-        - Controller 1 D-Pad Up = toggle drive relative to field
+        - Controller 1 D-Pad Up = toggle drive relative to field (press twice to reset relative to field orientation
+        - Controller 1 Left Bumper = Lock rotation to 0 degrees relative to field while holding
 
         Ring Shooter:
         - Controller 2 X button = start a firing sequence (spins up if not spun up, then shoots a ring. can be held to fire rapidly)
@@ -188,7 +189,9 @@ public class TeleOp2020 extends LinearOpMode{
                rotatePower = stopSpeed;
             }
 
-
+            if(gamepad1.left_bumper == true){ // if we want the robot to rotate to 0
+                rotatePower = mecanum_drive.calcTurnPIDPower(Math.toRadians(0), Math.toRadians(robot.getHeading())); // override the rotation with a PID output
+            }
 
             // Hardware instruction (telling the hardware what to do)
             if(driveFieldRelative) {
@@ -198,9 +201,7 @@ public class TeleOp2020 extends LinearOpMode{
                 mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
             }
 
-            if(instructFire) {
-                shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
-            }
+
             shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
             shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
 
@@ -212,6 +213,57 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
             intake.setRunning(intakeIsRunning); // make sure the intake intakin is set to the proper intake mode
+
+
+            if(instructFire) {
+                shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
+            }
+
+            if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
+                if(shooterAngledUp){
+                    shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
+                }
+                else {
+                    shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
+                }
+                shooter.spinUp();
+                shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
+            }
+            else if(gamepad2.left_trigger > 0.5){ // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
+                shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
+
+                intake.setIntakeRunSpeed(-intake.DEFAULT_INTAKE_RUN_SPEED);
+                intake.spinUp(); // and run the intake
+            }
+            else if(intakeIsRunning){ // if the intake is set to be running by the user and the shooter isn't firing
+                if(isSpinningUp){ // if the shooter should be spinning up
+                    if(shooterAngledUp){
+                        shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
+                    }
+                    else {
+                        shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
+                    }
+                }
+                else { // if not supposed to be spining up shooter, spin it up to a low speed to have it ready to shoot
+                    shooter.setTargetShooterPower(0.2);
+                }
+                shooter.spinUp();
+
+
+                intake.setIntakeRunSpeed(intake.DEFAULT_INTAKE_RUN_SPEED);
+                intake.spinUp(); // and run the intake
+            }
+            else { // if no buttons pressed, set the shooter to the do whatever it is being told to do by spinning up, and spin down intake
+                if(shooterAngledUp){
+                    shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
+                }
+                else {
+                    shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
+                }
+                shooter.setFlywheelMode(isSpinningUp); // make sure the spin up mode it set properly
+
+                intake.spinDown(); // and ensure that the intake is spun down
+            }
 
             //wobble.setIntakeDirection(wobbleIntakeDirection); // make sure it is intaking properly
             wobbleClamp.setIntakeDirection(wobbleIntakeDirection);

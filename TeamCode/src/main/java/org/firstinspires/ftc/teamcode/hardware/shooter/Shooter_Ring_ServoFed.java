@@ -109,4 +109,5 @@ public class Shooter_Ring_ServoFed {
     public boolean isSpunUp(){
         return spunUp;
     }
+    public boolean isFiring() {return isFiring;}
 }
