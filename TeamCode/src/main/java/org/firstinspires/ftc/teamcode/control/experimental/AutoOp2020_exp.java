@@ -52,8 +52,6 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         drive.setPoseEstimate(startPos); // set the localizer's start position
 
-        telemetry.addLine("Test Point -2");
-        telemetry.update();
 
         ArrayList<AutoTask> autoTasks = setupTestAutoTasks(); // add the list of task objects to the task list TODO: make sure to update to non test version once testing complete
         taskManager = new AutoTaskManager(autoTasks); // then set the drive to use those tasks when required
