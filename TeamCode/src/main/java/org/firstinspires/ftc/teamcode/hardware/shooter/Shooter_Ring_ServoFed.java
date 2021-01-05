@@ -27,7 +27,7 @@ public class Shooter_Ring_ServoFed {
     private static final boolean USING_PID = true;
     private static final double Kp = 2.4;
     private static final double Ki = 0.00;
-    private static final double Kd = 0.00;
+    private static final double Kd = 0.80;
     private double lastRuntime;
     private double integral;
     private double lastError;
