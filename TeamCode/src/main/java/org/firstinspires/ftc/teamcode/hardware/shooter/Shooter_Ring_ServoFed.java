@@ -23,13 +23,13 @@ public class Shooter_Ring_ServoFed {
 
 
     private static final boolean USING_PID = true;
-    private static final double Kp = 2.9;
+    private static final double Kp = 2.7;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
     private double lastRuntime;
     private double integral;
     private double lastError;
-    private double lastTargetSpeed;
+   // private double lastTargetSpeed;
     private static final double POWER_CEILING = 1.00;
 
     private static final double FEEDER_EXTENDED_POSITION = 0.52;
@@ -94,7 +94,7 @@ public class Shooter_Ring_ServoFed {
     }
 
     public void setTargetShooterPower(double targetShooterPower){
-        shooterRunPower = targetShooterPower;
+        this.shooterRunPower = targetShooterPower;
     }
     public double getTargetSpeed() {
         if(USING_PID){

@@ -214,6 +214,7 @@ public class TeleOp2020 extends LinearOpMode{
             if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
                 if(shooterAngledUp){
                     shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
+                    telemetry.addData("Power should be ", shooter.getTargetSpeed());
                     telemetry.addData("Setting target power to ", shooter.getTargetSpeed());
                 }
                 else {
