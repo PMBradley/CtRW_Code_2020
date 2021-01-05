@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
@@ -213,6 +214,7 @@ public class TeleOp2020 extends LinearOpMode{
             if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
                 if(shooterAngledUp){
                     shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
+                    telemetry.addData("Setting target power to ", shooter.getTargetSpeed());
                 }
                 else {
                     shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
