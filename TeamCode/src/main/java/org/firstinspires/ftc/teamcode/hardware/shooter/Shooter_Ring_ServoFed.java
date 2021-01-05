@@ -22,7 +22,7 @@ public class Shooter_Ring_ServoFed {
     private double spinUpEndTime = 0;
 
 
-    private static final boolean USING_PID = false;
+    private static final boolean USING_PID = true;
     private static final double Kp = 2.9;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
