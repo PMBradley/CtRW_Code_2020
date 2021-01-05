@@ -22,7 +22,7 @@ public class Shooter_Ring_ServoFed {
     private double spinUpEndTime = 0;
 
 
-    private static final boolean USING_PID = true;
+    private static final boolean USING_PID = false;
     private static final double Kp = 2.9;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
@@ -30,6 +30,7 @@ public class Shooter_Ring_ServoFed {
     private double integral;
     private double lastError;
     private double lastTargetSpeed;
+    private static final double POWER_CEILING = 1.00;
 
     private static final double FEEDER_EXTENDED_POSITION = 0.52;
     private static final double FEEDER_RETRACTED_POSITION = 0.38;
@@ -58,7 +59,7 @@ public class Shooter_Ring_ServoFed {
         }
         else {
             shooterMotor.setPower( shooterRunPower );
-            lastTargetSpeed = shooterRunPower; // if not using PID, the getPIDPower method can't get a chance to set the lastTargetSpeed
+            //lastTargetSpeed = shooterRunPower; // if not using PID, the getPIDPower method can't get a chance to set the lastTargetSpeed
         }
 
 
@@ -66,7 +67,7 @@ public class Shooter_Ring_ServoFed {
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
             firstSpinUp = false;
         }
-        if(USING_PID && Math.abs(encoderVeloToMotorSpeed(getFlywheelVelo()) - lastTargetSpeed) < 0.025){ // say the motor is spun up if within 0.05 of the target speed
+        if(USING_PID && Math.abs( encoderVeloToMotorSpeed(getFlywheelVelo()) ) - (shooterRunPower * POWER_CEILING) < 0.025){ // say the motor is spun up if within 0.05 of the target speed
             spunUp = true;
         }
         else if(localRuntime.milliseconds() >= spinUpEndTime){
@@ -95,7 +96,12 @@ public class Shooter_Ring_ServoFed {
     public void setTargetShooterPower(double targetShooterPower){
         shooterRunPower = targetShooterPower;
     }
-    public double getLastTargetSpeed() {return lastTargetSpeed;}
+    public double getTargetSpeed() {
+        if(USING_PID){
+            return shooterRunPower * POWER_CEILING;
+        }
+        return shooterRunPower;
+    }
     public double getFlywheelVelo(){
         return shooterEncoder.getCorrectedVelocity();
     }
@@ -115,7 +121,7 @@ public class Shooter_Ring_ServoFed {
 
         lastError = error; // update the last error to be the current error
         lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
-        lastTargetSpeed = targetSpeed; //update the last target speed to be the current target position
+      //  lastTargetSpeed = targetSpeed; //update the last target speed to be the current target position
 
         return speed + speedChange; // we return the speed change (PID output) plus the current speed because the PID is outputting a rate of change for speed, to reach target speed (just as you would have a rate of change of position to reach a target position)
     }
