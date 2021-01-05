@@ -23,7 +23,7 @@ public class Shooter_Ring_ServoFed {
 
 
     private static final boolean USING_PID = true;
-    private static final double Kp = 2.5;
+    private static final double Kp = 2.9;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
     private double lastRuntime;
@@ -52,20 +52,24 @@ public class Shooter_Ring_ServoFed {
     }
 
     public boolean spinUp(){
+
         if(USING_PID){
-            lastTargetSpeed = getPIDPower( shooterRunPower );
+            shooterMotor.setPower( getPIDPower( shooterRunPower ) );
         }
         else {
-            lastTargetSpeed = shooterRunPower;
+            shooterMotor.setPower( shooterRunPower );
+            lastTargetSpeed = shooterRunPower; // if not using PID, the getPIDPower method can't get a chance to set the lastTargetSpeed
         }
-        shooterMotor.setPower( lastTargetSpeed );
 
 
         if (firstSpinUp){
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
             firstSpinUp = false;
         }
-        if(localRuntime.milliseconds() >= spinUpEndTime){
+        if(USING_PID && Math.abs(encoderVeloToMotorSpeed(getFlywheelVelo()) - lastTargetSpeed) < 0.025){ // say the motor is spun up if within 0.05 of the target speed
+            spunUp = true;
+        }
+        else if(localRuntime.milliseconds() >= spinUpEndTime){
             spunUp = true;
         }
 
@@ -111,7 +115,7 @@ public class Shooter_Ring_ServoFed {
 
         lastError = error; // update the last error to be the current error
         lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
-       // lastTargetSpeed = targetSpeed; //update the last target speed to be the current target position
+        lastTargetSpeed = targetSpeed; //update the last target speed to be the current target position
 
         return speed + speedChange; // we return the speed change (PID output) plus the current speed because the PID is outputting a rate of change for speed, to reach target speed (just as you would have a rate of change of position to reach a target position)
     }
