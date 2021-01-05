@@ -53,7 +53,7 @@ public class TeleOp2020 extends LinearOpMode{
     double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
     double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0.00; // the motor speed for stopping the robot
-    private static final double SHOOTER_HIGH_SPEED = 0.97;
+    private static final double SHOOTER_HIGH_SPEED = 0.955;
     private static final double SHOOTER_LOW_SPEED = 0.80;
 
 
@@ -214,8 +214,6 @@ public class TeleOp2020 extends LinearOpMode{
             if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
                 if(shooterAngledUp){
                     shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
-                    telemetry.addData("Power should be ", shooter.getTargetSpeed());
-                    telemetry.addData("Setting target power to ", shooter.getTargetSpeed());
                 }
                 else {
                     shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
