@@ -33,9 +33,9 @@ public class Shooter_Ring_ServoFed {
 
     private static final double FEEDER_EXTENDED_POSITION = 0.52;
     private static final double FEEDER_RETRACTED_POSITION = 0.38;
-    private static final double FEEDER_EXTENSION_TIME = 250; // in milliseconds
+    private static final double FEEDER_EXTENSION_TIME = 200; // in milliseconds
 
-    private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
+    private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2310;
 
 
     private boolean isFiring = false;
@@ -61,13 +61,12 @@ public class Shooter_Ring_ServoFed {
     public boolean spinUp(){
         if(USING_PID){
             lastTargetSpeed = getPIDPower( shooterRunPower );
-
-            shooterMotor.setPower( shooterRunPower );
-
         }
         else {
-            shooterMotor.setPower( shooterRunPower );
+            lastTargetSpeed = shooterRunPower;
         }
+        shooterMotor.setPower( lastTargetSpeed );
+
 
         if (firstSpinUp){
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
