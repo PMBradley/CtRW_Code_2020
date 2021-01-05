@@ -22,7 +22,7 @@ public class Shooter_Ring_ServoFed {
     private double spinUpEndTime = 0;
 
 
-    private static final boolean USING_PID = false;
+    private static final boolean USING_PID = true;
     private static final double Kp = 2.5;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
@@ -35,7 +35,7 @@ public class Shooter_Ring_ServoFed {
     private static final double FEEDER_RETRACTED_POSITION = 0.38;
     private static final double FEEDER_EXTENSION_TIME = 200; // in milliseconds
 
-    private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2310;
+    private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2350;
 
 
     private boolean isFiring = false;
@@ -48,14 +48,7 @@ public class Shooter_Ring_ServoFed {
         this.feederServo = feederServo;
         localRuntime = new ElapsedTime();
 
-        if(USING_PID){
-            shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-        else {
-            shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
-        shooterEncoder = new Encoder((DcMotorEx)shooterMotor); // setup the encoder
-
+        shooterEncoder = new Encoder((DcMotorEx)shooterMotor); // setup the encoder, even if we aren't using it directly
     }
 
     public boolean spinUp(){

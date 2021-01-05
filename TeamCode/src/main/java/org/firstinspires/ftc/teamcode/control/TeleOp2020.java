@@ -52,7 +52,7 @@ public class TeleOp2020 extends LinearOpMode{
     double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
     double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0.00; // the motor speed for stopping the robot
-    private static final double SHOOTER_HIGH_SPEED = 1.00;
+    private static final double SHOOTER_HIGH_SPEED = 0.97;
     private static final double SHOOTER_LOW_SPEED = 0.80;
 
 
@@ -202,15 +202,6 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
 
-            shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
-            shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
-
-            if(shooterAngledUp){
-                shooter.setTargetShooterPower(SHOOTER_HIGH_SPEED);
-            }
-            else {
-                shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
-            }
 
             intake.setRunning(intakeIsRunning); // make sure the intake intakin is set to the proper intake mode
 
@@ -227,7 +218,6 @@ public class TeleOp2020 extends LinearOpMode{
                     shooter.setTargetShooterPower(SHOOTER_LOW_SPEED);
                 }
                 shooter.spinUp();
-                shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
             }
             else if(gamepad2.left_trigger > 0.5){ // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
                 shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
@@ -264,6 +254,9 @@ public class TeleOp2020 extends LinearOpMode{
 
                 intake.spinDown(); // and ensure that the intake is spun down
             }
+
+            shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
+
 
             //wobble.setIntakeDirection(wobbleIntakeDirection); // make sure it is intaking properly
             wobbleClamp.setIntakeDirection(wobbleIntakeDirection);
