@@ -50,11 +50,12 @@ public class Shooter_Ring_ServoFed {
 
         if(USING_PID){
             shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            shooterEncoder = new Encoder((DcMotorEx)shooterMotor); // setup the encoder
         }
         else {
             shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+        shooterEncoder = new Encoder((DcMotorEx)shooterMotor); // setup the encoder
+
     }
 
     public boolean spinUp(){
@@ -100,12 +101,7 @@ public class Shooter_Ring_ServoFed {
     }
     public double getLastTargetSpeed() {return lastTargetSpeed;}
     public double getFlywheelVelo(){
-        if(USING_PID){
-            return shooterEncoder.getCorrectedVelocity();
-        }
-        else {
-            return 0;
-        }
+        return shooterEncoder.getCorrectedVelocity();
     }
     private double getPIDPower( double targetSpeed ){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
