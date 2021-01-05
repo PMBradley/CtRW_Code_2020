@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.shooter;
 
+import android.app.usage.NetworkStatsManager;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -23,7 +25,7 @@ public class Shooter_Ring_ServoFed {
 
 
     private static final boolean USING_PID = true;
-    private static final double Kp = 2.7;
+    private static final double Kp = 2.4;
     private static final double Ki = 0.00;
     private static final double Kd = 0.00;
     private double lastRuntime;
@@ -67,10 +69,10 @@ public class Shooter_Ring_ServoFed {
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
             firstSpinUp = false;
         }
-        if(USING_PID && Math.abs( encoderVeloToMotorSpeed(getFlywheelVelo()) ) - getTargetSpeed() + 0.015 < 0.01){ // say the motor is spun up if within 0.01 of the target speed
+        if(USING_PID && Math.abs( encoderVeloToMotorSpeed(getFlywheelVelo()) ) - getTargetSpeed() < 0.01){ // say the motor is spun up if within 0.01 of the target speed
             spunUp = true;
         }
-        else if(localRuntime.milliseconds() >= spinUpEndTime){
+        else if(!USING_PID && localRuntime.milliseconds() >= spinUpEndTime){
             spunUp = true;
         }
 
