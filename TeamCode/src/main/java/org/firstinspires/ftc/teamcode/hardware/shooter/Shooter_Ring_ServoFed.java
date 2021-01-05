@@ -100,7 +100,12 @@ public class Shooter_Ring_ServoFed {
     }
     public double getLastTargetSpeed() {return lastTargetSpeed;}
     public double getFlywheelVelo(){
-        return shooterEncoder.getCorrectedVelocity();
+        if(USING_PID){
+            return shooterEncoder.getCorrectedVelocity();
+        }
+        else {
+            return 0;
+        }
     }
     private double getPIDPower( double targetSpeed ){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
