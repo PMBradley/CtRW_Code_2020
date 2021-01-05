@@ -97,7 +97,7 @@ public class Shooter_Ring_ServoFed {
     }
     private double getPIDPower( double targetSpeed ){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
-        targetSpeed *= 0.8; // scale the target speed so that we have headroom
+       // targetSpeed *= 0.9; // scale the target speed so that we have headroom
 
         double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
@@ -111,7 +111,7 @@ public class Shooter_Ring_ServoFed {
 
         lastError = error; // update the last error to be the current error
         lastRuntime = localRuntime.milliseconds(); // update the last runtime to be the current runtime
-        lastTargetSpeed = targetSpeed; //update the last target speed to be the current target position
+       // lastTargetSpeed = targetSpeed; //update the last target speed to be the current target position
 
         return speed + speedChange; // we return the speed change (PID output) plus the current speed because the PID is outputting a rate of change for speed, to reach target speed (just as you would have a rate of change of position to reach a target position)
     }
