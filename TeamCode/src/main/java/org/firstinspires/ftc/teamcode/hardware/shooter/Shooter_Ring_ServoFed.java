@@ -34,7 +34,7 @@ public class Shooter_Ring_ServoFed {
    // private double lastTargetSpeed;
     private static final double POWER_CEILING = 1.00;
 
-    private static final double FEEDER_EXTENDED_POSITION = 0.52;
+    private static final double FEEDER_EXTENDED_POSITION = 0.54;
     private static final double FEEDER_RETRACTED_POSITION = 0.38;
     private static final double FEEDER_EXTENSION_TIME = 200; // in milliseconds
 
