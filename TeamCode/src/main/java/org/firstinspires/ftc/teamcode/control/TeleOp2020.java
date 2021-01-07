@@ -53,7 +53,7 @@ public class TeleOp2020 extends LinearOpMode{
     double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
     double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     double stopSpeed = 0.00; // the motor speed for stopping the robot
-    private static final double SHOOTER_HIGH_SPEED = 0.82;
+    private static final double SHOOTER_HIGH_SPEED = 0.81;
     private static final double SHOOTER_LOW_SPEED = 0.70;
 
 
