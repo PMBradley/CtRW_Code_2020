@@ -35,7 +35,7 @@ public class AutoTaskManager {
 
 
     public ArrayList<AutoTask> getTasks(){ return autoTasks; }
-    public AutoTask getTaskAt(int index){
+    public AutoTask getTaskAt (int index){
         if( index < autoTasks.size() ){ // if the current task wouldn't be out of bounds
             return autoTasks.get(index); // return the current task
         }

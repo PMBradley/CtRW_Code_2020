@@ -29,16 +29,17 @@ public class AutoOp2020_exp extends LinearOpMode {
     Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
 
 
-     // private Pose2d startPose = new Pose2d(-50.0, -50.0, Math.toRadians(0));
-    private Pose2d startPose = new Pose2d(0.0, 0.0, Math.toRadians(0)); // TODO: change back to actual start position once done testing
+    private Pose2d startPose = new Pose2d(-60.0, 0.0, Math.toRadians(0));
+   // private Pose2d startPose = new Pose2d(0.0, 0.0, Math.toRadians(0)); // TODO: change back to actual start position once done testing
 
-    private TargetDrivePosition ringScanPos     = new TargetDrivePosition(-30.0, -50.0, Math.toRadians(0.0));
-    private TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(-7.0, -55.0, Math.toRadians(0.0));
-    private TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(-7.0, -55.0, Math.toRadians(0.0));
-    private TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(-7.0, -55.0, Math.toRadians(0.0));
-    private TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-44.0, -30.0, Math.toRadians(-90.0));
-    private TargetDrivePosition shootPos        = new TargetDrivePosition(-7.0, -24.0, Math.toRadians(0.0));
-    private TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-7.0, -24.0, Math.toRadians(0.0));
+    private TargetDrivePosition ringScanPos     = new TargetDrivePosition(-36.0, -12.0, Math.toRadians(0.0));
+    private TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(-6.0, -30.0, Math.toRadians(0.0));
+    private TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(20.0, -18.0, Math.toRadians(0.0));
+    private TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(44.0, -30.0, Math.toRadians(0.0));
+    private TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-32.0, -24.0, Math.toRadians(-90.0));
+    private TargetDrivePosition shootPos        = new TargetDrivePosition(-36.0, -12.0, Math.toRadians(0.0));
+    private TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-36.0, -12.0, Math.toRadians(0.0));
+    private TargetDrivePosition parkPos         = new TargetDrivePosition(12.0, 12.0, Math.toRadians(0.0));
 
 
     private boolean autonomousComplete = false;
@@ -70,8 +71,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         waitForStart();
 
-        telemetry.addLine("Test Point 0");
-        telemetry.update();
+
 
         while (opModeIsActive() && !isStopRequested() && !autonomousComplete){ // while it is ok to keep running in a loop, do so
 
@@ -194,6 +194,9 @@ public class AutoOp2020_exp extends LinearOpMode {
         atLocationTasks = new ArrayList<DriveFollowerTask>();
         atLocationTasks.add(new DriveFollowerTask(00)); // once at this location, wait 700 msecs
         autoTasks.add(new AutoTask("END", 10, new TargetDrivePosition(startPos.getX(), startPos.getY(), startPos.getHeading()), atLocationTasks));
+
+
+        autoTasks.add(new AutoTask("Apple", 1, new TargetDrivePosition(40, -25, Math.toRadians(90)), atLocationTasks));
 
 
         return autoTasks;
