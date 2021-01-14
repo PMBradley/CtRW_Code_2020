@@ -42,6 +42,9 @@ public class DriveConstants {
      * angular distances although most angular parameters are wrapped in Math.toRadians() for
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
+  /*  public static double WHEEL_RADIUS = 1.93; // in   // programming bot values
+    public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
+    public static double TRACK_WIDTH = 14.2; // in */
     public static double WHEEL_RADIUS = 1.93; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
     public static double TRACK_WIDTH = 14.2; // in
@@ -52,10 +55,12 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.0172;  // 1.0 / rpmToVelocity(MAX_RPM)
+    /* public static double kV = 0.0172;  // Test bot values
+    public static double kA = 0.00195;
+    public static double kStatic = 0.005; */
+    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
     public static double kA = 0.00195;
     public static double kStatic = 0.005;
-
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
      * the constraints should never exceed ~80% of the robot's actual capabilities. While Road

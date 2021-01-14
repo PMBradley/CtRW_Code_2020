@@ -391,6 +391,7 @@ public class Drive_Mecanum_Auto extends MecanumDrive {
             return new DriveFollowerTask();
     } // gets the current task (not the variable, but what it is according to the index)
     public int getTaskIndex(){ return taskIndex; } // get what the current task is
+    public boolean firstTaskCompleted(){ return (taskIndex >= 1); } // returns true if the first task in the task list has been passed
 
     public boolean doTasksAsync(){ // the main state machine function that runs through each task - when all tasks complete it returns true
         boolean allComplete = false;

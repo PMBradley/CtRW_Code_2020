@@ -23,6 +23,7 @@ public class Vision_OpenCV_ExternalCam {
     public static final int CAMERA_RESOLUTION_Y = 480; // the camera y resolution dimensions that will be used
     private static final OpenCvCameraRotation CAMERA_ROTATION = OpenCvCameraRotation.UPSIDE_DOWN; // which direction is up for the camera
 
+    private boolean cameraStreaming = false;
 
     public Vision_OpenCV_ExternalCam(HardwareMap hardwareMap){ // most basic constructor, just inits the camera, using the default device name
         initWebcam(hardwareMap); // init the webcam
@@ -61,9 +62,9 @@ public class Vision_OpenCV_ExternalCam {
         // webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
         webcam.openCameraDevice();
-        webcam.startStreaming(CAMERA_RESOLUTION_X, CAMERA_RESOLUTION_Y, CAMERA_ROTATION); // start the streaming process
+        startWebcamStreaming();
 
-        FtcDashboard.getInstance().startCameraStream(webcam, 0); // init the dashboard stream
+        FtcDashboard.getInstance().startCameraStream(webcam, 0); // init the dashboard stream (0 max fps means no limit)
     }
 
     public void setWebcamPipeine(CustomPipeline new_pipeline){
@@ -74,6 +75,19 @@ public class Vision_OpenCV_ExternalCam {
 
     public String getOutput(){ // the whole point of the class, this is where you finally access and get an output
         return pipeline.getAnalysis();
+    }
+
+
+    public void startWebcamStreaming(){
+        webcam.startStreaming(CAMERA_RESOLUTION_X, CAMERA_RESOLUTION_Y, CAMERA_ROTATION); // start the streaming process
+        cameraStreaming = true; // update the flag
+    }
+    public void stopWebcamStreaming(){
+        webcam.stopStreaming(); // stop the streaming process
+        cameraStreaming = false; // update the flag
+    }
+    public boolean isCameraStreaming(){
+        return cameraStreaming;
     }
 
 }

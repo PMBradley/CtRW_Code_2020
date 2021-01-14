@@ -22,7 +22,6 @@ public class Arm_Wobble_Grabber {
     private static final double GRAB_POSITION = 94.0;  // target position for grabbing, in degrees
     private static final double ENCODER_TICS_PER_REVOLUTION = 696.5; // the number of encoder tics measured per revolution of the motor used (see the manufacturer website for info)
 
-
     private static final double ENCODER_TICS_PER_DEGREE = 360 / ENCODER_TICS_PER_REVOLUTION;
 
 
@@ -43,7 +42,9 @@ public class Arm_Wobble_Grabber {
     private double lastError = 0.0;
     private double lastRuntime = 0.0;
     private double integral = 0.0;
-    private double lastTargetPosition = 0.0;
+    private double lastTargetPosition = IDLE_POSITION;
+
+    private int intakeDirection = 0;
 
 
     public Arm_Wobble_Grabber(DcMotor armMotor, Servo leftServo, Servo rightServo, double gearRatio){
@@ -57,24 +58,36 @@ public class Arm_Wobble_Grabber {
         this(armMotor, leftServo, rightServo, 1);
     }
 
+    public void stopIntake(){
+        setIntakeDirection(0);
+    }
+    public void intakeSpinIn(){
+        setIntakeDirection(1);
+    }
+    public void intakeSpinOut(){
+        setIntakeDirection(-1);
+    }
     // sets the intake run direction for the grabber
     public void setIntakeDirection( int direction ){ // 0 for direction is no motion, 1 moves the intake wheels to intake, -1 moves the intake wheels to outake
-            if(direction == 0){
-                leftServo.setPosition(STOP_POWER);
-                rightServo.setPosition(STOP_POWER);
-               // rightServo.setPosition(leftToRight(STOP_POWER));
-            }
-            if (direction == 1) {
-                leftServo.setPosition(INTAKE_POWER);
-                rightServo.setPosition(INTAKE_POWER);
-                //rightServo.setPosition(leftToRight(INTAKE_POWER));
-            }
-            if (direction == -1) {
-                leftServo.setPosition(OUTTAKE_POWER);
-                rightServo.setPosition(OUTTAKE_POWER);
-                //rightServo.setPosition(leftToRight(OUTTAKE_POWER));
-            }
+        intakeDirection = direction;
+
+        if(direction == 0){
+            leftServo.setPosition(STOP_POWER);
+            rightServo.setPosition(STOP_POWER);
+           // rightServo.setPosition(leftToRight(STOP_POWER));
+        }
+        if (direction == 1) {
+            leftServo.setPosition(INTAKE_POWER);
+            rightServo.setPosition(INTAKE_POWER);
+            //rightServo.setPosition(leftToRight(INTAKE_POWER));
+        }
+        if (direction == -1) {
+            leftServo.setPosition(OUTTAKE_POWER);
+            rightServo.setPosition(OUTTAKE_POWER);
+            //rightServo.setPosition(leftToRight(OUTTAKE_POWER));
+        }
     }
+    public int getIntakeDirection() {return intakeDirection;}
 
     public boolean setArmPosition( double targetPosition ){
         double position = encoderTicsToDegrees( armMotor.getCurrentPosition() ); // set our current position to be the encoder position in tics converted to degrees
@@ -105,7 +118,9 @@ public class Arm_Wobble_Grabber {
     public boolean goToGrabPos(){ // sets the arm to go to the grab position, returns true when there (within the margin of error)
         return setArmPosition(GRAB_POSITION);
     }
-
+    public boolean goToRecentPos(){ // sets the arm to go to the last used target position, returns true when there (within the margin of error)
+        return setArmPosition(lastTargetPosition);
+    }
 
     public double getArmTargetPosition(){
         return lastTargetPosition;
