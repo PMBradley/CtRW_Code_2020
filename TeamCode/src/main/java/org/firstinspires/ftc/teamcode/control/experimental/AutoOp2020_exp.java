@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.experimental;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,8 +22,8 @@ import java.util.ArrayList;
 /*
  * Welcome to the Autonomous OpMode! This opmode coordinates the robot's manipulators and drive without user input to complete challenges
  */
-@Autonomous(name = "AutoOp2020_EXP", group = "@@E")
-
+@Autonomous(name = "AutoOp2020_EXP", group = "@@E") // the name and group for the opmode
+@Config // allow FTC dashboard to access public static member variables here
 
 public class AutoOp2020_exp extends LinearOpMode {
 
@@ -36,19 +37,22 @@ public class AutoOp2020_exp extends LinearOpMode {
     AutoTaskManager taskManager;
     ElapsedTime runtime;
 
-    Pose2d startPos = new Pose2d(0, 0, Math.toRadians(0));
 
-    private Pose2d startPose = new Pose2d(-60.0, 0.0, Math.toRadians(0)); // the starting position of the robot relative to the middle of the field
+    public static String ROBOT_NAME = "Robot 2021";
 
-    private TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(-6.0, -30.0, Math.toRadians(0.0)); // the positions that the robot needs to drive to
-    private TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(20.0, -18.0, Math.toRadians(0.0));
-    private TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(44.0, -30.0, Math.toRadians(0.0));
-    private TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-32.0, -24.0, Math.toRadians(-90.0));
-    private TargetDrivePosition shootPos        = new TargetDrivePosition(-36.0, -12.0, Math.toRadians(0.0));
-    private TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-36.0, -12.0, Math.toRadians(0.0));
-    private TargetDrivePosition parkPos         = new TargetDrivePosition(12.0, 12.0, Math.toRadians(0.0));
+    private static Pose2d startPose = new Pose2d(-60.0, 0.0, Math.toRadians(0)); // the starting position of the robot relative to the middle of the field
 
-    private static final double RING_COLLECT_DISTANCE = 10;
+    public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(-6.0, -26.0, Math.toRadians(70.0)); // the positions that the robot needs to drive to
+    public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(20.0, -18.0, Math.toRadians(70.0));
+    public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(44.0, -26.0, Math.toRadians(70.0));
+    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-38.0, -24.0, Math.toRadians(300.0));
+    public static TargetDrivePosition shootPos        = new TargetDrivePosition(-42.0, -12.0, Math.toRadians(0.0));
+    public static TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-28.0, -15.0, Math.toRadians(0.0));
+    public static TargetDrivePosition parkPos         = new TargetDrivePosition(12.0, 12.0, Math.toRadians(0.0), Math.toRadians(90.0));
+
+    public static double ARM_OFFSET_DEGREES = -340;
+
+    //public static double RING_COLLECT_DISTANCE = 0;
 
     private String wobbleDropPos = "A";
     private boolean scanningComplete = false;
@@ -70,7 +74,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         vision = new Vision_OpenCV_ExternalCam(hardwareMap, new RingStackHeightPipeline()); // setup the camera handling class, passing in the pipeline we want to use to process inputs
 
 
-        drive.setPoseEstimate(startPos); // set the localizer's start position to our position on the field relative to the center
+        drive.setPoseEstimate(startPose); // set the localizer's start position to our position on the field relative to the center
         vision.stopWebcamStreaming(); // prevent wasting resources by stopping the webcam streaming process until it is needed
 
         ArrayList<AutoTask> autoTasks = setupAutoTasks(); // add the list of task objects to the task list
@@ -81,8 +85,10 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         drive.setTasks(taskManager.generateCurrentTaskDriveTaskList( drive.getPoseEstimate(), drive.getDriveConstraints() )); // then set the drive to go to that task's position and do any of that auto task's drive tasks
 
+        wobble.setArmStartingOffset(ARM_OFFSET_DEGREES); // set the wobble's starting offset, such that the starting position behaves like 0 (as in Auto the encoder likes to start in a weird position)
 
-        telemetry.addLine("Robot setup completed.");
+
+        telemetry.addLine(ROBOT_NAME + "'s setup completed.");
         telemetry.addData("Chosen first task", taskManager.getCurrentTask().getTaskName());
         telemetry.update();
 
@@ -91,8 +97,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         waitForStart(); // wait until play is pressed on the robot controller to progress
 
         // Post start setup (usually for anything that requires moving any parts on the robot)
-        shooter.optimizeForLonggoal(); // set the shooter to optimize for shooting from across the field
-
+        wobble.goToUpPos();
 
 
         while (opModeIsActive() && !isStopRequested() && !autonomousComplete){ // while it is ok to keep running in a loop, do so
@@ -152,6 +157,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             telemetry.addData("Current position", drive.getLocalizer().getPoseEstimate()); // print the estimated current position of the robot
 
             telemetry.addLine("Shooter velocity: " + shooter.getFlywheelVelo());
+            telemetry.addLine("Target Arm position: " + wobble.getArmTargetPosition() + " degrees");
             telemetry.addLine("Arm position: " + wobble.getArmPosition() + " degrees");
             telemetry.addLine("Wobble intake power: " + wobble.getIntakeDirection());
             telemetry.addLine("Ring intake power: " + intake.getCurrentIntakePower());
@@ -169,7 +175,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
     void updateSensors(String currentTaskName){ // updates any processing related to sensor data, in this game that mostly means camera data
 
-        if( currentTaskName.equals("Scan & Shoot Rings") && drive.getTaskIndex() >= 1 ){ // if current task is this task and we have completed driving to location
+        if( currentTaskName.equals("Scan & Shoot Rings") && drive.getTaskIndex() > 1 ){ // if current task is this task and we have completed driving to location
             if( !vision.isCameraStreaming() ){ // if the vision streaming process isn't started,
                 vision.startWebcamStreaming(); // start the streaming process
             }
@@ -193,48 +199,67 @@ public class AutoOp2020_exp extends LinearOpMode {
             intake.spinDown();
 
             if(drive.getTaskIndex() == 1){ // if at location and on the first subtask
+                wobble.intakeSpinIn();
                 wobble.goToGrabPos();
-                wobble.intakeSpinOut();
             }
             else if(drive.getTaskIndex() == 2){ // if at location and on the second subtask
                 wobble.stopIntake();
                 wobble.goToUpPos();
             }
+            else {
+                wobble.goToGrabPos();
+            }
         }
         else if ( currentTaskName.equals("Scan & Shoot Rings") || currentTaskName.equals("Shoot Rings") ) { // if current task is this task (or the other one)
+            wobble.goToRecentPos();
             shooter.spinUp(); // spin up the shooter on the way to
-            intake.spinDown();
+            shooter.optimizeForLonggoal(); // set the shooter to optimize for shooting from across the field
 
             if(drive.firstTaskCompleted()){ // if at location, start shooting
-                shooter.instructFire();
+                intake.spinDown();
 
+                shooter.instructFire();
+            }
+            else { // if not at location
+                if(currentTaskName.equals("Shoot Rings")){
+                    intake.spinUp();
+                    shooter.indexerDown();
+                }
+                else {
+                    intake.spinDown();
+                    shooter.indexerUp();
+                }
             }
         }
         else if( currentTaskName.equals("Collect Rings")  ){ // if current task is this task
             intake.spinUp(); // spin up the intake for ring collection
-
+            shooter.indexerDown();
             // specifically leaves the shooter in whatever state it was already in, but no need to maintain the PID by calling spinUp or spinDown as the motor will keep its last known speed and that is close enough
         }
         else if( currentTaskName.equals("Collect Wobble") ){ // if current task is this task
             shooter.spinDown();
             intake.spinDown();
 
-            if(drive.getTaskIndex() == 1){ // if at location and on the first subtask
-                wobble.goToGrabPos();
+
+            if(drive.getTaskIndex() <= 1){ // if at location and on the first subtask
                 wobble.intakeSpinOut();
+                wobble.goToGrabPos();
             }
             else if(drive.getTaskIndex() == 2){ // if at location and on the second subtask
-                wobble.stopIntake();
                 wobble.goToUpPos();
+                wobble.stopIntake();
             }
         }
         else { // if no tasks selected above, default states are as follows
             shooter.spinDown();
             intake.spinDown();
             wobble.stopIntake();
+            shooter.indexerUp();
+            wobble.goToRecentPos();
         }
 
-        wobble.goToRecentPos(); // always update the wobble PID, also shouldn't be impacted by running twice in one loop because of time compensation built in
+
+        shooter.updateFeeder(); // always update the shooter feeder, so that it can start the feeding process as soon as possible
     }
 
 
@@ -243,31 +268,33 @@ public class AutoOp2020_exp extends LinearOpMode {
         ArrayList<DriveFollowerTask> atLocationTasks = new ArrayList<DriveFollowerTask>(); // create an array list to hold the driveTasks for each location (reset between adding tasks unless their at location drive task list is the same)
 
 
-        atLocationTasks.clear();
-        atLocationTasks.add(new DriveFollowerTask(500)); // once at this location, wait msecs
+        atLocationTasks = new ArrayList<DriveFollowerTask>();
+        atLocationTasks.add(new DriveFollowerTask(1500)); // once at this location, wait msecs
         atLocationTasks.add(new DriveFollowerTask(50)); // then wait msecs
         autoTasks.add(new AutoTask("Place Wobble 1", 2, wobbleGoalPosA, atLocationTasks));
         autoTasks.add(new AutoTask("Place Wobble 2", 2, wobbleGoalPosA, atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
 
-        atLocationTasks.clear();
-        atLocationTasks.add(new DriveFollowerTask(850)); // once at this location, wait msecs
+        atLocationTasks = new ArrayList<DriveFollowerTask>();
+        atLocationTasks.add(new DriveFollowerTask(1050)); // once at this location, wait msecs
+        atLocationTasks.add(new DriveFollowerTask(50)); // once at this location, wait msecs
         autoTasks.add(new AutoTask("Scan & Shoot Rings", 1, shootPos, atLocationTasks));
         autoTasks.add(new AutoTask("Shoot Rings", 2, shootPos, atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
 
-        atLocationTasks.clear();
-        atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(ringPickupPos.getPose2d())
+        atLocationTasks = new ArrayList<DriveFollowerTask>();
+      /*  atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(ringPickupPos.getPose2d())
                 .forward(RING_COLLECT_DISTANCE)
                 .build()
-        )); // once at this location, move forwards into the rings
+        )); */// once at this location, move forwards into the rings
+        atLocationTasks.add(new DriveFollowerTask(700)); // once at this location, wait msecs
         autoTasks.add(new AutoTask("Collect Rings", 2, ringPickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
-        atLocationTasks.clear();
-        atLocationTasks.add(new DriveFollowerTask(700)); // wait msecs once at location
+        atLocationTasks = new ArrayList<DriveFollowerTask>();
+        atLocationTasks.add(new DriveFollowerTask(1800)); // wait msecs once at location
         atLocationTasks.add(new DriveFollowerTask(50)); // then wait msecs
         autoTasks.add(new AutoTask("Collect Wobble", 2, wobblePickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
-        atLocationTasks.clear();
-        atLocationTasks.add(new DriveFollowerTask(50)); // wait msecs once at location
+        atLocationTasks = new ArrayList<DriveFollowerTask>();
+        atLocationTasks.add(new DriveFollowerTask(50000)); // wait msecs once at location
         autoTasks.add(new AutoTask("END", 3, parkPos, atLocationTasks));
 
         return autoTasks;
@@ -303,7 +330,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
         atLocationTasks.add(new DriveFollowerTask(00)); // once at this location, wait 700 msecs
-        autoTasks.add(new AutoTask("END", 10, new TargetDrivePosition(startPos.getX(), startPos.getY(), startPos.getHeading()), atLocationTasks));
+        autoTasks.add(new AutoTask("END", 10, new TargetDrivePosition(startPose.getX(), startPose.getY(), startPose.getHeading()), atLocationTasks));
 
 
         autoTasks.add(new AutoTask("Apple", 1, new TargetDrivePosition(40, -25, Math.toRadians(90)), atLocationTasks));

@@ -58,8 +58,8 @@ public class DriveConstants {
     /* public static double kV = 0.0172;  // Test bot values
     public static double kA = 0.00195;
     public static double kStatic = 0.005; */
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0.00195;
+    public static double kV = 0.0177; // start with a value approximately 1.0 / rpmToVelocity(MAX_RPM)
+    public static double kA = 0.0043;
     public static double kStatic = 0.005;
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -70,7 +70,7 @@ public class DriveConstants {
      * forces acceleration-limited profiling).
      */
     public static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints( // og was 35, 20, 0
-            30.0, 15.0, 0.0,
+            45.0, 35.0, 0.0,
             Math.toRadians(180.0), Math.toRadians(180.0), 0.0
     );
 

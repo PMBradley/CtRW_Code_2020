@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.util.StateMachine;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
+@Config
 public class TargetDrivePosition {
-    private double x, y, heading; // main position variables - x and y are in inches - r is in radians
-    private boolean usingSpline; // a boolean flag that determines if the drive should traverse there using a spline path
-    private double splineHeading; // the heading that the spline generator uses as a target approach heading, in radians
+    public double x, y, heading; // main position variables - x and y are in inches - r is in radians
+    public boolean usingSpline; // a boolean flag that determines if the drive should traverse there using a spline path
+    public double splineHeading; // the heading that the spline generator uses as a target approach heading, in radians
 
     public TargetDrivePosition(){ // default constructor
         this.x = 0;

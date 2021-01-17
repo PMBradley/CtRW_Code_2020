@@ -26,7 +26,7 @@ public class Arm_Wobble_Grabber {
 
 
     public static final double Kp = 0.007;
-    public static final double Ki = 0.000001;
+    public static final double Ki = 0.00000; // old: 0.000001
     public static final double Kd = 0.00001;
 
 
@@ -45,7 +45,7 @@ public class Arm_Wobble_Grabber {
     private double lastTargetPosition = IDLE_POSITION;
 
     private int intakeDirection = 0;
-
+    private double armOffset = 0.0;
 
     public Arm_Wobble_Grabber(DcMotor armMotor, Servo leftServo, Servo rightServo, double gearRatio){
         this.armMotor = armMotor;
@@ -90,7 +90,7 @@ public class Arm_Wobble_Grabber {
     public int getIntakeDirection() {return intakeDirection;}
 
     public boolean setArmPosition( double targetPosition ){
-        double position = encoderTicsToDegrees( armMotor.getCurrentPosition() ); // set our current position to be the encoder position in tics converted to degrees
+        double position = getArmPosition(); // set our current position to be the encoder position in tics converted to degrees
 
         double error = targetPosition - position; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
@@ -110,28 +110,33 @@ public class Arm_Wobble_Grabber {
         return withinMarginOfError( targetPosition, position ); // returns true if close enough to the target to be within the margin of error
     }
     public boolean goToIdlePos(){ // sets the arm to go to the idle position, returns true when there (within the margin of error)
+        lastTargetPosition = IDLE_POSITION;
         return setArmPosition(IDLE_POSITION);
     }
     public boolean goToUpPos(){ // sets the arm to go to the up position, returns true when there (within the margin of error)
+        lastTargetPosition = IDLE_POSITION;
         return setArmPosition(UP_POSITION);
     }
     public boolean goToGrabPos(){ // sets the arm to go to the grab position, returns true when there (within the margin of error)
+        lastTargetPosition = IDLE_POSITION;
         return setArmPosition(GRAB_POSITION);
     }
     public boolean goToRecentPos(){ // sets the arm to go to the last used target position, returns true when there (within the margin of error)
         return setArmPosition(lastTargetPosition);
+    }
+    public void setArmStartingOffset(double offset){
+        armOffset = offset;
     }
 
     public double getArmTargetPosition(){
         return lastTargetPosition;
     }
     public double getArmPosition(){ // returns the current arm position in degrees
-        return encoderTicsToDegrees( armMotor.getCurrentPosition() ); // get the current encoder tics position, then convert that to degrees
+        return encoderTicsToDegrees( armMotor.getCurrentPosition() ) + armOffset; // get the current encoder tics position, then convert that to degrees
     }
     public double getArmError(){ // returns the last known error to the target position
         return lastError;
     }
-
 
     private double encoderTicsToDegrees( double tics ){ // converts tics of the encoder to degrees of arm rotation (used for getting position from the arm)
         return tics * ENCODER_TICS_PER_DEGREE * gearRatio;// aka tics * (360 / encoder tics per revolution) * gear ratio

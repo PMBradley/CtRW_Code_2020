@@ -41,8 +41,8 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double Y_MULTIPLIER = 1.00; // a distance multiplier for the y axis - tune as needed (see https://learnroadrunner.com for tuning info)
 
     public static double LATERAL_DISTANCE = 16.66123177; // in; distance between the left and right odometry wheels - update with physical robot changes to distance
-    public static double LATERAL_POD_FORWARD_OFFSET = -0.25; // in; forward offset of the lateral odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
-    public static double LATERAL_POD_LEFT_OFFSET = -6.25; // in; left offset of the lataeral odometry wheel - update with physical robot changes to distance - positive is left of center of rotation
+    public static double LATERAL_POD_FORWARD_OFFSET = -0.145; // in; forward offset of the lateral odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
+    public static double LATERAL_POD_LEFT_OFFSET = -11.25; // 6.25 in; left offset of the lataeral odometry wheel - update with physical robot changes to distance - positive is left of center of rotation
     public static double RIGHT_POD_FORWARD_OFFSET = 1.225; // in; forward offset of the right odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
     public static double LEFT_POD_FORWARD_OFFSET = 1.225; // in; forward offset of the left odometry wheel - update with physical robot changes to distance - positive is forward of center of rotation
 
