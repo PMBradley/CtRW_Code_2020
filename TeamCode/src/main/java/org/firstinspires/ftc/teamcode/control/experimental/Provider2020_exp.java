@@ -147,6 +147,7 @@ public class Provider2020_exp {
 
 
             intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            wobbleArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             JShootBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
 

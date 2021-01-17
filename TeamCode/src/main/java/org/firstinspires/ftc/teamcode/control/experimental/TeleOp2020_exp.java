@@ -210,6 +210,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                     shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
                     shooter.spinUp();
                     shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
+                    intake.spinDown();
                 }
                 else if(gamepad2.left_trigger > 0.5){ // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
                     shooter.indexerDown(); // move the indexer to the intaking position
@@ -292,6 +293,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
                 if(localizer != null){ // if we have a localizer that exists, get the position estimate from it
                     telemetry.addData("Field Position", localizer.getPoseEstimate());
+                    telemetry.addData("Wheel Positions", localizer.getWheelPositions());
                 }
 
                 telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
