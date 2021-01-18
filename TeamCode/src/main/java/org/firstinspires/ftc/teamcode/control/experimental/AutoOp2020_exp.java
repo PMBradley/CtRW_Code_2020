@@ -45,14 +45,14 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(-6.0, -26.0, Math.toRadians(70.0)); // the positions that the robot needs to drive to
     public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(20.0, -18.0, Math.toRadians(70.0));
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(44.0, -26.0, Math.toRadians(70.0));
-    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-38.0, -24.0, Math.toRadians(300.0));
-    public static TargetDrivePosition shootPos        = new TargetDrivePosition(-42.0, -12.0, Math.toRadians(0.0));
-    public static TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-28.0, -15.0, Math.toRadians(0.0));
+    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-40.0, -25.0, Math.toRadians(300.0));
+    public static TargetDrivePosition shootPos        = new TargetDrivePosition(-48.0, -13.0, Math.toRadians(0.0));
+    public static TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-35.0, -15.0, Math.toRadians(0.0));
     public static TargetDrivePosition parkPos         = new TargetDrivePosition(12.0, 12.0, Math.toRadians(0.0), Math.toRadians(90.0));
 
     public static double ARM_OFFSET_DEGREES = -340;
 
-    //public static double RING_COLLECT_DISTANCE = 0;
+    public static double RING_COLLECT_DISTANCE = 2.5;
 
     private String wobbleDropPos = "A";
     private boolean scanningComplete = false;
@@ -204,10 +204,10 @@ public class AutoOp2020_exp extends LinearOpMode {
             }
             else if(drive.getTaskIndex() == 2){ // if at location and on the second subtask
                 wobble.stopIntake();
-                wobble.goToUpPos();
+               // wobble.goToUpPos();
             }
             else {
-                wobble.goToGrabPos();
+               // wobble.goToGrabPos();
             }
         }
         else if ( currentTaskName.equals("Scan & Shoot Rings") || currentTaskName.equals("Shoot Rings") ) { // if current task is this task (or the other one)
@@ -241,12 +241,12 @@ public class AutoOp2020_exp extends LinearOpMode {
             intake.spinDown();
 
 
-            if(drive.getTaskIndex() <= 1){ // if at location and on the first subtask
+            if(drive.getTaskIndex() == 1){ // if at location and on the first subtask
                 wobble.intakeSpinOut();
-                wobble.goToGrabPos();
+           //     wobble.goToGrabPos();
             }
             else if(drive.getTaskIndex() == 2){ // if at location and on the second subtask
-                wobble.goToUpPos();
+               // wobble.goToUpPos();
                 wobble.stopIntake();
             }
         }
@@ -255,10 +255,10 @@ public class AutoOp2020_exp extends LinearOpMode {
             intake.spinDown();
             wobble.stopIntake();
             shooter.indexerUp();
-            wobble.goToRecentPos();
+           // wobble.goToRecentPos();
         }
 
-
+        wobble.goToRecentPos();
         shooter.updateFeeder(); // always update the shooter feeder, so that it can start the feeding process as soon as possible
     }
 
@@ -281,11 +281,15 @@ public class AutoOp2020_exp extends LinearOpMode {
         autoTasks.add(new AutoTask("Shoot Rings", 2, shootPos, atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
-      /*  atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(ringPickupPos.getPose2d())
-                .forward(RING_COLLECT_DISTANCE)
+        atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(ringPickupPos.getPose2d())
+                .lineToLinearHeading(new Pose2d(ringPickupPos.getX() + RING_COLLECT_DISTANCE, ringPickupPos.getY(), ringPickupPos.getHeading()))
                 .build()
-        )); */// once at this location, move forwards into the rings
-        atLocationTasks.add(new DriveFollowerTask(700)); // once at this location, wait msecs
+        )); // once at this location, move forwards into the rings by the RING COLLECT DISTANCE
+        /*atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(atLocationTasks.get(0).getTraj().end())
+                .lineToLinearHeading(new Pose2d(ringPickupPos.getX() + (2*RING_COLLECT_DISTANCE), ringPickupPos.getY(), ringPickupPos.getHeading()))
+                .build()
+        )); */// once at this location, move forwards into the rings by the RING COLLECT DISTANCE
+      //  atLocationTasks.add(new DriveFollowerTask(700)); // once at this location, wait msecs
         autoTasks.add(new AutoTask("Collect Rings", 2, ringPickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
