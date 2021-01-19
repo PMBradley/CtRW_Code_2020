@@ -54,6 +54,13 @@ public class AutoTask {
         this.completed = isCompleted;
         return this;
     }
-
+    public AutoTask setTaskLocation(TargetDrivePosition taskLocation){
+        this.taskLocation = taskLocation;
+        return this;
+    }
+    public AutoTask setLocationTasks(ArrayList<DriveFollowerTask> locationTasks){
+        this.tasksAtLocation = locationTasks;
+        return this;
+    }
 
 }

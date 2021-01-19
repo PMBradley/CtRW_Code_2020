@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class AutoTaskManager {
     ArrayList<AutoTask> autoTasks;
     int taskIndex = 0;
-    double priorityInfluence = 10; // the number that is put to the power of the task's priority then multiplied by the distance
+    double priorityInfluence = 1000; // the number that is put to the power of the task's priority then multiplied by the distance
 
 
     public AutoTaskManager(){
@@ -82,6 +82,9 @@ public class AutoTaskManager {
     private double priorityFactoredDistance( AutoTask task, Pose2d currentPos ){
         return Math.pow(priorityInfluence, task.getPriority()) * (task.getTaskLocation().getDistanceFrom(currentPos) + 1); // multiply distance by the priority influence to the priority power
     }    // the 1 is added in to prevent any errors with priority being ignored should the distance be 0
+    public double getDistanceFromTaskLocation( Pose2d currentPos ){ // returns the distance to the current task's task location
+        return getCurrentTask().getTaskLocation().getDistanceFrom(currentPos);
+    }
 
     public ArrayList<DriveFollowerTask> generateCurrentTaskDriveTaskList(Pose2d currentPos, DriveConstraints driveConstraints ){ // calculate a drive task to drive to reach the task start position
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
@@ -131,5 +134,25 @@ public class AutoTaskManager {
         }
 
         targetTask.setCompleted(false);
+    }
+    public void setTaskWithNameLocation(String name, TargetDrivePosition taskLocation){
+        AutoTask targetTask = getTaskAt(0);
+        for(AutoTask task : autoTasks){
+            if(task.getTaskName().equals(name)){
+                targetTask = task;
+            }
+        }
+
+        targetTask.setTaskLocation(taskLocation);
+    }
+    public void setTaskWithNameLocationTasks(String name, ArrayList<DriveFollowerTask> atLocationTasks){
+        AutoTask targetTask = getTaskAt(0);
+        for(AutoTask task : autoTasks){
+            if(task.getTaskName().equals(name)){
+                targetTask = task;
+            }
+        }
+
+        targetTask.setLocationTasks(atLocationTasks);
     }
 }

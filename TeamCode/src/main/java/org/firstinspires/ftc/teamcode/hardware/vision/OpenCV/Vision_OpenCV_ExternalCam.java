@@ -21,7 +21,7 @@ public class Vision_OpenCV_ExternalCam {
 
     public static final int CAMERA_RESOLUTION_X = 640; // the camera x resolution dimensions that will be used
     public static final int CAMERA_RESOLUTION_Y = 480; // the camera y resolution dimensions that will be used
-    private static final OpenCvCameraRotation CAMERA_ROTATION = OpenCvCameraRotation.UPSIDE_DOWN; // which direction is up for the camera
+    private static final OpenCvCameraRotation CAMERA_ROTATION = OpenCvCameraRotation.SIDEWAYS_RIGHT; // which direction is up for the camera
 
     private boolean cameraStreaming = false;
 
@@ -62,7 +62,7 @@ public class Vision_OpenCV_ExternalCam {
         // webcam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
 
         webcam.openCameraDevice();
-        startWebcamStreaming();
+       // startWebcamStreaming();
 
         FtcDashboard.getInstance().startCameraStream(webcam, 0); // init the dashboard stream (0 max fps means no limit)
     }

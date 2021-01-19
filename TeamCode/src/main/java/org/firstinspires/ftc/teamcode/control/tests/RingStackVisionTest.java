@@ -44,6 +44,8 @@ public class RingStackVisionTest extends LinearOpMode {
 
         vision = new Vision_OpenCV_ExternalCam(hardwareMap, "Webcam 1", new RingStackHeightPipeline());
 
+        vision.startWebcamStreaming();
+
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.vision.OpenCV;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.opencv.core.Core;
@@ -10,6 +11,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 
+@Config
 public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * An enum to defined for use with ring count
@@ -21,7 +23,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
         MOST
     }
 
-    public static double min_avg = 150; // tune this value to get consistent color comparisons
+    public static double min_avg = 117; // tune this value to get consistent color comparisons (all color values lower than it will be seen as a place where a ring is)
 
     /*
      * Some color constants
@@ -35,10 +37,10 @@ public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * The core values which define the location and size of the sample regions
      */
-    static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(100,100);
-    static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(100,350);
-    static final int REGION_WIDTH = 350;
-    static final int REGION_HEIGHT = 60;
+    public static Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(125,115);
+    public static Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(125,200);
+    public static int REGION_WIDTH = 175;
+    public static int REGION_HEIGHT = 40;
 
     /*
      * Points which actually define the sample region rectangles, derived from above values
@@ -203,7 +205,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
          * Now that we found the values, we actually need to go and
          * figure out how they compare to the minimum average color value
          */
-        if(avg2 >= min_avg){ // Is there enough yellow in the top region
+        if(avg2 < min_avg){ // Is there enough yellow in the top region
             amount = RingAmount.MOST; // Record our analysis
 
             /*
@@ -217,7 +219,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
                     ORANGE, // The color the rectangle is drawn in
                     -1); // Negative thickness means solid fill
         }
-        else if(avg1 >= min_avg) { // Was it from region 2?
+        else if(avg1 < min_avg) { // Was it from region 2?
             amount = RingAmount.ONE; // Record our analysis
 
             /*
@@ -246,14 +248,26 @@ public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * Call this from the OpMode thread to obtain the latest analysis - this is the overriding of the CustomPipeline class
      */
-   /* @Override
-    public String getAnalysis()
-    {
-        return amount.toString();
-    }*/
+
     @Override
     public String getAnalysis()
     {
-        return amount.toString() + " " + avg1 + ", " + avg2;
+        return enumToNumString(amount) + " " + avg1 + ", " + avg2;
+    }
+
+    public String enumToNumString(RingAmount amount){
+        switch (amount.toString()){
+            case "NONE":
+                return "0 Rings";
+
+            case "ONE":
+                return "1 Ring";
+
+            case "MOST":
+                return "4 Rings";
+
+            default:
+                return "4 Rings";
+        }
     }
 }
