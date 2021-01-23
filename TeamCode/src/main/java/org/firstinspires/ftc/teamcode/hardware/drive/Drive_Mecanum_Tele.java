@@ -91,14 +91,15 @@ public class Drive_Mecanum_Tele {
 
         // if boosting is true, the robot will use the boostingMultiplier instead of translateMultiplier for speed setting
         if(isBoosting){ // if boosting, use the boosting speed
-            field_x *= boostingMultiplier; // multiply the speeds by the boostingDivisor (what percentage of max speed you want to be at while boosting)
+            field_x *= boostingMultiplier; // multiply the speeds by the boostingMultiplier (what percentage of max speed you want to be at while boosting)
             field_y *= boostingMultiplier;
+            r *= boostingMultiplier;
         }
         else{ // if moving regularly, use the regular translate speed
-            field_x *= translateMultiplier; // multiply the speeds by the translateDivisor (what percentage of max speed you want to be at while moving normally)
+            field_x *= translateMultiplier; // multiply the speeds by the translateMultiplier (what percentage of max speed you want to be at while moving normally)
             field_y *= translateMultiplier;
+            r *= turnMultiplier;  // also multiply the r value by the turn speed modifier
         }
-        r *= turnMultiplier;  // also multiply the r value by the turn speed modifier, but do it outside of the if statement because it happens the same either way
 
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula

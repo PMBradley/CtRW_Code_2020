@@ -32,9 +32,9 @@ public class J_Shooter_Ring_ServoFed {
     private double shooterShootSpeed; // the variable
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
-    public static final double SHOOTER_PID_HIGHGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
-    public static final double SHOOTER_PID_POWERSHOT_SPEED = 0.65; // the power the shooter uses as a default for PID mode
-    public static final double SHOOTER_PID_LONGGOAL_SPEED = 1.0; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.65; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_LONGGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -47,15 +47,15 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final double FEEDER_RETRACTED_POSITION = degToServoPos(86.0);// the feeder servo extened position
     private static final double FEEDER_EXTENDED_POSITION = degToServoPos(135.0);
-    private static final double FEEDER_EXTENSION_TIME = 130; // in milliseconds
+    public static final double FEEDER_EXTENSION_TIME = 130; // in milliseconds
 
     private static final double INDEXER_DOWN_POSITION = degToServoPos(134.0); // the little ring lifter down position
     private static final double INDEXER_UP_POSITION = degToServoPos(0.0);
-    private static final double INDEXER_MOVE_TIME = 300; // in milliseconds
+    public static final double INDEXER_MOVE_TIME = 365; // in milliseconds
 
     private static final double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
     private static final double ANGLER_HIGHGOAL_POSITION = degToServoPos(110.0);
-    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 110.0);
+    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 95.5);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
 

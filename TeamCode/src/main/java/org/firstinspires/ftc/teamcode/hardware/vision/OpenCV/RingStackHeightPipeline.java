@@ -23,7 +23,7 @@ public class RingStackHeightPipeline extends CustomPipeline{
         MOST
     }
 
-    public static double min_avg = 117; // tune this value to get consistent color comparisons (all color values lower than it will be seen as a place where a ring is)
+    public static double min_avg = 137; // tune this value to get consistent color comparisons (all color values lower than it will be seen as a place where a ring is)
 
     /*
      * Some color constants
@@ -37,10 +37,10 @@ public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * The core values which define the location and size of the sample regions
      */
-    public static Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(125,115);
-    public static Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(125,200);
+    public static Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(150, 130);
+    public static Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(150,200);
     public static int REGION_WIDTH = 175;
-    public static int REGION_HEIGHT = 40;
+    public static int REGION_HEIGHT = 32;
 
     /*
      * Points which actually define the sample region rectangles, derived from above values

@@ -1,6 +1,7 @@
     package org.firstinspires.ftc.teamcode.control.experimental;
 
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
         - Controller 1 Right Stick (x axis only) = rotation
         - Controller 1 Right Bumper = boost button
         - Controller 1 D-Pad Up = toggle drive relative to field
+        - Controller 1 D-Pad Left/Right = preform the powershot shooting subroutine
 
         Ring Shooter:
         - Controller 2 X button = start a firing sequence (spins up if not spun up, then shoots a ring. can be held to fire rapidly)
@@ -40,6 +42,7 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 
     @TeleOp(name = "TeleOp2020_EXP", group = "@@E")
 
+    @Config
     public class TeleOp2020_exp extends LinearOpMode{
         // TeleOp Variables
 
@@ -47,13 +50,15 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
         String robotName = "Robot 2020";
 
         // Robot Speed variables
-        double turnSpeed = 0.80; // Speed multiplier for turning (1 being 100% of power going in)
-        double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
-        double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
-        double stopSpeed = 0.00; // the motor speed for stopping the robot
+        public static double turnSpeed = 0.50; // Speed multiplier for turning (1 being 100% of power going in) when not boosting
+        public static double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
+        public static double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
+        public static double stopSpeed = 0.00; // the motor speed for stopping the robot
+
+        public static double POWERSHOT_TURN_SPEED = 0.4; // the speed that the robot turns when shooting powershots automatically
 
         // Constants
-        static final double DEAD_ZONE_RADIUS = 0.01; // the minimum value that can be passed into the drive function
+        static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
 
         // Robot Classes
         private Provider2020_exp robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -77,6 +82,8 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
         private int wobbleArmPosition = 0; // 0 = folded pos, 1 = up pos, 2 = grab position
         private int wobbleIntakeDirection = 0; // 0 = stopped, 1 = intaking, -1 = outtaking
         private boolean intakeIsRunning = false; // holds if the intake should be running or not
+        private boolean powershotTurning = false;
+
 
         // The "Main" for TeleOp (the place where the main code is run)
         @Override
@@ -190,9 +197,32 @@ import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
                    rotatePower = stopSpeed;
                 }
 
-                if(gamepad1.left_bumper == true){ // if we want the robot to rotate to 0
-                    rotatePower = mecanum_drive.calcTurnPIDPower(Math.toRadians(0), Math.toRadians(robot.getHeading())); // override the rotation with a PID output
+
+
+                if(gamepad1.dpad_right || gamepad1.dpad_left){
+                    shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
+                    shooter.instructFire(); // tell the shooter to start shooting
+
+                    if(shooter.getFiringState() == 2){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                        powershotTurning = true;
+                    }
+
+                    if(powershotTurning && gamepad1.dpad_right){ // if turning and pressing right, turn right
+                        rotatePower = POWERSHOT_TURN_SPEED;
+                    }
+                    else if(powershotTurning && gamepad1.dpad_left){ // else if turning but turning left, turn left
+                        rotatePower = -POWERSHOT_TURN_SPEED;
+                    }
                 }
+                else {
+                    if(gamepad1.left_bumper){ // if we want the robot to rotate to 0
+                        rotatePower = mecanum_drive.calcTurnPIDPower(Math.toRadians(0), Math.toRadians(robot.getHeading())); // override the rotation with a PID output
+                    }
+
+                    powershotTurning = false; // if neither are pressed, reset the turning variable
+                }
+
+
 
                 // Hardware instruction (telling the hardware what to do)
                 if(driveFieldRelative) {
