@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,7 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.teamcode.hardware.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 
 /*
@@ -37,19 +38,24 @@ public class Provider2020 {
     public DcMotor driveBR;
 
     // Manipulator motors (motors for other things, not driving) - names are example names, they can be set for whatever application you have
-    public DcMotor shooterMotor;
+    //public DcMotor shooterMotor;
     public DcMotor intakeMotor;
     public DcMotor wobbleArmMotor;
-    public DcMotor wobbleArmMotor2;
+    //public DcMotor wobbleArmMotorClaw;
+    public DcMotor JShootFront;
+    public DcMotor JShootBack;
 
     // Servo Variables - names are example names, they can be set for whatever application you have
     public Servo intakeLockServo;
     public Servo shooterFeederServo;
+    public Servo shooterIndexerServo;
+    public Servo shooterAnglerServo;
     public Servo wobbleLeftWheelServo;
     public Servo wobbleRightWheelServo;
     public Servo wobbleClampServo;
 
     // Sensor Variables
+    public Encoder shooterEncoder;
 
     // Touch Sensor variables - it is recommended to change the word "SensorX" in the names with a basic descriptor of what they are for, for example "touchBumper"
     public DigitalChannel touchSensor0;
@@ -114,42 +120,58 @@ public class Provider2020 {
         }
 
 
-       // Reverse drive motor directions as needed
+        // Reverse drive motor directions as needed
         driveFL.setDirection(DcMotor.Direction.REVERSE);
         driveBL.setDirection(DcMotor.Direction.REVERSE);
 
 
         if(!oneHubMode){ // if using more than one hub, setup the other motors and servos
             // Grabbing the motors from the hardware map
-            shooterMotor = mainMap.get(DcMotor.class, "shooterMotor");
+            //shooterMotor = mainMap.get(DcMotor.class, "shooterMotor");
             intakeMotor = mainMap.get(DcMotor.class, "intakeMotor");
             wobbleArmMotor = mainMap.get(DcMotor.class, "wobbleArmMotor");
-            wobbleArmMotor2 = mainMap.get(DcMotor.class, "wobbleArmMotor2");
+            //wobbleArmMotorClaw = mainMap.get(DcMotor.class, "wobbleArmMotor2");
+
+            JShootFront = mainMap.get(DcMotor.class, "JShootFront");
+            JShootBack = mainMap.get(DcMotor.class, "JShootBack");
 
 
-            shooterMotor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT ); // don't halt the motor actively for the shooter
+            JShootFront.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT );
+            JShootBack.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT );
 
-           // shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
+            //shooterMotor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT ); // don't halt the motor actively for the shooter
+
+            //     shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
             wobbleArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            wobbleArmMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //wobbleArmMotorClaw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
             intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            wobbleArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            JShootBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
             // Grabbing the servos from the hardware map
             intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
             shooterFeederServo = mainMap.get(Servo.class, "feederServo");
+            shooterIndexerServo = mainMap.get(Servo.class, "indexerServo");
+            shooterAnglerServo = mainMap.get(Servo.class, "anglerServo");
             wobbleLeftWheelServo = mainMap.get(Servo.class, "wobbleLeftWheelServo");
             wobbleRightWheelServo = mainMap.get(Servo.class, "wobbleRightWheelServo");
             wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
 
-            wobbleLeftWheelServo.getController().pwmDisable();
-            wobbleRightWheelServo.getController().pwmDisable();
 
+            // wobbleLeftWheelServo.getController().pwmDisable(); // set these servos to continuous mode
+            // wobbleRightWheelServo.getController().pwmDisable();
+
+            shooterFeederServo.getController().pwmEnable(); // set these servos to discrete mode
+            shooterIndexerServo.getController().pwmEnable();
+            shooterAnglerServo.getController().pwmEnable();
             wobbleClampServo.getController().pwmEnable();
 
             wobbleLeftWheelServo.setDirection(Servo.Direction.REVERSE);
+            shooterFeederServo.setDirection(Servo.Direction.REVERSE);// reverse this servo
+
         }
 
 
