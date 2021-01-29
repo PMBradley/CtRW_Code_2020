@@ -104,8 +104,10 @@ public class RunIntake extends LinearOpMode{
 
         runtime.reset(); // reset the clock once start has been pressed so runtime is
 
-        intake.setRunning(true);
-        shooter.indexerDown();
+        while(opModeIsActive() && !isStopRequested()){
+            intake.setRunning(true);
+            shooter.indexerDown();
+        }
     }
 
 
