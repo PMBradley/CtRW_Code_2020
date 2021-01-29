@@ -271,10 +271,10 @@ public class TeleOp2020 extends LinearOpMode{
                 intake.spinDown(); // and ensure that the intake is spun down
             }
 
-            if ( gamepad2.b ) {
-                shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
-            }
-            else if(shooterAngledUp){
+            //if ( gamepad2.b ) {
+            //    shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+           // }
+            if(shooterAngledUp){
                 shooter.optimizeForHighgoal();
             }
             else {
@@ -305,6 +305,12 @@ public class TeleOp2020 extends LinearOpMode{
             }
             else{
                 telemetry.addLine("Driving robot relative");
+            }
+            if(shooterAngledUp){
+                telemetry.addLine("Shooter Optimized for: Highgoal");
+            }
+            else {
+                telemetry.addLine("Shooter Optimized for: Powershots");
             }
 
             if(robot.driveUsingEncoders){
