@@ -48,7 +48,7 @@ public class AutoOp2020 extends LinearOpMode {
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(40.5, -28.0, Math.toRadians(70.0), Math.toRadians(-25));// TODO: re-enable the actual target wobble goal positions once done
     //     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(-6.0, -26.0, Math.toRadians(180));
 
-    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-42.7, -18.2, Math.toRadians(-45.0));
+    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-41.3, -16.8, Math.toRadians(-45.0));
     public static TargetDrivePosition shootPos        = new TargetDrivePosition(-51.1, -13, Math.toRadians(7.4));
     public static TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-35.5, -12.5, Math.toRadians(0.0));
     public static TargetDrivePosition parkPos         = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
