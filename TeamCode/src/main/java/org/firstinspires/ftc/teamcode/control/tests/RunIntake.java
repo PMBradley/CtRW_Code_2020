@@ -106,7 +106,7 @@ public class RunIntake extends LinearOpMode{
 
         while(opModeIsActive() && !isStopRequested()){
             intake.setRunning(true);
-            shooter.indexerDown();
+            shooter.indexerUp();
         }
     }
 
