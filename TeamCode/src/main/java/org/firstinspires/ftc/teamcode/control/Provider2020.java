@@ -141,8 +141,8 @@ public class Provider2020 {
 
             //shooterMotor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT ); // don't halt the motor actively for the shooter
 
-            JShootFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
-            JShootBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //JShootFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
+            //JShootBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             wobbleArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             //wobbleArmMotorClaw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
