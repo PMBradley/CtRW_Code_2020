@@ -23,7 +23,7 @@ import java.util.ArrayList;
 /*
  * Welcome to the Autonomous OpMode! This opmode coordinates the robot's manipulators and drive without user input to complete challenges
  */
-@Autonomous(name = "AutoOp2020", group = "@@@") // the name and group for the opmode
+@Autonomous(name = "AutoOp2020_exp", group = "@@@") // the name and group for the opmode
 @Config // allow FTC dashboard to access public static member variables here
 
 public class AutoOp2020_exp extends LinearOpMode {

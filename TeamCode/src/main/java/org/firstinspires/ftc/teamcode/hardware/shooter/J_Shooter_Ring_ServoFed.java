@@ -25,7 +25,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double Kp = 2.5;
     public static double Ki = 0.00002;
     public static double Kd = 0.00;
-    public static boolean I_ENABLED = true;
+    public static boolean I_ENABLED = false;
     public static double I_DIVISOR = 2.0;
     private double lastRuntime;
     private double integral;
@@ -36,7 +36,7 @@ public class J_Shooter_Ring_ServoFed {
     private double shooterShootSpeed; // the variable
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
-    public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_POWERSHOT_SPEED = 0.70; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
@@ -58,7 +58,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 
     public static double ANGLER_POWERSHOT_POSITION = degToServoPos(104.0); // the trajectory angler down position
-    public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(110.0);
+    public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(104.0);
     public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 106.2);
     public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 102.6);
 
@@ -221,7 +221,7 @@ public class J_Shooter_Ring_ServoFed {
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
         double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
 
-        double speedChange = (Kp * error) + (Ki * integral * 100000) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
+        double speedChange = (Kp * error) + (Ki * integral / 100000) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
 
 
         lastError = error; // update the last error to be the current error
