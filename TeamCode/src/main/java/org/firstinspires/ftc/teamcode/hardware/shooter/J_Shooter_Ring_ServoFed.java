@@ -23,9 +23,10 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
-    public static double Ki = 0.00005;
+    public static double Ki = 0.00002;
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
+    public static double I_DIVISOR = 2.0;
     private double lastRuntime;
     private double integral;
     private double lastError;
@@ -207,7 +208,7 @@ public class J_Shooter_Ring_ServoFed {
 
         if (Math.abs(integral) > 0 && Math.abs(error) > 0.005) {
             if(integral/Math.abs(integral) != error/Math.abs(error)){
-                integral = 0;
+                integral += error/I_DIVISOR;
             }
         }
       //  if(Math.abs(error) )
@@ -220,7 +221,7 @@ public class J_Shooter_Ring_ServoFed {
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
         double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
 
-        double speedChange = (Kp * error) + (Ki * integral) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
+        double speedChange = (Kp * error) + (Ki * integral * 100000) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
 
 
         lastError = error; // update the last error to be the current error
