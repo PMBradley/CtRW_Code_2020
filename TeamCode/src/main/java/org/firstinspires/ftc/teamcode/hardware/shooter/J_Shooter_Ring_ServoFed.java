@@ -25,6 +25,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double Kp = 2.5;
     public static double Ki = 0.00005;
     public static double Kd = 0.00;
+    public static boolean I_ENABLED = true;
     private double lastRuntime;
     private double integral;
     private double lastError;
@@ -35,7 +36,7 @@ public class J_Shooter_Ring_ServoFed {
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
     public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
-    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.65; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.70; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
@@ -55,7 +56,7 @@ public class J_Shooter_Ring_ServoFed {
     private static final double INDEXER_UP_POSITION = degToServoPos(0.0);
     public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 
-    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
+    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(104.0); // the trajectory angler down position
     public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(110.0);
     public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 106.2);
     public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 102.6);
@@ -213,8 +214,9 @@ public class J_Shooter_Ring_ServoFed {
    //     telemetry.addData("Error: ", error);
     //    telemetry.addData("Integral: ", integral);
 
-
-        integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
+        if(I_ENABLED){
+            integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
+        }
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
         double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
 
