@@ -234,6 +234,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double encoderVeloToMotorSpeed(double encoderVelo){
         return encoderVelo / VELOCITY_TICS_PER_MOTOR_POWER; // correct this with some conversion rate multiplier
     }
+    public double getIntegral() {return integral;}
 
     public boolean indexerUp(){
         indexerServo.setPosition( INDEXER_UP_POSITION );

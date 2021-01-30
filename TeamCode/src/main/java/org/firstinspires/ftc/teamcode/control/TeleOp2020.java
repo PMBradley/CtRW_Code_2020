@@ -338,8 +338,8 @@ public class TeleOp2020 extends LinearOpMode{
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
             telemetry.addData("Shot Count: ", shooter.getShotCount());
             telemetry.addData("Firing state", shooter.getFiringState());
-            telemetry.addData("Flywheel Velocity: ", shooter.getFlywheelVelo());
             telemetry.addData("Corrected Flywheel Velocity: ", shooter.encoderVeloToMotorSpeed(shooter.getFlywheelVelo()));
+            telemetry.addData("Integral: ", shooter.getIntegral());
             telemetry.addData("Target Flywheel Velocity: ", shooter.getTargetShootingSpeed());
             telemetry.addData("Arm target position", wobble.getArmTargetPosition());
             telemetry.addData("Wheel arm position", wobble.getArmPosition());
