@@ -77,7 +77,7 @@ public class AutoOp2020 extends LinearOpMode {
 
         vision = new Vision_OpenCV_ExternalCam(hardwareMap, "Webcam 1", new RingStackHeightPipeline()); // setup the camera handling class, passing in the pipeline we want to use to process inputs
 
-
+        J_Shooter_Ring_ServoFed.I_ENABLED = true;
 
         drive.setPoseEstimate(startPose); // set the localizer's start position to our position on the field relative to the center
 

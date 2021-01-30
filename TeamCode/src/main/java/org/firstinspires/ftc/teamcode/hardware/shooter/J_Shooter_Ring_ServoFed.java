@@ -23,10 +23,10 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
-    public static double Ki = 0.000002;
+    public static double Ki = 0.2;
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
-    public static double I_MAX = 3260.0;
+    public static double I_MAX = 111113260.0;
     private double lastRuntime;
     private double integral;
     private double lastError;
@@ -206,12 +206,18 @@ public class J_Shooter_Ring_ServoFed {
         double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
 
-        if (Math.abs(integral) > I_MAX && Math.abs(error) > 0.005) {
-           // if(integral/Math.abs(integral) != error/Math.abs(error)){
-            
+        if (Math.abs(integral) > I_MAX ) {
+           //
             integral = Math.abs(I_MAX) * integral/Math.abs(integral);
             //}
         }
+
+        if(Math.abs(integral) > 0 && Math.abs(error) > 0.005){
+            if(integral/Math.abs(integral) != error/Math.abs(error)){
+                //integral =
+            }
+        }
+
       //  if(Math.abs(error) )
    //     telemetry.addData("Error: ", error);
     //    telemetry.addData("Integral: ", integral);
