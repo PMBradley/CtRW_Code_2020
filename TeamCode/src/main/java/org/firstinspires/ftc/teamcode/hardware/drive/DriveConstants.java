@@ -58,7 +58,7 @@ public class DriveConstants {
     /* public static double kV = 0.0172;  // Test bot values
     public static double kA = 0.00195;
     public static double kStatic = 0.005; */
-    public static double kV = 0.0177; // start with a value approximately 1.0 / rpmToVelocity(MAX_RPM)
+    public static double kV = 0.0183; // start with a value approximately 1.0 / rpmToVelocity(MAX_RPM)
     public static double kA = 0.0043;
     public static double kStatic = 0.005;
     /*

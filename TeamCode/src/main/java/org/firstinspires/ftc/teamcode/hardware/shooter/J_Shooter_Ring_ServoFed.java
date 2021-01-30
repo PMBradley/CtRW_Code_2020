@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode.hardware.shooter;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
-
+@Config
 public class J_Shooter_Ring_ServoFed {
     private DcMotor shooterMotorFront;
     private DcMotor shooterMotorBack;
@@ -20,9 +22,9 @@ public class J_Shooter_Ring_ServoFed {
     private static final double SPIN_UP_TIME = 1200; // in milliseconds
 
     private static final boolean USING_PID = true;
-    private static final double Kp = 2.5;
-    private static final double Ki = 0.00;
-    private static final double Kd = 0.00;
+    public static double Kp = 2.5;
+    public static double Ki = 0.00005;
+    public static double Kd = 0.00;
     private double lastRuntime;
     private double integral;
     private double lastError;
@@ -34,7 +36,7 @@ public class J_Shooter_Ring_ServoFed {
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
     public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_POWERSHOT_SPEED = 0.65; // the power the shooter uses as a default for PID mode
-    public static double SHOOTER_PID_LONGGOAL_SPEED = 0.75; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -49,19 +51,26 @@ public class J_Shooter_Ring_ServoFed {
     private static final double FEEDER_EXTENDED_POSITION = degToServoPos(135.0);
     public static final double FEEDER_EXTENSION_TIME = 130; // in milliseconds
 
-    private static final double INDEXER_DOWN_POSITION = degToServoPos(70.0); // the little ring lifter down position
+    private static final double INDEXER_DOWN_POSITION = degToServoPos(110.0); // the little ring lifter down position
     private static final double INDEXER_UP_POSITION = degToServoPos(0.0);
-    public static final double INDEXER_MOVE_TIME = 365; // in milliseconds
+    public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 
-    private static final double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
-    private static final double ANGLER_HIGHGOAL_POSITION = degToServoPos(110.0);
-    private static final double ANGLER_LONGGOAL_POSITION = degToServoPos( 95.5);
+    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
+    public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(110.0);
+    public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 106.2);
+    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 102.6);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
+    public static double PID_VELO_CAP = 1.0;
 
     private boolean isFiring = false;
     private int firingState = 0;
     private double moveStartTime = 0;
+
+    private int shotCount = 0;
+    private boolean angleFirstShot = false;
+
+    Telemetry telemetry;
 
 
     public J_Shooter_Ring_ServoFed(DcMotor shooterMotorFront, DcMotor shooterMotorBack, Servo feederServo, Servo indexerServo, Servo anglerServo){
@@ -82,17 +91,36 @@ public class J_Shooter_Ring_ServoFed {
         this.anglerServo = anglerServo;
         localRuntime = new ElapsedTime();
     }
+ /*   public J_Shooter_Ring_ServoFed(DcMotor shooterMotorFront, DcMotor shooterMotorBack, Servo feederServo, Servo indexerServo, Servo anglerServo, Telemetry telemetry){
+        this.telemetry = telemetry;
+
+        if(USING_PID){ // if using PID
+            shooterEncoder = new Encoder((DcMotorEx)shooterMotorBack); // setup the encoder
+            shooterRunSpeed = SHOOTER_PID_HIGHGOAL_SPEED;  // and set the base runspeed to the shooter PID speed
+            shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
+        }
+        else {
+            shooterRunSpeed = SHOOTER_SPEED;
+        }
+
+        this.shooterMotorFront = shooterMotorFront;
+        this.shooterMotorBack = shooterMotorBack;
+        this.feederServo = feederServo;
+        this.indexerServo = indexerServo;
+        this.anglerServo = anglerServo;
+        localRuntime = new ElapsedTime();
+    }*/
 
 
     public boolean spinUp(){
         if(USING_PID){
-            double motorPower = getPIDPower( shooterRunSpeed ); // calling this only once to mess with timing things less
+            double motorPower = getPIDPower( getTargetShootingSpeed() ); // calling this only once to mess with timing things less
             shooterMotorFront.setPower(motorPower);
             shooterMotorBack.setPower(motorPower);
         }
         else{
-            shooterMotorFront.setPower( shooterRunSpeed );
-            shooterMotorBack.setPower( shooterRunSpeed );
+            shooterMotorFront.setPower( getTargetShootingSpeed() );
+            shooterMotorBack.setPower( getTargetShootingSpeed() );
         }
 
 
@@ -135,7 +163,7 @@ public class J_Shooter_Ring_ServoFed {
     }
     public double getTargetShootingSpeed() {
         if(USING_PID){
-            return shooterRunSpeed * 0.8; // because shooter power is scaled for the PID
+            return shooterRunSpeed * PID_VELO_CAP; // because shooter power is scaled for the PID
         }
         else {
             return shooterRunSpeed;
@@ -144,14 +172,23 @@ public class J_Shooter_Ring_ServoFed {
     public void optimizeForHighgoal(){
         angleUp();
         shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
+        angleFirstShot = false;
     }
     public void optimizeForPowershots(){
         angleDown();
         shooterShootSpeed = SHOOTER_PID_POWERSHOT_SPEED;
+        angleFirstShot = false;
     }
     public void optimizeForLonggoal(){
-        setAnglerServoDegrees(ANGLER_LONGGOAL_POSITION);
         shooterShootSpeed = SHOOTER_PID_LONGGOAL_SPEED;
+        angleFirstShot = true;
+
+        if(shotCount == 0){
+            anglerServo.setPosition(FIRSTSHOT_LONGGOAL_POSITION);
+        }
+        else {
+            setAnglerServoDegrees(ANGLER_LONGGOAL_POSITION);
+        }
     }
 
 
@@ -161,9 +198,21 @@ public class J_Shooter_Ring_ServoFed {
     }
     private double getPIDPower(double targetSpeed){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
+    //    telemetry.addData("Actual Target Speed: ", targetSpeed);
+     //   telemetry.addData("Actual Speed Speed: ", speed);
 
         double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
+
+        if (Math.abs(integral) > 0 && Math.abs(error) > 0.005) {
+            if(integral/Math.abs(integral) != error/Math.abs(error)){
+                integral = 0;
+            }
+        }
+      //  if(Math.abs(error) )
+   //     telemetry.addData("Error: ", error);
+    //    telemetry.addData("Integral: ", integral);
+
 
         integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
@@ -256,11 +305,14 @@ public class J_Shooter_Ring_ServoFed {
                     if(localRuntime.milliseconds() >= moveStartTime + (2*FEEDER_EXTENSION_TIME)){
                         firingState = 0;
                         isFiring = false;
+                        shotCount++;
                     }
                     break;
             } // end of case switch
         } // end of if
     } // end of funtion
+    public void resetShotCount(){shotCount = 0;}
+    public int getShotCount(){return shotCount;}
 
     public int getFiringState(){
         return firingState;

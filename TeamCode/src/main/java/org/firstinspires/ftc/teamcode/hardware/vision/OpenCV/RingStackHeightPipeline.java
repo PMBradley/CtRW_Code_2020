@@ -37,8 +37,8 @@ public class RingStackHeightPipeline extends CustomPipeline{
     /*
      * The core values which define the location and size of the sample regions
      */
-    public static Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(150, 130);
-    public static Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(150,200);
+    public static Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(210, 65);
+    public static Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(210,135);
     public static int REGION_WIDTH = 175;
     public static int REGION_HEIGHT = 32;
 

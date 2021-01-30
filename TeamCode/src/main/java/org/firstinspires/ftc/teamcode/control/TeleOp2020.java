@@ -235,6 +235,9 @@ public class TeleOp2020 extends LinearOpMode{
             if(instructFire) {
                 shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
             }
+            else {
+                shooter.resetShotCount();
+            }
 
             if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
                 shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
@@ -271,10 +274,10 @@ public class TeleOp2020 extends LinearOpMode{
                 intake.spinDown(); // and ensure that the intake is spun down
             }
 
-            //if ( gamepad2.b ) {
-            //    shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
-           // }
-            if(shooterAngledUp){
+            if ( gamepad2.b ) {
+                shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+            }
+            else if(shooterAngledUp){
                 shooter.optimizeForHighgoal();
             }
             else {
@@ -333,6 +336,7 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
+            telemetry.addData("Shot Count: ", shooter.getShotCount());
             telemetry.addData("Firing state", shooter.getFiringState());
             telemetry.addData("Flywheel Velocity: ", shooter.getFlywheelVelo());
             telemetry.addData("Corrected Flywheel Velocity: ", shooter.encoderVeloToMotorSpeed(shooter.getFlywheelVelo()));
