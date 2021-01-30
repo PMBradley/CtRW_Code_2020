@@ -221,7 +221,7 @@ public class J_Shooter_Ring_ServoFed {
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
         double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
 
-        double speedChange = (Kp * error) + (Ki * integral * 100000) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
+        double speedChange = (Kp * error) + (Ki * integral / 100000) + (Kd * dError); // multiply each term by its coefficient, then add together to get the final power
 
 
         lastError = error; // update the last error to be the current error
