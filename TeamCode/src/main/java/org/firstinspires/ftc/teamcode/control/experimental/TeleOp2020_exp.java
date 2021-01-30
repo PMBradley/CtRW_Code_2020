@@ -240,7 +240,10 @@ public class TeleOp2020_exp extends LinearOpMode{
 
 
             // Hardware instruction (telling the hardware what to do)
-            if(driveFieldRelative) {
+            if (powershotDriving){
+                powershotDriving = !auto_drive.doTasksAsync();
+            }
+            else if(driveFieldRelative) {
                 mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
             }
             else {

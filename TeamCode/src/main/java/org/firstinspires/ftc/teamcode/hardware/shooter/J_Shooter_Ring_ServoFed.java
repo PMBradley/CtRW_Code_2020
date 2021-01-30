@@ -23,10 +23,10 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
-    public static double Ki = 0.00002;
+    public static double Ki = 2.0;
     public static double Kd = 0.00;
     public static boolean I_ENABLED = false;
-    public static double I_DIVISOR = 2.0;
+    public static double I_MAX = 2.0;
     private double lastRuntime;
     private double integral;
     private double lastError;
@@ -208,7 +208,7 @@ public class J_Shooter_Ring_ServoFed {
 
         if (Math.abs(integral) > 0 && Math.abs(error) > 0.005) {
             if(integral/Math.abs(integral) != error/Math.abs(error)){
-                integral += error/I_DIVISOR;
+                integral = Math.abs(I_MAX) * integral/Math.abs(I_MAX);
             }
         }
       //  if(Math.abs(error) )
