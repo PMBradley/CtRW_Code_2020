@@ -25,7 +25,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double Kp = 2.5;
     public static double Ki = 2.0;
     public static double Kd = 0.00;
-    public static boolean I_ENABLED = false;
+    public static boolean I_ENABLED = true;
     public static double I_MAX = 2.0;
     private double lastRuntime;
     private double integral;
