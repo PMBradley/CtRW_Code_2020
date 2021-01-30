@@ -23,11 +23,12 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
-    public static double Ki = 20.0;
+    public static double Ki = 400.0;
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
+    public static double I_ENABLED_RADUIUS = 0.03;
     public static double I_MAX = 360.0;
-    public static double I_RESET_ERROR = 0.04; // how far I has to overshoot before resetting I
+    public static double I_RESET_ERROR = 0.01; // how far I has to overshoot before resetting I
     private double lastRuntime;
     private double integral;
     private double lastError;
@@ -216,7 +217,6 @@ public class J_Shooter_Ring_ServoFed {
             else {
                 integral = Math.abs(I_MAX) * integral/Math.abs(integral);
             }
-
         }
 
 
@@ -225,7 +225,7 @@ public class J_Shooter_Ring_ServoFed {
    //     telemetry.addData("Error: ", error);
     //    telemetry.addData("Integral: ", integral);
 
-        if(I_ENABLED){
+        if(I_ENABLED && Math.abs(error) < I_ENABLED_RADUIUS){
             integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
         }
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
