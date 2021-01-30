@@ -23,10 +23,11 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
-    public static double Ki = 0.2;
+    public static double Ki = 20.0;
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
-    public static double I_MAX = 111113260.0;
+    public static double I_MAX = 360.0;
+    public static double I_RESET_ERROR = 0.04; // how far I has to overshoot before resetting I
     private double lastRuntime;
     private double integral;
     private double lastError;
@@ -144,6 +145,8 @@ public class J_Shooter_Ring_ServoFed {
         shooterMotorFront.setPower( 0.0 );
         shooterMotorBack.setPower( 0.0 );
 
+        integral = 0;
+
         spunUp = false;
         firstSpinUp = true;
     }
@@ -207,16 +210,16 @@ public class J_Shooter_Ring_ServoFed {
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
 
         if (Math.abs(integral) > I_MAX ) {
-           //
-            integral = Math.abs(I_MAX) * integral/Math.abs(integral);
-            //}
+            if( Math.abs(error) > 0.05 && integral/Math.abs(integral) != error/Math.abs(error)) {
+                integral = 0;
+            }
+            else {
+                integral = Math.abs(I_MAX) * integral/Math.abs(integral);
+            }
+
         }
 
-        if(Math.abs(integral) > 0 && Math.abs(error) > 0.005){
-            if(integral/Math.abs(integral) != error/Math.abs(error)){
-                //integral =
-            }
-        }
+
 
       //  if(Math.abs(error) )
    //     telemetry.addData("Error: ", error);
