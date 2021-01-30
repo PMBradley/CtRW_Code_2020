@@ -210,7 +210,7 @@ public class J_Shooter_Ring_ServoFed {
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
 
         if (Math.abs(integral) > I_MAX ) {
-            if( Math.abs(error) > 0.05 && integral/Math.abs(integral) != error/Math.abs(error)) {
+            if( Math.abs(error) > I_RESET_ERROR && integral/Math.abs(integral) != error/Math.abs(error)) {
                 integral = 0;
             }
             else {
