@@ -91,6 +91,7 @@ public class TeleOp2020 extends LinearOpMode{
     private boolean powershotDriving = false;
     private int lastPowershotIndex = 0;
     private boolean firstPowershotDrive = true;
+    private boolean firstPowershotDriveToggle = true;
 
 
     // The "Main" for TeleOp (the place where the main code is run)
@@ -210,9 +211,18 @@ public class TeleOp2020 extends LinearOpMode{
             }
 
 
+            if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
+                powershotDriving = !powershotDriving;
 
-            if(gamepad1.dpad_right || gamepad1.dpad_left){
+                firstPowershotDriveToggle = false;
+            }
+            else if (!gamepad1.dpad_right && !gamepad1.dpad_left){
+                firstPowershotDriveToggle = true;
+            }
+
+            if(powershotDriving){
                 shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
+
 
                 if(auto_drive.getTaskIndex() != lastPowershotIndex){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
@@ -376,8 +386,8 @@ public class TeleOp2020 extends LinearOpMode{
 
 
     /* PUT ALL FUNCTIONS HERE */
-    private static final double FIRST_POWERSHOT_RIGHT_DISTANCE = 14.5;
-    private static final double POWERSHOT_APART_DISTANCE = 6.5;
+    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 11.5;
+    public static double POWERSHOT_APART_DISTANCE = 7.0;
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 

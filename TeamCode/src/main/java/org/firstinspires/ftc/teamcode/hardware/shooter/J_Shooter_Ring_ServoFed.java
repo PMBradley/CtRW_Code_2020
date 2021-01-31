@@ -23,7 +23,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
-    public static double Ki = 550.0;
+    public static double Ki = 250.0;
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
     public static double I_ENABLED_RADUIUS = 0.03;
@@ -61,8 +61,8 @@ public class J_Shooter_Ring_ServoFed {
 
     public static double ANGLER_POWERSHOT_POSITION = degToServoPos(104.0); // the trajectory angler down position
     public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(104.0);
-    public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 95.5);
-    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 92.0);
+    public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 96.5);
+    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 93.2);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
     public static double PID_VELO_CAP = 1.0;
