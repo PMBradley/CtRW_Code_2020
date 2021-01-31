@@ -228,7 +228,6 @@ public class TeleOp2020 extends LinearOpMode{
 
                 if(auto_drive.getTaskIndex() != lastPowershotIndex && auto_drive.getTaskIndex() < 3){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
-                    shooter.updateFeeder();
 
                     if(shooter.getFiringState() > 0){
                         lastPowershotIndex = auto_drive.getTaskIndex();
