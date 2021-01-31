@@ -23,7 +23,7 @@ public class J_Shooter_Ring_ServoFed {
 
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
-    public static double Ki = 400.0;
+    public static double Ki = 550.0;
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
     public static double I_ENABLED_RADUIUS = 0.03;
@@ -131,9 +131,10 @@ public class J_Shooter_Ring_ServoFed {
         if (firstSpinUp){
             spinUpEndTime = localRuntime.milliseconds() + SPIN_UP_TIME;
             firstSpinUp = false;
+            integral = 0;
         }
 
-        if(USING_PID && Math.abs(encoderVeloToMotorSpeed(getFlywheelVelo()) - shooterRunSpeed) < 0.025){ // say the motor is spun up if within 0.05 of the target speed
+        if(USING_PID && Math.abs(encoderVeloToMotorSpeed(getFlywheelVelo()) - shooterRunSpeed) < 0.01){ // say the motor is spun up if within 0.05 of the target speed
             spunUp = true;
         }
         else if(localRuntime.milliseconds() >= spinUpEndTime){
@@ -212,10 +213,10 @@ public class J_Shooter_Ring_ServoFed {
 
         if (Math.abs(integral) > I_MAX ) {
             if( Math.abs(error) > I_RESET_ERROR && integral/Math.abs(integral) != error/Math.abs(error)) {
-                integral = 0;
+               // integral = 0;
             }
             else {
-                integral = Math.abs(I_MAX) * integral/Math.abs(integral);
+                //integral = Math.abs(I_MAX) * integral/Math.abs(integral);
             }
         }
 
