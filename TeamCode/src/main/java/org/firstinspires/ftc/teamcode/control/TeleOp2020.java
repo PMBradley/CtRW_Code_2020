@@ -2,15 +2,20 @@ package org.firstinspires.ftc.teamcode.control;
 
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
 import org.firstinspires.ftc.teamcode.hardware.shooter.J_Shooter_Ring_ServoFed;
 import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
+import org.firstinspires.ftc.teamcode.util.StateMachine.DriveFollowerTask;
+
+import java.util.ArrayList;
 
 
 /*
@@ -68,7 +73,8 @@ public class TeleOp2020 extends LinearOpMode{
     private Intake_Ring_Drop intake; // the intake class instance
     private J_Shooter_Ring_ServoFed shooter; // the shooter class instance
     private Arm_Wobble_Grabber wobble; // the wobble intake/arm class instance
-    //private Arm_Wobble_Grabber wobbleClamp; // wobble intake, but clamp
+    private Drive_Mecanum_Auto auto_drive;
+
 
     // Flags
     private boolean firstToggleDriveRelative = true; // used to ensure proper toggling behavior (see usage under logic section)
@@ -82,7 +88,9 @@ public class TeleOp2020 extends LinearOpMode{
     private int wobbleArmPosition = 0; // 0 = folded pos, 1 = up pos, 2 = grab position
     private int wobbleIntakeDirection = 0; // 0 = stopped, 1 = intaking, -1 = outtaking
     private boolean intakeIsRunning = false; // holds if the intake should be running or not
-    private boolean powershotTurning = false;
+    private boolean powershotDriving = false;
+    private int lastPowershotIndex = 0;
+    private boolean firstPowershotDrive = true;
 
 
     // The "Main" for TeleOp (the place where the main code is run)
@@ -95,12 +103,16 @@ public class TeleOp2020 extends LinearOpMode{
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed); // pass in the drive motors and the speed variables to setup properly
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
-        //shooter = new Shooter_Ring_ServoFed(robot.shooterMotor, robot.shooterFeederServo);
         shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo, 1.0/5.0);
-        //wobbleClamp = new Arm_Wobble_Grabber(robot.wobbleArmMotor2, robot.wobbleClampServo, robot.wobbleClampServo, 1.0/6.0);
+
+        auto_drive = new Drive_Mecanum_Auto(hardwareMap); // setup the second automated drive class
+
 
         robot.setEncoderActive(false); // start the game without running encoders
+
+        ArrayList<DriveFollowerTask> autoPowershotTasks = getAutoPowershotTasks(); // calculate the trajectories for the powershot driving
+
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
@@ -201,17 +213,18 @@ public class TeleOp2020 extends LinearOpMode{
 
             if(gamepad1.dpad_right || gamepad1.dpad_left){
                 shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
-                shooter.instructFire(); // tell the shooter to start shooting
 
-                if(shooter.getFiringState() == 2){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
-                    powershotTurning = true;
+                if(auto_drive.getTaskIndex() != lastPowershotIndex){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                    shooter.instructFire(); // tell the shooter to start shooting
+
+                    lastPowershotIndex = auto_drive.getTaskIndex();
                 }
 
-                if(powershotTurning && gamepad1.dpad_right){ // if turning and pressing right, turn right
-                    rotatePower = POWERSHOT_TURN_SPEED;
-                }
-                else if(powershotTurning && gamepad1.dpad_left){ // else if turning but turning left, turn left
-                    rotatePower = -POWERSHOT_TURN_SPEED;
+                if(firstPowershotDrive) { // if first loop run
+                    auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
+                    auto_drive.setTasks(autoPowershotTasks);
+
+                    firstPowershotDrive = false;
                 }
             }
             else {
@@ -219,13 +232,17 @@ public class TeleOp2020 extends LinearOpMode{
                     rotatePower = mecanum_drive.calcTurnPIDPower(Math.toRadians(0), Math.toRadians(robot.getHeading())); // override the rotation with a PID output
                 }
 
-                powershotTurning = false; // if neither are pressed, reset the turning variable
+                powershotDriving = false; // if neither are pressed, reset the turning variable
+                firstPowershotDrive = true;
             }
 
 
 
             // Hardware instruction (telling the hardware what to do)
-            if(driveFieldRelative) {
+            if (powershotDriving){
+                powershotDriving = !auto_drive.doTasksAsync();
+            }
+            else if(driveFieldRelative) {
                 mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
             }
             else {
@@ -303,7 +320,10 @@ public class TeleOp2020 extends LinearOpMode{
 
 
             // Telemetry
-            if(driveFieldRelative){ // add telemetry relating to robot drive mode
+            if(powershotDriving){
+                telemetry.addLine("Automatically Powershot Driving");
+            }
+            else if(driveFieldRelative){ // add telemetry relating to robot drive mode
                 telemetry.addLine("Driving field relative");
             }
             else{
@@ -356,5 +376,26 @@ public class TeleOp2020 extends LinearOpMode{
 
 
     /* PUT ALL FUNCTIONS HERE */
+    private static final double FIRST_POWERSHOT_RIGHT_DISTANCE = 14.5;
+    private static final double POWERSHOT_APART_DISTANCE = 6.5;
+    private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
+        ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
+
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(new Pose2d(0, 0, 0))
+                .strafeRight(FIRST_POWERSHOT_RIGHT_DISTANCE)
+                .build()
+        ));
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
+                .strafeRight(POWERSHOT_APART_DISTANCE)
+                .build()
+        ));
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(1).getTraj().end())
+                .strafeRight(POWERSHOT_APART_DISTANCE)
+                .build()
+        ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+
+        return driveTasks;
+    }
 }

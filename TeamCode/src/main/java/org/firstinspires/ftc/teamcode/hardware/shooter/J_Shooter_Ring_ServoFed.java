@@ -61,8 +61,8 @@ public class J_Shooter_Ring_ServoFed {
 
     public static double ANGLER_POWERSHOT_POSITION = degToServoPos(104.0); // the trajectory angler down position
     public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(104.0);
-    public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 106.2);
-    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 102.6);
+    public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 95.5);
+    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 92.0);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
     public static double PID_VELO_CAP = 1.0;
@@ -180,15 +180,18 @@ public class J_Shooter_Ring_ServoFed {
         angleUp();
         shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
         angleFirstShot = false;
+        I_ENABLED = false;
     }
     public void optimizeForPowershots(){
         angleDown();
         shooterShootSpeed = SHOOTER_PID_POWERSHOT_SPEED;
         angleFirstShot = false;
+        I_ENABLED = true;
     }
     public void optimizeForLonggoal(){
         shooterShootSpeed = SHOOTER_PID_LONGGOAL_SPEED;
         angleFirstShot = true;
+        I_ENABLED = true;
 
         if(shotCount == 0){
             anglerServo.setPosition(FIRSTSHOT_LONGGOAL_POSITION);
@@ -211,22 +214,11 @@ public class J_Shooter_Ring_ServoFed {
         double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
 
-        if (Math.abs(integral) > I_MAX ) {
-            if( Math.abs(error) > I_RESET_ERROR && integral/Math.abs(integral) != error/Math.abs(error)) {
-               // integral = 0;
-            }
-            else {
-                //integral = Math.abs(I_MAX) * integral/Math.abs(integral);
-            }
-        }
-
-
-
       //  if(Math.abs(error) )
    //     telemetry.addData("Error: ", error);
     //    telemetry.addData("Integral: ", integral);
 
-        if(I_ENABLED && Math.abs(error) < I_ENABLED_RADUIUS){
+        if(I_ENABLED && Math.abs(error) < I_ENABLED_RADUIUS){ // only use integral if within a certain radius to prevent insane windup
             integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
         }
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
