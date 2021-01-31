@@ -222,12 +222,17 @@ public class TeleOp2020 extends LinearOpMode{
 
             if(powershotDriving){
                 shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
+                shooter.optimizeForPowershots();
+                shooter.spinUp();
 
 
-                if(auto_drive.getTaskIndex() != lastPowershotIndex){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                if(auto_drive.getTaskIndex() != lastPowershotIndex && auto_drive.getTaskIndex() < 3){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
+                    shooter.updateFeeder();
 
-                    lastPowershotIndex = auto_drive.getTaskIndex();
+                    if(shooter.getFiringState() > 0){
+                        lastPowershotIndex = auto_drive.getTaskIndex();
+                    }
                 }
 
                 if(firstPowershotDrive) { // if first loop run
@@ -386,8 +391,8 @@ public class TeleOp2020 extends LinearOpMode{
 
 
     /* PUT ALL FUNCTIONS HERE */
-    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 11.5;
-    public static double POWERSHOT_APART_DISTANCE = 7.0;
+    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 10.0;
+    public static double POWERSHOT_APART_DISTANCE = 7.2;
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
