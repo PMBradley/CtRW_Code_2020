@@ -430,7 +430,7 @@ public class AutoOp2020 extends LinearOpMode {
         else {
             wobbleGoalPosition = wobbleGoalPosC;
 
-            taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPosition.getX()+5.2, wobbleGoalPosition.getY()+5.2, wobbleGoalPosition.getHeading() )); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
+            taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPosition.getX()+5.3, wobbleGoalPosition.getY()+5.3, wobbleGoalPosition.getHeading() )); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
             taskManager.setTaskWithNameLocation("Place Wobble 2", wobbleGoalPosition); // once the position has been found, set the tasks to their new positions
         }
 
