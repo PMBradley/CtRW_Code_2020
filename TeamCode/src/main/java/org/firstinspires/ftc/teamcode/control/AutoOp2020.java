@@ -44,9 +44,8 @@ public class AutoOp2020 extends LinearOpMode {
     private static Pose2d startPose = new Pose2d(-65.3, -9.61, Math.toRadians(0)); // the starting position of the robot relative to the middle of the field
 
     public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(18.0, -20.0, Math.toRadians(0.0)); // the positions that the robot needs to drive to
-    public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -15.0, Math.toRadians(90.0));
-    public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(37, -28.0, Math.toRadians(70.0), Math.toRadians(-25));// TODO: re-enable the actual target wobble goal positions once done
-    //     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(-6.0, -26.0, Math.toRadians(180));
+    public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -12.0, Math.toRadians(90.0));
+    public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(37, -28.0, Math.toRadians(70.0), Math.toRadians(-25));
 
     public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-41.3, -16.8, Math.toRadians(-45.0));
     public static TargetDrivePosition shootPos        = new TargetDrivePosition(-51.1, -13, Math.toRadians(7.0));
@@ -426,7 +425,7 @@ public class AutoOp2020 extends LinearOpMode {
             taskManager.setTaskWithNameLocationTasks("Collect Rings", new ArrayList<DriveFollowerTask>()); // if only one ring there, remove the drive movement forward once at location to pick up the third ring (by resetting the at location tasks list for collecting rings)
 
             taskManager.setTaskWithNameLocation("Place Wobble 1", wobbleGoalPosition); // once the position has been found, set the tasks to their new positions
-            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPosition.getX(), wobbleGoalPosition.getY()+8.5, wobbleGoalPosition.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
+            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPosition.getX(), wobbleGoalPosition.getY()+9.5, wobbleGoalPosition.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
         }
         else {
             wobbleGoalPosition = wobbleGoalPosC;
