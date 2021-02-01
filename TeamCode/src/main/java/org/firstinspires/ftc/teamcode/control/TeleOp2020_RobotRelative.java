@@ -213,6 +213,11 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
             if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
                 powershotDriving = !powershotDriving;
 
+                if (powershotDriving) {
+                    auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
+                    auto_drive.setTasks(autoPowershotTasks);
+                }
+
                 firstPowershotDriveToggle = false;
             }
             else if (!gamepad1.dpad_right && !gamepad1.dpad_left){
@@ -226,22 +231,17 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                 shooter.spinUp();
 
 
-                if(auto_drive.getTaskIndex() != lastPowershotIndex && auto_drive.getTaskIndex() < 3){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                if(auto_drive.getTaskIndex() != lastPowershotIndex && auto_drive.getTaskIndex() > 0){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
 
-                    if(shooter.getFiringState() > 1){
+                    if (shooter.getFiringState() > 1) {
                         lastPowershotIndex = auto_drive.getTaskIndex();
                     }
                 }
 
-                if(firstPowershotDrive) { // if first loop run
-                    auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
-                    auto_drive.setTasks(autoPowershotTasks);
-
-                    firstPowershotDrive = false;
-                }
 
                 shooter.updateFeeder();
+                powershotDriving = !auto_drive.doTasksAsync();
             }
             else {
                 if(gamepad1.left_bumper){ // if we want the robot to rotate to 0
@@ -249,23 +249,20 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                 }
 
                 powershotDriving = false; // if neither are pressed, reset the turning variable
-                firstPowershotDrive = true;
+                lastPowershotIndex = 0;
             }
 
 
 
             // Hardware instruction (telling the hardware what to do)
-            if (powershotDriving){
-                powershotDriving = !auto_drive.doTasksAsync();
-            }
-            else if(driveFieldRelative) {
-                mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
-            }
-            else {
-                mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
-            }
-
             if( !powershotDriving ) {
+                if(driveFieldRelative) {
+                    mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
+                }
+                else {
+                    mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
+                }
+
                 if (instructFire) {
                     shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
                 } else {
