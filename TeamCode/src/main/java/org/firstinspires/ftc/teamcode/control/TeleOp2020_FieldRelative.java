@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.control;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -388,6 +389,7 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
 
     /* PUT ALL FUNCTIONS HERE */
+    public static double FIRST_POWERSHOT_BACK_DISTANCE = -23.0;
     public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 10.0;
     public static double POWERSHOT_APART_DISTANCE = 7.2;
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
@@ -395,7 +397,7 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
 
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(new Pose2d(0, 0, 0))
-                .strafeRight(FIRST_POWERSHOT_RIGHT_DISTANCE)
+                .lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
