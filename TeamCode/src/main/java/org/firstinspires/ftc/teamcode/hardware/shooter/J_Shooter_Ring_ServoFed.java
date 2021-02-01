@@ -180,7 +180,7 @@ public class J_Shooter_Ring_ServoFed {
         angleUp();
         shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
         angleFirstShot = false;
-        I_ENABLED = true; // TODO:
+        I_ENABLED = false;
     }
     public void optimizeForPowershots(){
         angleDown();

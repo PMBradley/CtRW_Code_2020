@@ -222,13 +222,14 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
             if(powershotDriving){
                 shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
                 shooter.optimizeForPowershots();
+                shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
                 shooter.spinUp();
-                
+
 
                 if(auto_drive.getTaskIndex() != lastPowershotIndex && auto_drive.getTaskIndex() < 3){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
 
-                    if(shooter.getFiringState() > 0){
+                    if(shooter.getFiringState() > 1){
                         lastPowershotIndex = auto_drive.getTaskIndex();
                     }
                 }
