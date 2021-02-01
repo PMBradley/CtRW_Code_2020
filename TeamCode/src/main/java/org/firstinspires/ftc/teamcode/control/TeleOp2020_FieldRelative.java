@@ -45,10 +45,10 @@ import java.util.ArrayList;
  */
 
 
-@TeleOp(name = "TeleOp2020", group = "@@@")
+@TeleOp(name = "TeleOp2020 Field Relative", group = "@@@")
 
 @Config
-public class TeleOp2020 extends LinearOpMode{
+public class TeleOp2020_FieldRelative extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
@@ -59,8 +59,6 @@ public class TeleOp2020 extends LinearOpMode{
     public static double translateSpeed = 0.40; // Speed multiplier for translation (1 being 100% of power going in)
     public static double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     public static double stopSpeed = 0.00; // the motor speed for stopping the robot
-
-    public static double POWERSHOT_TURN_SPEED = 0.4; // the speed that the robot turns when shooting powershots automatically
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
@@ -82,9 +80,9 @@ public class TeleOp2020 extends LinearOpMode{
     private boolean firstIntakeRunToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstAngleToggle = true;
 
-    private boolean driveFieldRelative = true; // default is driving relative to field
+    private boolean driveFieldRelative = true; // default to driving robot relative
     private boolean isSpinningUp = false;
-    private boolean shooterAngledUp = false;
+    private boolean shooterAngledUp = true;
     private int wobbleArmPosition = 0; // 0 = folded pos, 1 = up pos, 2 = grab position
     private int wobbleIntakeDirection = 0; // 0 = stopped, 1 = intaking, -1 = outtaking
     private boolean intakeIsRunning = false; // holds if the intake should be running or not
