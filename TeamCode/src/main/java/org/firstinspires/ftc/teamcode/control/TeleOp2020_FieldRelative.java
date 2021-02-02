@@ -59,7 +59,7 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
-    static final double RELATIVE_OFFSET_DEG = -90;
+    static final double RELATIVE_OFFSET_DEG = 0;
     
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
