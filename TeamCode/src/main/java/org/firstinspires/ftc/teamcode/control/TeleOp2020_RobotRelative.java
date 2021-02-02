@@ -53,7 +53,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
-    String robotName = "Robot 2020";
+    String robotName = "Lil' ring flinga";
 
     // Robot Speed variables
     public static double turnSpeed = 0.50; // Speed multiplier for turning (1 being 100% of power going in) when not boosting
