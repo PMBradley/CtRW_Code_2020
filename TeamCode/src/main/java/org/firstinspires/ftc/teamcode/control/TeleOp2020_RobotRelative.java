@@ -402,7 +402,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
         
-        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(1).getTraj().end())
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
                 .strafeRight(POWERSHOT_APART_DISTANCE)
                 .build()
         ));
