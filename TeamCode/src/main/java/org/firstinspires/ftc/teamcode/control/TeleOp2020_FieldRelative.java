@@ -206,6 +206,19 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
                 rotatePower = stopSpeed;
             }
 
+           if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
+                powershotDriving = !powershotDriving;
+
+                if (powershotDriving) {
+                    auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
+                    auto_drive.setTasks(autoPowershotTasks);
+                }
+
+                firstPowershotDriveToggle = false;
+            }
+            else if (!gamepad1.dpad_right && !gamepad1.dpad_left){
+                firstPowershotDriveToggle = true;
+            }
 
             if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
                 powershotDriving = !powershotDriving;
@@ -228,12 +241,12 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
                 shooter.spinUp();
 
 
-                if(auto_drive.getTaskIndex() != lastPowershotIndex){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                if(auto_drive.getTaskIndex() == 1 || auto_drive.getTaskIndex() == 3 || auto_drive.getTaskIndex() == 5){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
 
-                    if (shooter.getFiringState() > 1) {
-                        lastPowershotIndex = auto_drive.getTaskIndex();
-                    }
+                    //if (shooter.getFiringState() > 1) {
+                    //    lastPowershotIndex = auto_drive.getTaskIndex();
+                    //}
                 }
 
 
@@ -391,16 +404,20 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
                 .lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+        
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
                 .strafeRight(POWERSHOT_APART_DISTANCE)
                 .build()
         ));
-        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(1).getTraj().end())
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+        
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
                 .strafeRight(POWERSHOT_APART_DISTANCE)
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
-
+        
         return driveTasks;
     }
 }
