@@ -49,7 +49,7 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
-    String robotName = "Robot 2020";
+    String robotName = "Lil' ring flinga";
 
     // Robot Speed variables
     public static double turnSpeed = 0.50; // Speed multiplier for turning (1 being 100% of power going in) when not boosting
@@ -59,7 +59,7 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
-    static final double RELATIVE_OFFSET_DEG = 0;
+    static final double RELATIVE_OFFSET_DEG = -90;
     
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
