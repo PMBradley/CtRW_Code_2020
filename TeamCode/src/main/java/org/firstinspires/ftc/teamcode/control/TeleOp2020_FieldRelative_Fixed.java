@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 /*
     Welcome to the 2020-2021 TeleOp class!
-
     Robot control scheme:
         Main Drive:
         - Controller 1 Left Stick = translation
@@ -29,15 +28,12 @@ import java.util.ArrayList;
         - Controller 1 Right Bumper = boost button
         - Controller 1 D-Pad Up = toggle drive relative to field
         - Controller 1 D-Pad Left/Right = preform the powershot shooting subroutine
-
         Ring Shooter:
         - Controller 2 X button = start a firing sequence (spins up if not spun up, then shoots a ring. can be held to fire rapidly)
         - Controller 2 Right Bumper = toggle if the shooter motor is spun up
         - Constroller 2
-
         Ring Intake:
         - Controller 2 Left Bumper = toggle if the ring intake is active
-
         Wobble Intake/Arm:
         - Controller 2 Right Stick (y axis) = up moves the intake wheels to outtake the wobble goal, down moves the intake wheels to intake the wobble goal
         - Controller 2 D-Pad Up = Move the wobble arm to the lifted position (for going over the wall)
@@ -63,8 +59,8 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
-    static final double RELATIVE_DRIVE_OFFSET = -90;
-
+    static final double RELATIVE_OFFSET_DEG = -90;
+    
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
     private ElapsedTime runtime; // internal clock
@@ -214,6 +210,11 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
             if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
                 powershotDriving = !powershotDriving;
 
+                if (powershotDriving) {
+                    auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
+                    auto_drive.setTasks(autoPowershotTasks);
+                }
+
                 firstPowershotDriveToggle = false;
             }
             else if (!gamepad1.dpad_right && !gamepad1.dpad_left){
@@ -223,23 +224,21 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
             if(powershotDriving){
                 shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
                 shooter.optimizeForPowershots();
+                shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
                 shooter.spinUp();
 
 
-                if(auto_drive.getTaskIndex() != lastPowershotIndex && auto_drive.getTaskIndex() < 3){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                if(auto_drive.getTaskIndex() != lastPowershotIndex){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
 
-                    if(shooter.getFiringState() > 0){
+                    if (shooter.getFiringState() > 1) {
                         lastPowershotIndex = auto_drive.getTaskIndex();
                     }
                 }
 
-                if(firstPowershotDrive) { // if first loop run
-                    auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
-                    auto_drive.setTasks(autoPowershotTasks);
 
-                    firstPowershotDrive = false;
-                }
+                shooter.updateFeeder();
+                powershotDriving = !auto_drive.doTasksAsync();
             }
             else {
                 if(gamepad1.left_bumper){ // if we want the robot to rotate to 0
@@ -247,74 +246,65 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
                 }
 
                 powershotDriving = false; // if neither are pressed, reset the turning variable
-                firstPowershotDrive = true;
+                lastPowershotIndex = 0;
             }
 
 
 
             // Hardware instruction (telling the hardware what to do)
-            if (powershotDriving){
-                powershotDriving = !auto_drive.doTasksAsync();
-            }
-            else if(driveFieldRelative) {
-                mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading() + RELATIVE_DRIVE_OFFSET, isBoosting); // call the drive field relative method
-            }
-            else {
-                mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
-            }
-
-            if(instructFire) {
-                shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
-            }
-            else {
-                shooter.resetShotCount();
-            }
-
-            if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
-                shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
-                shooter.spinUp();
-                shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
-                intake.spinDown();
-            }
-            else if(gamepad2.left_trigger > 0.5){ // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
-                shooter.indexerDown(); // move the indexer to the intaking position
-                shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
-
-                intake.setIntakeRunSpeed(-intake.DEFAULT_INTAKE_RUN_SPEED);
-                intake.spinUp(); // and run the intake
-            }
-            else if(intakeIsRunning){ // if the intake is set to be running by the user and the shooter isn't firing
-                shooter.indexerDown(); // move the indexer to the intaking position
-
-                if(isSpinningUp){ // if the shooter should be spinning up
-                    shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed()); // set the shooter to its full speed
+            if( !powershotDriving ) {
+                if(driveFieldRelative) {
+                    mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading() + RELATIVE_OFFSET_DEG, isBoosting); // call the drive field relative method
                 }
-                else { // if not supposed to be spinnig up shooter, spin it up to a low speed to help with intaking
-                    shooter.setTargetShooterSpeed(0.2);
+                else {
+                    mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
                 }
-                shooter.spinUp();
+
+                if (instructFire) {
+                    shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
+                } else {
+                    shooter.resetShotCount();
+                }
+
+                if (shooter.isFiring()) { // if the shooter is firing, make sure the be updating the feeder
+                    shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
+                    shooter.spinUp();
+                    shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
+                    intake.spinDown();
+                } else if (gamepad2.left_trigger > 0.5) { // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
+                    shooter.indexerDown(); // move the indexer to the intaking position
+                    shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
+
+                    intake.setIntakeRunSpeed(-intake.DEFAULT_INTAKE_RUN_SPEED);
+                    intake.spinUp(); // and run the intake
+                } else if (intakeIsRunning) { // if the intake is set to be running by the user and the shooter isn't firing
+                    shooter.indexerDown(); // move the indexer to the intaking position
+
+                    if (isSpinningUp) { // if the shooter should be spinning up
+                        shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed()); // set the shooter to its full speed
+                    } else { // if not supposed to be spinnig up shooter, spin it up to a low speed to help with intaking
+                        shooter.setTargetShooterSpeed(0.2);
+                    }
+                    shooter.spinUp();
 
 
-                intake.setIntakeRunSpeed(intake.DEFAULT_INTAKE_RUN_SPEED);
-                intake.spinUp(); // and run the intake
-            }
-            else { // otherwise set the shooter to the proper mode
-                shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
-                shooter.indexerUp();
+                    intake.setIntakeRunSpeed(intake.DEFAULT_INTAKE_RUN_SPEED);
+                    intake.spinUp(); // and run the intake
+                } else { // otherwise set the shooter to the proper mode
+                    shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
+                    shooter.indexerUp();
 
-                intake.spinDown(); // and ensure that the intake is spun down
-            }
+                    intake.spinDown(); // and ensure that the intake is spun down
+                }
 
-            if ( gamepad2.b ) {
-                shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                if (gamepad2.b) {
+                    shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                } else if (shooterAngledUp) {
+                    shooter.optimizeForHighgoal();
+                } else {
+                    shooter.optimizeForPowershots();
+                }
             }
-            else if(shooterAngledUp){
-                shooter.optimizeForHighgoal();
-            }
-            else {
-                shooter.optimizeForPowershots();
-            }
-
 
             wobble.setIntakeDirection(wobbleIntakeDirection); // make sure it is intaking properly
             //wobbleClamp.setIntakeDirection(wobbleIntakeDirection);
