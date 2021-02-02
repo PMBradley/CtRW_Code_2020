@@ -231,12 +231,12 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                 shooter.spinUp();
 
 
-                if(auto_drive.getTaskIndex() != lastPowershotIndex){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                if(auto_drive.getTaskIndex() == 1 || auto_drive.getTaskIndex() == 3 || auto_drive.getTaskIndex() == 5){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
 
-                    if (shooter.getFiringState() > 1) {
-                        lastPowershotIndex = auto_drive.getTaskIndex();
-                    }
+                    //if (shooter.getFiringState() > 1) {
+                    //    lastPowershotIndex = auto_drive.getTaskIndex();
+                    //}
                 }
 
 
@@ -394,10 +394,14 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                 .lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+        
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
                 .strafeRight(POWERSHOT_APART_DISTANCE)
                 .build()
         ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+        
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(1).getTraj().end())
                 .strafeRight(POWERSHOT_APART_DISTANCE)
                 .build()
