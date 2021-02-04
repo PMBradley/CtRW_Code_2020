@@ -85,8 +85,8 @@ public class Drive_Mecanum_Tele {
         double cos = Math.cos(Math.toRadians(heading));
 
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
-        double field_x = (x * cos) - (y * sin);
-        double field_y = (x * sin) + (y * cos);
+        double field_x = (y * cos) - (x * sin);
+        double field_y = (y * sin) + (x * cos);
 
 
         // if boosting is true, the robot will use the boostingMultiplier instead of translateMultiplier for speed setting
@@ -103,10 +103,10 @@ public class Drive_Mecanum_Tele {
 
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
-        powerFL = (field_y + (r * turnMultiplier) + field_x);
-        powerFR = (field_y - (r * turnMultiplier) - field_x);
-        powerBL = (field_y + (r * turnMultiplier) - field_x);
-        powerBR = (field_y - (r * turnMultiplier) + field_x);
+        powerFL = (field_y + (r) + field_x);
+        powerFR = (field_y - (r) - field_x);
+        powerBL = (field_y + (r) - field_x);
+        powerBR = (field_y - (r) + field_x);
 
 
         // Normalize the powers before we pass them into the motors (so that no power is outside of the range when passed in, preserving the intended slope)

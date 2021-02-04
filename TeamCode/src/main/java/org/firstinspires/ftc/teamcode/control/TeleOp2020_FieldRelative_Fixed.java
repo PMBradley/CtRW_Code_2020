@@ -129,8 +129,8 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
 
             // Variables
             boolean isBoosting = !gamepad1.right_bumper;  // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
-            double xTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
-            double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double xTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double yTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
             double rotatePower = gamepad1.right_stick_x * Math.abs(gamepad1.right_stick_x);
             boolean instructFire = gamepad2.x; // if pressing the second gamepad x, instruct a fire event
 
@@ -395,8 +395,9 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
 
     /* PUT ALL FUNCTIONS HERE */
     public static double FIRST_POWERSHOT_BACK_DISTANCE = -23.0;
-    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 10.0;
-    public static double POWERSHOT_APART_DISTANCE = 7.2;
+    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 8.0;
+    public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 11.0;
+    public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 7.0;
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
@@ -408,13 +409,13 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
         
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
-                .strafeRight(POWERSHOT_APART_DISTANCE)
+                .strafeRight(SECOND_POWERSHOT_RIGHT_DISTANCE)
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
         
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
-                .strafeRight(POWERSHOT_APART_DISTANCE)
+                .strafeRight(THIRD_POWERSHOT_RIGHT_DISTANCE)
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );

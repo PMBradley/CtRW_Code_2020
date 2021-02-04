@@ -51,7 +51,7 @@ public class AutoOp2020 extends LinearOpMode {
     public static TargetDrivePosition shootPos        = new TargetDrivePosition(-51.1, -13, Math.toRadians(7.0));
     public static TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-35.5, -12.5, Math.toRadians(0.0));
     public static TargetDrivePosition parkPos         = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
-    public static double RING_COLLECT_DISTANCE = 6.7; // how far the robot moves to
+    public static double RING_COLLECT_DISTANCE = 8.2; // how far the robot moves to
     public static double ARM_OFFSET_DEGREES = -300; // an offset for the wobble arm
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
     public static double ARM_DROP_DROP_DISTANCE = 12; // how far the robot is from the drop position before it deploys the arm early
