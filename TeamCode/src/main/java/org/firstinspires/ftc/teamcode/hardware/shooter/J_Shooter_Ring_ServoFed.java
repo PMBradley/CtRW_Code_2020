@@ -41,6 +41,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_POWERSHOT_SPEED = 0.58; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
+    public static double MIN_SHOOT_SPEED = 0.40; // the lowest power the shooter will ever let the user attempt to shoot at (only matters if the user sets a custom shooting power)
     private boolean firstSpinUp = true;
     private boolean spunUp = false;
     private double spinUpEndTime = 0;
@@ -141,6 +142,10 @@ public class J_Shooter_Ring_ServoFed {
             spunUp = true;
         }
 
+        if(encoderVeloToMotorSpeed(getFlywheelVelo()) < MIN_SHOOT_SPEED){ // only *even* the shooter is spun up if it is above the min threshold, no matter if it is at the target power
+            spunUp = false;
+        }
+
         return spunUp;
     }
     public void spinDown(){
@@ -180,7 +185,7 @@ public class J_Shooter_Ring_ServoFed {
         angleUp();
         shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
         angleFirstShot = false;
-        I_ENABLED = false;
+        I_ENABLED = true;
     }
     public void optimizeForPowershots(){
         angleDown();

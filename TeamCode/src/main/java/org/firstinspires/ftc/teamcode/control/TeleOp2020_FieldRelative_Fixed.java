@@ -194,6 +194,9 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
                 wobbleIntakeDirection = 0;
             }
 
+            if (wobbleIntakeDirection != 0 || shooter.isSpunUp()){
+                isBoosting = false; // if intaking/outtaking with the wobble or the shooter is spun up, slow down the robot to allow for finer control
+            }
 
             //setup a dead zone for the controllers
             if(Math.abs(xTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
