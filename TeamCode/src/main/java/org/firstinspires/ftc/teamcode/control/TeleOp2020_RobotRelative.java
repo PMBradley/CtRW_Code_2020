@@ -109,7 +109,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
         auto_drive = new Drive_Mecanum_Auto(hardwareMap); // setup the second automated drive class
 
 
-        robot.setEncoderActive(false); // start the game without running encoders
+        robot.setEncoderActive(false); // start the game without running encoders on drive encoders
 
         ArrayList<DriveFollowerTask> autoPowershotTasks = getAutoPowershotTasks(); // calculate the trajectories for the powershot driving
 
@@ -195,6 +195,11 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
             }
             else { // default state is 0
                 wobbleIntakeDirection = 0;
+            }
+
+
+            if(wobbleIntakeDirection != 0 || shooter.isSpunUp()){
+                isBoosting = false; // if intaking/outtaking with the wobble or the shooter is spun up, slow down the robot to allow for finer control
             }
 
 

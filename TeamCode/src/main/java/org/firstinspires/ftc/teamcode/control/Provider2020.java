@@ -166,7 +166,7 @@ public class Provider2020 {
             // wobbleRightWheelServo.getController().pwmDisable();
 
             shooterFeederServo.getController().pwmEnable(); // set these servos to discrete mode
-            shooterIndexerServo.getController().pwmEnable();
+            //shooterIndexerServo.getController().pwmEnable();
             shooterAnglerServo.getController().pwmEnable();
             wobbleClampServo.getController().pwmEnable();
 
