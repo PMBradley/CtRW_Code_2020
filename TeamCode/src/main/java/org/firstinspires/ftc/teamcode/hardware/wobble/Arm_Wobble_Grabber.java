@@ -45,6 +45,7 @@ public class Arm_Wobble_Grabber {
     private double lastTargetPosition = IDLE_POSITION;
 
     private int intakeDirection = 0;
+    private double armStartingOffset = 0.0;
     private double armOffset = 0.0;
 
     public Arm_Wobble_Grabber(DcMotor armMotor, Servo leftServo, Servo rightServo, double gearRatio){
@@ -53,6 +54,9 @@ public class Arm_Wobble_Grabber {
         this.rightServo = rightServo;
         this.localRuntime = new ElapsedTime();
         this.gearRatio = gearRatio;
+
+        armStartingOffset = -getRawArmPosition(); // set the starting offset to cancel out with whatever the starting encoder value is (meaning it will be the oppostite of the starting encoder value)
+            // this results in whatever the initialized position is behaving like 0
     }
     public Arm_Wobble_Grabber(DcMotor armMotor, Servo leftServo, Servo rightServo){
         this(armMotor, leftServo, rightServo, 1);
@@ -124,7 +128,7 @@ public class Arm_Wobble_Grabber {
     public boolean goToRecentPos(){ // sets the arm to go to the last used target position, returns true when there (within the margin of error)
         return setArmPosition(lastTargetPosition);
     }
-    public void setArmStartingOffset(double offset){
+    public void setArmOffset(double offset){
         armOffset = offset;
     }
 
@@ -132,7 +136,10 @@ public class Arm_Wobble_Grabber {
         return lastTargetPosition;
     }
     public double getArmPosition(){ // returns the current arm position in degrees
-        return encoderTicsToDegrees( armMotor.getCurrentPosition() ) + armOffset; // get the current encoder tics position, then convert that to degrees
+        return getRawArmPosition() + armStartingOffset + armOffset; // get the current encoder tics position, then convert that to degrees
+    }
+    public double getRawArmPosition(){
+        return encoderTicsToDegrees( armMotor.getCurrentPosition() );
     }
     public double getArmError(){ // returns the last known error to the target position
         return lastError;

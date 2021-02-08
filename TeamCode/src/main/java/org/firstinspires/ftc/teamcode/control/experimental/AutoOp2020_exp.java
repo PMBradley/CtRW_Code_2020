@@ -90,7 +90,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         drive.setTasks(taskManager.generateCurrentTaskDriveTaskList( drive.getPoseEstimate(), drive.getDriveConstraints() )); // then set the drive to go to that task's position and do any of that auto task's drive tasks
 
-        wobble.setArmStartingOffset(ARM_OFFSET_DEGREES); // set the wobble's starting offset, such that the starting position behaves like 0 (as in Auto the encoder likes to start in a weird position)
+        wobble.setArmOffset(ARM_OFFSET_DEGREES); // set the wobble's starting offset, such that the starting position behaves like 0 (as in Auto the encoder likes to start in a weird position)
 
 
         telemetry.addLine(ROBOT_NAME + "'s setup completed.");
