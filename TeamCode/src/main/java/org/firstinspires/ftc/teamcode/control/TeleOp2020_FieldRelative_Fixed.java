@@ -401,7 +401,7 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
     public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 8.0;
     public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 11.0;
     public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 7.0;
-    public static double FORWARD_COMPENSATION_DISTANCE = 0.90; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
+    public static double FORWARD_COMPENSATION_DISTANCE = 0.65; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
@@ -411,19 +411,19 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
-        
+
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
-                .lineTo(new Vector2d(driveTasks.get(0).getTraj().end().getY() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(0).getTraj().end().getY() - SECOND_POWERSHOT_RIGHT_DISTANCE))
+                .lineTo(new Vector2d(driveTasks.get(0).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(0).getTraj().end().getY() - SECOND_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
-        
+
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
-                .lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getY() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
+                .lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
-        
+
         return driveTasks;
     }
 }
