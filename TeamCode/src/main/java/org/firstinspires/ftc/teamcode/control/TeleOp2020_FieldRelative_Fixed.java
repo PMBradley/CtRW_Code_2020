@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.control;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -60,16 +62,20 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
     static final double RELATIVE_OFFSET_DEG = -90;
-    
+    static final int TELEMETRY_TRANSMISSION_INTERVAL = 25;
+
+
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
-    private ElapsedTime runtime; // internal clock
     private Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
     private StandardTrackingWheelLocalizer localizer; // the odometry based localizer - uses dead wheels to determine (x, y, r) position on the field
     private Intake_Ring_Drop intake; // the intake class instance
     private J_Shooter_Ring_ServoFed shooter; // the shooter class instance
     private Arm_Wobble_Grabber wobble; // the wobble intake/arm class instance
     private Drive_Mecanum_Auto auto_drive;
+
+    private FtcDashboard dashboard;
+    private ElapsedTime runtime; // internal clock
 
 
     // Flags
@@ -104,6 +110,9 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo, 1.0/5.0);
 
         auto_drive = new Drive_Mecanum_Auto(hardwareMap); // setup the second automated drive class
+
+        dashboard = FtcDashboard.getInstance();
+        dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL);
 
 
         robot.setEncoderActive(false); // start the game without running encoders
@@ -390,8 +399,9 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
             //telemetry.addData("Claw arm encoder position", robot.wobbleArmMotor2.getCurrentPosition());
 
 
-
             telemetry.update();
+
+            updateDashboard();
         }  // end of running while loop
     }
 
@@ -425,5 +435,18 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
 
         return driveTasks;
+    }
+
+    public void updateDashboard(){
+        TelemetryPacket packet = new TelemetryPacket();
+
+        // add data to the packet
+        packet.put("raw_shooter_velo", shooter.getFlywheelVelo()); // get the shooter velocity and add that
+        packet.put("shooter_velo", J_Shooter_Ring_ServoFed.encoderVeloToMotorSpeed(shooter.getFlywheelVelo())); // get the shooter velocity and convert it to motor speed for readability
+
+        // send off the data packet
+        if(dashboard != null){
+            dashboard.sendTelemetryPacket(packet);
+        }
     }
 }
