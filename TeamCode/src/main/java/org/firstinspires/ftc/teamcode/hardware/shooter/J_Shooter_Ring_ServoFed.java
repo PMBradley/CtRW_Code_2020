@@ -57,11 +57,11 @@ public class J_Shooter_Ring_ServoFed {
     public static final double FEEDER_EXTENSION_TIME = 130; // in milliseconds
 
     private static final double INDEXER_DOWN_POSITION = degToServoPos(110.0); // the little ring lifter down position
-    private static final double INDEXER_UP_POSITION = degToServoPos(0.0);
+    private static final double INDEXER_UP_POSITION = degToServoPos(65.0);
     public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 
-    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(103.5); // the trajectory angler down position
-    public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(97.5);
+    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(109.0); // the trajectory angler down position
+    public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(103.5);
     public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 97.0);
     public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 88.0);
 
