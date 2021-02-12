@@ -60,10 +60,10 @@ public class J_Shooter_Ring_ServoFed {
     private static final double INDEXER_UP_POSITION = degToServoPos(65.0);
     public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 
-    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(109.0); // the trajectory angler down position
+    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(111.0); // the trajectory angler down position
     public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(103.5);
     public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 97.0);
-    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos( 88.0);
+    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos(97.0);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
     public static double PID_VELO_CAP = 1.0;

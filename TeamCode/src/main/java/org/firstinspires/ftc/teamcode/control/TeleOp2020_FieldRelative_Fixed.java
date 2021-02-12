@@ -408,9 +408,9 @@ public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
 
     /* PUT ALL FUNCTIONS HERE */
     public static double FIRST_POWERSHOT_BACK_DISTANCE = -23.0;
-    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 9.0;
-    public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 9.0;
-    public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 8.0;
+    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 9.7;
+    public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 8.4;
+    public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 7.4;
     public static double FORWARD_COMPENSATION_DISTANCE = 0.65; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
