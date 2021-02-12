@@ -66,7 +66,7 @@ public class AutoTaskManager {
         double shortestDistance = Double.MAX_VALUE; // assume that the shortest applicable distance is somewhere less than the max possible double value
         int shortestIndex = 0;
 
-        for(int i = 0; i < autoTasks.size(); i++){ // TODO: find which task is the closest using priority factored distance
+        for(int i = 0; i < autoTasks.size(); i++){
             if(!getTaskAt(i).isCompleted()){
                 double distance = priorityFactoredDistance( getTaskAt(i), currentPos );
 
