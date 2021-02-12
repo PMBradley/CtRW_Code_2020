@@ -48,7 +48,7 @@ public class AutoOp2020 extends LinearOpMode {
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(42, -30.0, Math.toRadians(70.0), Math.toRadians(-25));
 
     public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-41.3, -16.8, Math.toRadians(-45.0));
-    public static TargetDrivePosition shootPos        = new TargetDrivePosition(-51.1, -8, Math.toRadians(3.2));
+    public static TargetDrivePosition shootPos        = new TargetDrivePosition(-51.1, -8, Math.toRadians(1.2));
     public static TargetDrivePosition ringPickupPos   = new TargetDrivePosition(-35.5, -12.5, Math.toRadians(0.0));
     public static TargetDrivePosition parkPos         = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
     public static double RING_COLLECT_DISTANCE = 9.7; // how far the robot moves to
@@ -314,7 +314,7 @@ public class AutoOp2020 extends LinearOpMode {
         atLocationTasks.add(new DriveFollowerTask(1000)); // once at this location, wait msecs
         autoTasks.add(new AutoTask("Scan & Shoot Rings", 1, shootPos, atLocationTasks));
         atLocationTasks.add(new DriveFollowerTask(450)); // only for the second one, give it more time just to be safe
-        autoTasks.add(new AutoTask("Shoot Rings", 2, new TargetDrivePosition(shootPos.getX(), shootPos.getY(), shootPos.getHeading() - Math.toRadians(1.0)), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
+        autoTasks.add(new AutoTask("Shoot Rings", 2, new TargetDrivePosition(shootPos.getX(), shootPos.getY(), shootPos.getHeading() - Math.toRadians(2.0)), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
 
        // autoTasks.add(new AutoTask("Shoot Rings", 2, new TargetDrivePosition(shootPos.getX(), shootPos.getY() + 5.0, shootPos.getHeading() - Math.toRadians(2.8)), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
 
