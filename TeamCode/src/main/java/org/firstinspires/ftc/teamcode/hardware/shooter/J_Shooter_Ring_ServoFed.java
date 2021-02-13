@@ -27,6 +27,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
     public static double I_ENABLED_RADUIUS = 0.03;
+    public static double SHOOTER_ENCODER_INCREMENT = 0.0125;
     public static double I_MAX = 360.0;
     public static double I_RESET_ERROR = 0.01; // how far I has to overshoot before resetting I
     private double lastRuntime;
@@ -60,10 +61,10 @@ public class J_Shooter_Ring_ServoFed {
     private static final double INDEXER_UP_POSITION = degToServoPos(65.0);
     public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 
-    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(111.0); // the trajectory angler down position
+    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
     public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(103.5);
     public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 97.0);
-    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos(90.2);
+    public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos(86.8);
 
     private static final double VELOCITY_TICS_PER_MOTOR_POWER = 2598.4;
     public static double PID_VELO_CAP = 1.0;
@@ -213,17 +214,11 @@ public class J_Shooter_Ring_ServoFed {
     }
     private double getPIDPower(double targetSpeed){ // gets the power needed to reach the target velocity based on our current velocity
         double speed = encoderVeloToMotorSpeed( shooterEncoder.getCorrectedVelocity() ); // convert from encoder tics velocity to a -1 to 1 scale
-    //    telemetry.addData("Actual Target Speed: ", targetSpeed);
-     //   telemetry.addData("Actual Speed Speed: ", speed);
 
         double error = targetSpeed - speed; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
 
-      //  if(Math.abs(error) )
-   //     telemetry.addData("Error: ", error);
-    //    telemetry.addData("Integral: ", integral);
-
-        if(I_ENABLED && Math.abs(error) < I_ENABLED_RADUIUS){ // only use integral if within a certain radius to prevent insane windup
+        if(I_ENABLED && Math.abs(error) < I_ENABLED_RADUIUS && Math.abs(error) > SHOOTER_ENCODER_INCREMENT){ // only use integral if within a certain radius to prevent insane windup
             integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
         }
         // multiplied by the timeDifference to prevent wild variation in how much it is increase if cycle time increases/decreases for some reason
