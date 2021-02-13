@@ -27,7 +27,7 @@ public class J_Shooter_Ring_ServoFed {
     public static double Kd = 0.00;
     public static boolean I_ENABLED = true;
     public static double I_ENABLED_RADUIUS = 0.03;
-    public static double SHOOTER_ENCODER_INCREMENT = 0.0125;
+    public static double SHOOTER_ENCODER_INCREMENT = 0.008;
     public static double I_MAX = 360.0;
     public static double I_RESET_ERROR = 0.01; // how far I has to overshoot before resetting I
     private double lastRuntime;
