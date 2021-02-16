@@ -166,7 +166,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 }
                 else if( currentTaskName.equals("Shoot Stack Rings") ){ // if this prerec task completed
                     if(wobbleDropPos.equals("C")){
-                        taskManager.markTaskWithNameIncomplete("Collect 4th Ring"); // activate the dependant task
+                        //taskManager.markTaskWithNameIncomplete("Collect 4th Ring"); // activate the dependant task
                     }
                 }
                 else if( currentTaskName.equals("Collect Rings") ){ // if this prerec task completed

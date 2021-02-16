@@ -97,25 +97,6 @@ public class J_Shooter_Ring_ServoFed {
         this.anglerServo = anglerServo;
         localRuntime = new ElapsedTime();
     }
- /*   public J_Shooter_Ring_ServoFed(DcMotor shooterMotorFront, DcMotor shooterMotorBack, Servo feederServo, Servo indexerServo, Servo anglerServo, Telemetry telemetry){
-        this.telemetry = telemetry;
-
-        if(USING_PID){ // if using PID
-            shooterEncoder = new Encoder((DcMotorEx)shooterMotorBack); // setup the encoder
-            shooterRunSpeed = SHOOTER_PID_HIGHGOAL_SPEED;  // and set the base runspeed to the shooter PID speed
-            shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
-        }
-        else {
-            shooterRunSpeed = SHOOTER_SPEED;
-        }
-
-        this.shooterMotorFront = shooterMotorFront;
-        this.shooterMotorBack = shooterMotorBack;
-        this.feederServo = feederServo;
-        this.indexerServo = indexerServo;
-        this.anglerServo = anglerServo;
-        localRuntime = new ElapsedTime();
-    }*/
 
 
     public boolean spinUp(){
