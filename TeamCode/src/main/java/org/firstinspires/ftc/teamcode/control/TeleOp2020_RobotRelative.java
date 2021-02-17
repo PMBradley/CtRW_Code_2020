@@ -205,7 +205,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
             }
 
 
-            if(wobbleIntakeDirection != 0 || shooter.isSpunUp()){
+            if(wobbleIntakeDirection != 0 || shooter.isFiring()){
                 isBoosting = false; // if intaking/outtaking with the wobble or the shooter is spun up, slow down the robot to allow for finer control
             }
 

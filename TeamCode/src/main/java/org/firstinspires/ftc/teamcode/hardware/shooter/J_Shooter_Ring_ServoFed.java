@@ -24,7 +24,7 @@ public class J_Shooter_Ring_ServoFed {
     private static final boolean USING_PID = true;
     public static double Kp = 2.5;
     public static double Ki = 250.0;
-    public static double Kd = 0.00;
+    public static double Kd = 0.005;
     public static boolean I_ENABLED = true;
     public static double I_ENABLED_RADUIUS = 0.03;
     public static double SHOOTER_ENCODER_INCREMENT = 0.008;
@@ -40,7 +40,7 @@ public class J_Shooter_Ring_ServoFed {
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
     public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
-    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.59; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.5618842; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     public static double MIN_SHOOT_SPEED = 0.40; // the lowest power the shooter will ever let the user attempt to shoot at (only matters if the user sets a custom shooting power)
     private boolean firstSpinUp = true;
@@ -61,7 +61,7 @@ public class J_Shooter_Ring_ServoFed {
     private static final double INDEXER_UP_POSITION = degToServoPos(65.0);
     public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 
-    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(114.0); // the trajectory angler down position
+    public static double ANGLER_POWERSHOT_POSITION = degToServoPos(116.4); // the trajectory angler down position
     public static double ANGLER_HIGHGOAL_POSITION = degToServoPos(103.5);
     public static double ANGLER_LONGGOAL_POSITION = degToServoPos( 97.0);
     public static double FIRSTSHOT_LONGGOAL_POSITION = degToServoPos(86.8);
@@ -166,17 +166,20 @@ public class J_Shooter_Ring_ServoFed {
     public void optimizeForHighgoal(){
         angleUp();
         shooterShootSpeed = SHOOTER_PID_HIGHGOAL_SPEED;
+        shooterRunSpeed = shooterShootSpeed;
         angleFirstShot = false;
         I_ENABLED = true;
     }
     public void optimizeForPowershots(){
         angleDown();
         shooterShootSpeed = SHOOTER_PID_POWERSHOT_SPEED;
+        shooterRunSpeed = shooterShootSpeed;
         angleFirstShot = false;
         I_ENABLED = true;
     }
     public void optimizeForLonggoal(){
         shooterShootSpeed = SHOOTER_PID_LONGGOAL_SPEED;
+        shooterRunSpeed = shooterShootSpeed;
         angleFirstShot = true;
         I_ENABLED = true;
 
