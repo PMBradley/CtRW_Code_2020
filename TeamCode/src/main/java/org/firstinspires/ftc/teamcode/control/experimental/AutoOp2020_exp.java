@@ -52,13 +52,13 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-41.0, -18, Math.toRadians(-45.0));
 
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, -5, Math.toRadians(0.0));
-    public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.5, -14, Math.toRadians(15.2), Math.toRadians(-70));
+    public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.5, -14, Math.toRadians(15.2), Math.toRadians(-82));
     public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.5, -3, Math.toRadians(15.2));
-    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.5, 6, Math.toRadians(15.2));
+    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.3, 6, Math.toRadians(15.2));
     public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(48.5, 30, Math.toRadians(-30.0), Math.toRadians(-40));
     public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -2, Math.toRadians(-30.0), Math.toRadians(-90));
 
-    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-31, 7, Math.toRadians(-130.0));
+    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-30, 2, Math.toRadians(-150.0));
     public static TargetDrivePosition ringPickupPos = new TargetDrivePosition(-40.5, -12.5, Math.toRadians(180.0));
     public static TargetDrivePosition parkPosA     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
     public static TargetDrivePosition parkPosB     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
@@ -308,17 +308,19 @@ public class AutoOp2020_exp extends LinearOpMode {
 
             shooter.spinUp(); // spin up the shooter on the way to
 
-            if(drive.firstTaskCompleted() || Math.abs(drive.getPoseEstimate().getX() - lineShootPos.getX()) < 1){ // if at location, start shooting
+            if(drive.firstTaskCompleted() || Math.abs(drive.getPoseEstimate().getX() - lineShootPos.getX()) < 3){ // if at location, start shooting
                 shooter.instructFire();
+                intake.spinDown();
+                shooter.indexerUp();
 
-                if(currentTaskTime.milliseconds() > 2500 || shooter.getFiringState() > 0 || currentTaskName.equals("Shoot Power Rings")){
+               /* if( shooter.getFiringState() > 0 || currentTaskName.equals("Shoot Power Rings") || ){
                     intake.spinDown();
                     shooter.indexerUp();
                 }
                 else {
                     intake.spinUp();
                     shooter.indexerDown();
-                }
+                }*/
             }
             else { // if not at location
                 intake.spinUp();
