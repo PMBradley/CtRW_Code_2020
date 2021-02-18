@@ -59,7 +59,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(48.2, 30, Math.toRadians(-30.0), Math.toRadians(-40));
     public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -11, Math.toRadians(-30.0), Math.toRadians(-90));
 
-    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-25, 2, Math.toRadians(-160.0));
+    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-28, 2, Math.toRadians(-160.0));
     public static TargetDrivePosition ringPickupPos = new TargetDrivePosition(-40.5, -12.5, Math.toRadians(180.0));
     public static TargetDrivePosition parkPosA     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
     public static TargetDrivePosition parkPosB     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
