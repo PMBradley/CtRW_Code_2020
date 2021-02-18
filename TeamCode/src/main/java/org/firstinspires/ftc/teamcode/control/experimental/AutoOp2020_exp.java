@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.control.Provider2020;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
 import org.firstinspires.ftc.teamcode.hardware.shooter.J_Shooter_Ring_ServoFed;
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.FarRingStackHeightPipeline;
 import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.RingStackHeightPipeline;
 import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.Vision_OpenCV_ExternalCam;
 import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
@@ -58,7 +59,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(48.2, 30, Math.toRadians(-30.0), Math.toRadians(-40));
     public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -11, Math.toRadians(-30.0), Math.toRadians(-90));
 
-    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-30, 2, Math.toRadians(-160.0));
+    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-25, 2, Math.toRadians(-160.0));
     public static TargetDrivePosition ringPickupPos = new TargetDrivePosition(-40.5, -12.5, Math.toRadians(180.0));
     public static TargetDrivePosition parkPosA     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
     public static TargetDrivePosition parkPosB     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
@@ -91,7 +92,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo);
 
-        vision = new Vision_OpenCV_ExternalCam(hardwareMap, "Webcam 1", new RingStackHeightPipeline()); // setup the camera handling class, passing in the pipeline we want to use to process inputs
+        vision = new Vision_OpenCV_ExternalCam(hardwareMap, "Webcam 1", new FarRingStackHeightPipeline()); // setup the camera handling class, passing in the pipeline we want to use to process inputs
 
 
 
