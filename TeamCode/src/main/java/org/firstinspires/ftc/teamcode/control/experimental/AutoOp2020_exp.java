@@ -50,16 +50,16 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(18.0, -20.0, Math.toRadians(0.0)); // the positions that the robot needs to drive to
     public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -15.0, Math.toRadians(90.0));
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(42.4, -22.6, Math.toRadians(70.0), Math.toRadians(-85));
-    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-41.0, -21, Math.toRadians(-45.0));
+    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-40.5, -20, Math.toRadians(-135.0));
 
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(0.0));
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.8, Math.toRadians(15.2), Math.toRadians(-82));
     public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, -2.2, Math.toRadians(15.2));
-    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 5.2, Math.toRadians(15.2));
+    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 6.5, Math.toRadians(15.2));
     public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.8, 33, Math.toRadians(-30.0), Math.toRadians(-40));
     public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -9, Math.toRadians(-30.0), Math.toRadians(-90));
 
-    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-34, -4, Math.toRadians(-160.0));
+    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-33.5, -4.1, Math.toRadians(-160.0));
     public static TargetDrivePosition ringPickupPos = new TargetDrivePosition(-40.5, -12.5, Math.toRadians(180.0));
     public static TargetDrivePosition parkPosA     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
     public static TargetDrivePosition parkPosB     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
