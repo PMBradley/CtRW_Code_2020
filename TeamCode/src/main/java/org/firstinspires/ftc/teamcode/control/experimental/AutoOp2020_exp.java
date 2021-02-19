@@ -423,8 +423,8 @@ public class AutoOp2020_exp extends LinearOpMode {
 
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
-        atLocationTasks.add(new DriveFollowerTask(180)); // only for the second one, give it more time just to be safe
-        atLocationTasks.add(new DriveFollowerTask(400)); // once at this location, wait msecs
+        atLocationTasks.add(new DriveFollowerTask(80)); // only for the second one, give it more time just to be safe
+        atLocationTasks.add(new DriveFollowerTask(420)); // once at this location, wait msecs
         autoTasks.add(new AutoTask("Shoot Single Ring", 2, new TargetDrivePosition(lineShootPos.getX(), lineShootPos.getY(), lineShootPos.getHeading()), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
         autoTasks.add(new AutoTask("Shoot Power Rings", 2, new TargetDrivePosition(lineShootPos.getX(), lineShootPos.getY(), lineShootPos.getHeading()), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
         autoTasks.add(new AutoTask("Shoot Stack Rings", 2, new TargetDrivePosition(lineShootPos.getX(), lineShootPos.getY(), lineShootPos.getHeading()), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
