@@ -70,7 +70,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static double ARM_OFFSET_DEGREES = -300; // an offset for the wobble arm
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
     public static double ARM_DROP_DROP_DISTANCE = 12; // how far the robot is from the drop position before it deploys the arm early
-    public static double RING_COLLECT_DISTANCE = 13.7;
+    public static double RING_COLLECT_DISTANCE = 15.7;
     public static int RING_SCAN_COUNT = 300; // scan the rings for 500 milliseconds
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
@@ -394,9 +394,9 @@ public class AutoOp2020_exp extends LinearOpMode {
         }
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
-        atLocationTasks.add(new DriveFollowerTask(220)); // once at this location, wait msecs
+        atLocationTasks.add(new DriveFollowerTask(420)); // once at this location, wait msecs
         atLocationTasks.add(new DriveFollowerTask(10)); // then wait msecs
-        autoTasks.add(new AutoTask("Place Wobble 1", 2, wobbleGoalPosA, atLocationTasks));
+        autoTasks.add(new AutoTask("Place Wobble 1", 2, wobbleGoalPosA, new ArrayList<DriveFollowerTask>()));
         autoTasks.add(new AutoTask("Place Wobble 2", 2, wobbleGoalPosA, atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
