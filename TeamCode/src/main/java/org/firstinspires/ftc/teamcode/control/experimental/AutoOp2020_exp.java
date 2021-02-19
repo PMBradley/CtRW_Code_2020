@@ -75,7 +75,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
 
-    private String wobbleDropPos = "C";
+    private String wobbleDropPos = "C"; // the default position
     private TargetDrivePosition wobbleGoalPos = new TargetDrivePosition();
     private boolean scanningComplete = false;
     private boolean autonomousComplete = false;
