@@ -50,7 +50,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(18.0, -20.0, Math.toRadians(0.0)); // the positions that the robot needs to drive to
     public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -15.0, Math.toRadians(90.0));
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(42.4, -22.6, Math.toRadians(70.0), Math.toRadians(-85));
-    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-40.5, -20.5, Math.toRadians(-45.0));
+    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-40.5, -21.5, Math.toRadians(-45.0), Math.toRadians(-135));
 
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(0.0));
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.6, Math.toRadians(15.2), Math.toRadians(-82));
