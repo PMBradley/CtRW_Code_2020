@@ -70,7 +70,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static double ARM_OFFSET_DEGREES = -300; // an offset for the wobble arm
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
     public static double ARM_DROP_DROP_DISTANCE = 12; // how far the robot is from the drop position before it deploys the arm early
-    public static double RING_COLLECT_DISTANCE = 15.7;
+    public static double RING_COLLECT_DISTANCE = 16.5;
     public static int RING_SCAN_COUNT = 300; // scan the rings for 500 milliseconds
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
