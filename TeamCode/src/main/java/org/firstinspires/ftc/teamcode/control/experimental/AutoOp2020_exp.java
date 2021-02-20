@@ -120,7 +120,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             telemetry.update();
         }
         // count up the votes that the camera collected for what drop state it is
-        wobbleDropPos = getCalculatedDropPosition(); // get which position was voted for by the camera system the most //TODO
+        wobbleDropPos = getCalculatedDropPosition(); // get which position was voted for by the camera system the most
 
         // set the first target position based on priorities and what is closest
         taskManager.updateCurrentTaskToClosest( drive.getPoseEstimate() ); // have the task manager set the current auto task to the next closest incomplete task

@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.FarRingStackHeightPipeline;
 import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.RingStackHeightPipeline;
 import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.Vision_OpenCV_ExternalCam;
 
@@ -42,7 +43,7 @@ public class RingStackVisionTest extends LinearOpMode {
         // Call class constructors here (so that nothing major happens before init)
         runtime = new ElapsedTime();
 
-        vision = new Vision_OpenCV_ExternalCam(hardwareMap, "Webcam 1", new RingStackHeightPipeline());
+        vision = new Vision_OpenCV_ExternalCam(hardwareMap, "Webcam 1", new FarRingStackHeightPipeline());
 
         vision.startWebcamStreaming();
 
