@@ -51,7 +51,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(-4));
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.6, Math.toRadians(15.2), Math.toRadians(-82));
-    public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, -2.2, Math.toRadians(15.2));
+    public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, 7, Math.toRadians(15.2));
     public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 5.5, Math.toRadians(15.2));
     //public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 33, Math.toRadians(-30.0), Math.toRadians(-40));
     //public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -9, Math.toRadians(-30.0), Math.toRadians(-90));
@@ -311,7 +311,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                     intake.spinUp();
                     if(Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= ARM_DROP_DROP_DISTANCE  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE && Math.abs(drive.getPoseEstimate().getY() - wobbleGoalPos.getY()) <= ARM_DROP_DROP_DISTANCE){
                         wobble.goToGrabPos();
-                        wobble.intakeSpinIn();
+                        //wobble.intakeSpinIn();
                     }
                     else{
                         wobble.setArmPosition(ARM_OFFSET_DEGREES);
@@ -515,7 +515,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             parkPosition = parkPosB;
 
             taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY(), wobbleGoalPos.getHeading())); // once the position has been found, set the tasks to their new positions
-            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY()+9.5, wobbleGoalPos.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
+            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY()-9.4, wobbleGoalPos.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
         }
         else {
             wobbleGoalPos = wobbleGoalPosC;
