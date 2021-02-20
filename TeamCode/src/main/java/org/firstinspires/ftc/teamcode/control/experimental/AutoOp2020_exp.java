@@ -45,13 +45,13 @@ public class AutoOp2020_exp extends LinearOpMode {
     private static Pose2d startPose = new Pose2d(-65.3, 7.39, Math.toRadians(0)); // the starting position of the robot relative to the middle of the field
 
     public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(18.0, -20.0, Math.toRadians(0.0)); // the positions that the robot needs to drive to
-    public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -15.0, Math.toRadians(90.0));
+    public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -4.4, Math.toRadians(90.0));
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(44, -24, Math.toRadians(70.0), Math.toRadians(-85));
     public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-39.5, -21.4, Math.toRadians(-45.0), Math.toRadians(-135));
 
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(-4));
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.6, Math.toRadians(15.2), Math.toRadians(-82));
-    public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, 7, Math.toRadians(15.2));
+    public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, -2.2, Math.toRadians(15.2));
     public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 5.5, Math.toRadians(15.2));
     //public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 33, Math.toRadians(-30.0), Math.toRadians(-40));
     //public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -9, Math.toRadians(-30.0), Math.toRadians(-90));
@@ -67,7 +67,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition parkPosC     = new TargetDrivePosition(0.0, -15.0, Math.toRadians(0.0));
 
 
-    public static double ARM_OFFSET_DEGREES = -300; // an offset for the wobble arm
+    public static double ARM_OFFSET_DEGREES = -360; // an offset for the wobble arm
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
     public static double ARM_DROP_DROP_DISTANCE = 3; // how far the robot is from the drop position before it deploys the arm early
     public static double RING_COLLECT_DISTANCE = 16.5;
@@ -515,7 +515,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             parkPosition = parkPosB;
 
             taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY(), wobbleGoalPos.getHeading())); // once the position has been found, set the tasks to their new positions
-            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY()-9.4, wobbleGoalPos.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
+            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY()-9.5, wobbleGoalPos.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
         }
         else {
             wobbleGoalPos = wobbleGoalPosC;
