@@ -304,7 +304,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 }
                 else if(drive.getTaskIndex() == 6){ // if driving to pick up rings
                     intake.spinUp();
-                    if(drive.getPoseEstimate().getY() - drive.getCurrentTask().getTraj().end().getY() < 6){
+                    if(Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= ARM_DROP_DROP_DISTANCE  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE ){
                         wobble.goToGrabPos();
                         wobble.intakeSpinIn();
                     }
