@@ -47,7 +47,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(18.0, -20.0, Math.toRadians(0.0)); // the positions that the robot needs to drive to
     public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -15.0, Math.toRadians(90.0));
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(44, -24, Math.toRadians(70.0), Math.toRadians(-85));
-    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-40.0, -22.2, Math.toRadians(-45.0), Math.toRadians(-135));
+    public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-39.5, -21.4, Math.toRadians(-45.0), Math.toRadians(-135));
 
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(-4));
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.6, Math.toRadians(15.2), Math.toRadians(-82));
@@ -101,9 +101,8 @@ public class AutoOp2020_exp extends LinearOpMode {
         drive.setPoseEstimate(startPose); // set the localizer's start position to our position on the field relative to the center
 
 
-
+        wobble.setCurrentPosAs0();
         wobble.setArmOffset(ARM_OFFSET_DEGREES); // set the wobble's starting offset, such that the starting position behaves like 0 (as in Auto the encoder likes to start in a weird position)
-
 
         // Do the ring scanning
         vision.startWebcamStreaming(); // start the streaming process
@@ -400,7 +399,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
 
         TargetDrivePosition wobbleGoalPosition = wobbleGoalPosA;
-        if(wobbleGoalPosition.equals("B")){
+        if(wobbleDropPosLabel.equals("B")){
             wobbleGoalPosition = wobbleGoalPosB;
         }
         else if(wobbleDropPosLabel.equals("C")){

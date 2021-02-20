@@ -54,12 +54,14 @@ public class Arm_Wobble_Grabber {
         this.rightServo = rightServo;
         this.localRuntime = new ElapsedTime();
         this.gearRatio = gearRatio;
-
-        armStartingOffset = -getRawArmPosition(); // set the starting offset to cancel out with whatever the starting encoder value is (meaning it will be the oppostite of the starting encoder value)
-            // this results in whatever the initialized position is behaving like 0
     }
     public Arm_Wobble_Grabber(DcMotor armMotor, Servo leftServo, Servo rightServo){
         this(armMotor, leftServo, rightServo, 1);
+    }
+
+    public void setCurrentPosAs0(){
+        armStartingOffset = -getRawArmPosition(); // set the starting offset to cancel out with whatever the starting encoder value is (meaning it will be the oppostite of the starting encoder value)
+        // this results in whatever the initialized position is behaving like 0
     }
 
     public void stopIntake(){
