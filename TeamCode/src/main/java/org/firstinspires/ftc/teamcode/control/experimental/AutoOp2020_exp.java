@@ -52,7 +52,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(-4));
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.6, Math.toRadians(15.2), Math.toRadians(-82));
     public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, -2.2, Math.toRadians(15.2));
-    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 6.0, Math.toRadians(15.2));
+    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 5.0, Math.toRadians(15.2));
     //public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 33, Math.toRadians(-30.0), Math.toRadians(-40));
     //public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -9, Math.toRadians(-30.0), Math.toRadians(-90));
     public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 15, Math.toRadians(-30.0), Math.toRadians(-40));
@@ -71,7 +71,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
     public static double ARM_DROP_DROP_DISTANCE = 3; // how far the robot is from the drop position before it deploys the arm early
     public static double RING_COLLECT_DISTANCE = 16.5;
-    public static int RING_SCAN_COUNT = 300; // scan the ring 100 times
+    public static int RING_SCAN_TIME = 1500; // scan the ring for 700 msecs
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
 
@@ -109,7 +109,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         vision.startWebcamStreaming(); // start the streaming process
         currentTaskTime.reset();
         //while(); // wait for 500 milliseconds without stopping any background processes
-        for(int i = 0; i < RING_SCAN_COUNT || (!isStopRequested() && currentTaskTime.milliseconds() < 1500); i++){ // scan for however long the ring_scan_time is
+        for(int i = 0; !isStopRequested() && currentTaskTime.milliseconds() < RING_SCAN_TIME; i++){ // scan for however long the ring_scan_time is
             updateSensors("Scan rings"); // call the update sensors method telling it that we are currently scanning rings
 
             telemetry.addLine("Scanning rings...");
@@ -352,10 +352,6 @@ public class AutoOp2020_exp extends LinearOpMode {
             intake.spinUp(); // spin up the intake for ring collection
             shooter.indexerDown();
 
-            if(drive.getTaskIndex() > 1){
-                wobble.goToGrabPos();
-                wobble.intakeSpinOut();
-            }
             // specifically leaves the shooter in whatever state it was already in, but no need to maintain the PID by calling spinUp or spinDown as the motor will keep its last known speed and that is close enough
         }
         else if( currentTaskName.equals("Collect Wobble") ){ // if current task is this task
@@ -444,7 +440,6 @@ public class AutoOp2020_exp extends LinearOpMode {
         atLocationTasks = new ArrayList<DriveFollowerTask>();
         atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(stackPickupPos.getPose2d())
             .forward(RING_COLLECT_DISTANCE) // go forward to pickup rings
-            .splineToSplineHeading(wobblePickupPos.getPose2d(), wobblePickupPos.getSplineHeading()) // and in the same motion go to pickup wobble
             .build()
         ));
         autoTasks.add(new AutoTask("Collect Rings", 2, stackPickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
@@ -456,7 +451,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         autoTasks.add(new AutoTask("Collect Wobble", 2, wobblePickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
-        autoTasks.add(new AutoTask("END", 4, parkPosA, atLocationTasks));
+        autoTasks.add(new AutoTask("END", 6, parkPosA, atLocationTasks));
 
         return autoTasks;
     }
