@@ -56,8 +56,11 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.6, Math.toRadians(15.2), Math.toRadians(-82));
     public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, -2.2, Math.toRadians(15.2));
     public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 7.4, Math.toRadians(15.2));
-    public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 33, Math.toRadians(-30.0), Math.toRadians(-40));
-    public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -9, Math.toRadians(-30.0), Math.toRadians(-90));
+    //public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 33, Math.toRadians(-30.0), Math.toRadians(-40));
+    //public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -9, Math.toRadians(-30.0), Math.toRadians(-90));
+    public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 15, Math.toRadians(-30.0), Math.toRadians(-40));
+    public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -30, Math.toRadians(-30.0), Math.toRadians(-90));
+
 
     //public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-34, -4.0, Math.toRadians(-160.0));
     public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-31, 8.5, Math.toRadians(283));
@@ -432,7 +435,8 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
         atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(stackPickupPos.getPose2d())
-            .forward(RING_COLLECT_DISTANCE)
+            .forward(RING_COLLECT_DISTANCE) // go forward to pickup rings
+            .splineToSplineHeading(wobblePickupPos.getPose2d(), wobblePickupPos.getSplineHeading()) // and in the same motion go to pickup wobble
             .build()
         ));
         autoTasks.add(new AutoTask("Collect Rings", 2, stackPickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time

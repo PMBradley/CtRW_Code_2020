@@ -1,13 +1,17 @@
-package org.firstinspires.ftc.teamcode.control;
+package org.firstinspires.ftc.teamcode.control.tests;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.control.Provider2020;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
@@ -42,10 +46,11 @@ import java.util.ArrayList;
  */
 
 
-@TeleOp(name = "TeleOp2020 Field Relative", group = "@@@")
+@TeleOp(name = "TeleOp2020 Fixed Field Relative", group = "@@@")
 
+@Disabled
 @Config
-public class TeleOp2020_FieldRelative extends LinearOpMode{
+public class TeleOp2020_FieldRelative_Fixed extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
@@ -59,17 +64,21 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
-    static final double RELATIVE_OFFSET_DEG = 0;
-    
+    static final double RELATIVE_OFFSET_DEG = -90;
+    static final int TELEMETRY_TRANSMISSION_INTERVAL = 25;
+
+
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
-    private ElapsedTime runtime; // internal clock
     private Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
     private StandardTrackingWheelLocalizer localizer; // the odometry based localizer - uses dead wheels to determine (x, y, r) position on the field
     private Intake_Ring_Drop intake; // the intake class instance
     private J_Shooter_Ring_ServoFed shooter; // the shooter class instance
     private Arm_Wobble_Grabber wobble; // the wobble intake/arm class instance
     private Drive_Mecanum_Auto auto_drive;
+
+    private FtcDashboard dashboard;
+    private ElapsedTime runtime; // internal clock
 
 
     // Flags
@@ -105,6 +114,9 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
         auto_drive = new Drive_Mecanum_Auto(hardwareMap); // setup the second automated drive class
 
+        dashboard = FtcDashboard.getInstance();
+        dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL);
+
 
         robot.setEncoderActive(false); // start the game without running encoders
 
@@ -129,8 +141,8 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
             // Variables
             boolean isBoosting = !gamepad1.right_bumper;  // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
-            double xTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
-            double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double xTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double yTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
             double rotatePower = gamepad1.right_stick_x * Math.abs(gamepad1.right_stick_x);
             boolean instructFire = gamepad2.x; // if pressing the second gamepad x, instruct a fire event
 
@@ -194,6 +206,9 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
                 wobbleIntakeDirection = 0;
             }
 
+            if (wobbleIntakeDirection != 0 || shooter.isSpunUp()){
+                isBoosting = false; // if intaking/outtaking with the wobble or the shooter is spun up, slow down the robot to allow for finer control
+            }
 
             //setup a dead zone for the controllers
             if(Math.abs(xTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
@@ -206,7 +221,8 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
                 rotatePower = stopSpeed;
             }
 
-           if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
+
+            if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
                 powershotDriving = !powershotDriving;
 
                 if (powershotDriving) {
@@ -383,19 +399,22 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
 
             // telemetry.addData("Wheel arm encoder position", robot.wobbleArmMotor.getCurrentPosition());
             //telemetry.addData("Claw arm position", wobbleClamp.getArmPosition());
-            //telemetry.addData("Claw arm encoder position", robot.wobbleArmMotor2.getCurrentPosition());
-
+            //telemetry.addData("Claw arm encoder position", robot.wobbleArmMotor2.getCurrentPosition());+
 
 
             telemetry.update();
+
+            updateDashboard();
         }  // end of running while loop
     }
 
 
     /* PUT ALL FUNCTIONS HERE */
     public static double FIRST_POWERSHOT_BACK_DISTANCE = -23.0;
-    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 10.0;
-    public static double POWERSHOT_APART_DISTANCE = 7.2;
+    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 12.5;
+    public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 10.15;
+    public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 5.9;
+    public static double FORWARD_COMPENSATION_DISTANCE = 0.65; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
@@ -405,19 +424,32 @@ public class TeleOp2020_FieldRelative extends LinearOpMode{
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
-        
+
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
-                .strafeRight(POWERSHOT_APART_DISTANCE)
+                .lineTo(new Vector2d(driveTasks.get(0).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(0).getTraj().end().getY() - SECOND_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
-        
+
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
-                .strafeRight(POWERSHOT_APART_DISTANCE)
+                .lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
-        
+
         return driveTasks;
+    }
+
+    public void updateDashboard(){
+        TelemetryPacket packet = new TelemetryPacket();
+
+        // add data to the packet
+        packet.put("raw_shooter_velo", shooter.getFlywheelVelo()); // get the shooter velocity and add that
+        packet.put("shooter_velo", J_Shooter_Ring_ServoFed.encoderVeloToMotorSpeed(shooter.getFlywheelVelo())); // get the shooter velocity and convert it to motor speed for readability
+
+        // send off the data packet
+        if(dashboard != null){
+            dashboard.sendTelemetryPacket(packet);
+        }
     }
 }
