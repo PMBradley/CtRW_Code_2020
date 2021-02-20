@@ -66,15 +66,15 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-31, 8.5, Math.toRadians(283));
     public static TargetDrivePosition ringPickupPos = new TargetDrivePosition(-40.5, -12.5, Math.toRadians(180.0));
     public static TargetDrivePosition parkPosA     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
-    public static TargetDrivePosition parkPosB     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
+    public static TargetDrivePosition parkPosB     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(90.0));
     public static TargetDrivePosition parkPosC     = new TargetDrivePosition(0.0, -15.0, Math.toRadians(0.0));
 
 
     public static double ARM_OFFSET_DEGREES = -300; // an offset for the wobble arm
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
-    public static double ARM_DROP_DROP_DISTANCE = 12; // how far the robot is from the drop position before it deploys the arm early
+    public static double ARM_DROP_DROP_DISTANCE = 3; // how far the robot is from the drop position before it deploys the arm early
     public static double RING_COLLECT_DISTANCE = 16.5;
-    public static int RING_SCAN_COUNT = 300; // scan the rings for 500 milliseconds
+    public static int RING_SCAN_COUNT = 100; // scan the ring 100 times
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
 
@@ -273,7 +273,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 shooter.indexerUp();
             }
 
-            if(drive.getTaskIndex() == 1 || Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= 3 ){ // if at location and on the first subtask
+            if(drive.getTaskIndex() == 1 || Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE ){ // if at location and on the first subtask
                 wobble.goToGrabPos();
                 wobble.intakeSpinIn();
             }
@@ -348,6 +348,11 @@ public class AutoOp2020_exp extends LinearOpMode {
         else if( currentTaskName.equals("Collect Rings")  ){ // if current task is this task
             intake.spinUp(); // spin up the intake for ring collection
             shooter.indexerDown();
+
+            if(drive.getTaskIndex() > 1){
+                wobble.goToGrabPos();
+                wobble.intakeSpinOut();
+            }
             // specifically leaves the shooter in whatever state it was already in, but no need to maintain the PID by calling spinUp or spinDown as the motor will keep its last known speed and that is close enough
         }
         else if( currentTaskName.equals("Collect Wobble") ){ // if current task is this task
@@ -443,7 +448,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         autoTasks.add(new AutoTask("Collect 4th Ring", 2, ringPickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
-        atLocationTasks.add(new DriveFollowerTask(250)); // wait msecs once at location
+        atLocationTasks.add(new DriveFollowerTask(150)); // wait msecs once at location
         atLocationTasks.add(new DriveFollowerTask(70)); // then wait msecs
         autoTasks.add(new AutoTask("Collect Wobble", 2, wobblePickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
