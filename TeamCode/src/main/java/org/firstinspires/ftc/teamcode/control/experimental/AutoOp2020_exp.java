@@ -120,6 +120,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         }
         // count up the votes that the camera collected for what drop state it is
         wobbleDropPosLabel = getCalculatedDropPosition(); // get which position was voted for by the camera system the most
+        setWobbleGoalPos(wobbleDropPosLabel); // update the task positions based on sensor data
 
         ArrayList<AutoTask> autoTasks = setupAutoTasks(); // add the list of task objects to the task list
         taskManager = new AutoTaskManager(autoTasks); // then set the drive to use those tasks when required
@@ -128,7 +129,6 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         drive.setTasks(taskManager.generateCurrentTaskDriveTaskList( drive.getPoseEstimate(), drive.getDriveConstraints() )); // then set the drive to go to that task's position and do any of that auto task's drive tasks
 
-        setWobbleGoalPos(wobbleDropPosLabel); // update the task positions based on sensor data
         vision.webcam.closeCameraDevice(); // stop the camera to prevent slowing down the system
         scanningComplete = true;
 
@@ -276,7 +276,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 shooter.indexerUp();
             }
 
-            if(drive.getTaskIndex() == 1 || (Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= ARM_DROP_DROP_DISTANCE  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE ) ){ // if at location and on the first subtask
+            if(drive.getTaskIndex() == 1 || (Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= ARM_DROP_DROP_DISTANCE  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE && Math.abs(drive.getPoseEstimate().getY() - wobbleGoalPos.getY()) <= ARM_DROP_DROP_DISTANCE) ){ // if at location and on the first subtask
                 wobble.goToGrabPos();
                 wobble.intakeSpinIn();
             }
@@ -303,7 +303,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 }
                 else if(drive.getTaskIndex() == 6){ // if driving to pick up rings
                     intake.spinUp();
-                    if(Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= ARM_DROP_DROP_DISTANCE  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE ){
+                    if(Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= ARM_DROP_DROP_DISTANCE  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE && Math.abs(drive.getPoseEstimate().getY() - wobbleGoalPos.getY()) <= ARM_DROP_DROP_DISTANCE){
                         wobble.goToGrabPos();
                         wobble.intakeSpinIn();
                     }
@@ -507,8 +507,6 @@ public class AutoOp2020_exp extends LinearOpMode {
         else if (positionLabel.equals("B")){
             wobbleGoalPos = wobbleGoalPosB;
             parkPosition = parkPosB;
-
-            taskManager.setTaskWithNameLocationTasks("Collect Rings", new ArrayList<DriveFollowerTask>()); // if only one ring there, remove the drive movement forward once at location to pick up the third ring (by resetting the at location tasks list for collecting rings)
 
             taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY(), wobbleGoalPos.getHeading())); // once the position has been found, set the tasks to their new positions
             taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY()+9.5, wobbleGoalPos.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
