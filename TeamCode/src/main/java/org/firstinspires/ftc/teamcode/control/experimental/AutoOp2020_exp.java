@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.control.experimental;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,7 +11,6 @@ import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
 import org.firstinspires.ftc.teamcode.hardware.shooter.J_Shooter_Ring_ServoFed;
 import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.FarRingStackHeightPipeline;
-import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.RingStackHeightPipeline;
 import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.Vision_OpenCV_ExternalCam;
 import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 import org.firstinspires.ftc.teamcode.util.StateMachine.AutoTask;
@@ -20,7 +18,6 @@ import org.firstinspires.ftc.teamcode.util.StateMachine.AutoTaskManager;
 import org.firstinspires.ftc.teamcode.util.StateMachine.DriveFollowerTask;
 import org.firstinspires.ftc.teamcode.util.StateMachine.TargetDrivePosition;
 
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 /*
@@ -55,7 +52,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(-4));
     public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.4, -13.6, Math.toRadians(15.2), Math.toRadians(-82));
     public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.4, -2.2, Math.toRadians(15.2));
-    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 6.5, Math.toRadians(15.2));
+    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.4, 6.0, Math.toRadians(15.2));
     //public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 33, Math.toRadians(-30.0), Math.toRadians(-40));
     //public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(53, -9, Math.toRadians(-30.0), Math.toRadians(-90));
     public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(47.7, 15, Math.toRadians(-30.0), Math.toRadians(-40));
@@ -78,7 +75,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
 
-    private String wobbleDropPos = "C"; // the default position
+    private String wobbleDropPosLabel = "C"; // the default position
     private TargetDrivePosition wobbleGoalPos = new TargetDrivePosition();
     private boolean scanningComplete = false;
     private boolean autonomousComplete = false;
@@ -111,16 +108,18 @@ public class AutoOp2020_exp extends LinearOpMode {
         // Do the ring scanning
         vision.startWebcamStreaming(); // start the streaming process
         currentTaskTime.reset();
-        while(opModeIsActive() && !isStopRequested() && currentTaskTime.milliseconds() < 500); // wait for 500 milliseconds without stopping any background processes
-        for(int i = 0; i < RING_SCAN_COUNT; i++){ // scan for however long the ring_scan_time is
+        //while(); // wait for 500 milliseconds without stopping any background processes
+        for(int i = 0; i < RING_SCAN_COUNT || (opModeIsActive() && !isStopRequested() && currentTaskTime.milliseconds() < 1500); i++){ // scan for however long the ring_scan_time is
             updateSensors("Scan rings"); // call the update sensors method telling it that we are currently scanning rings
 
             telemetry.addLine("Scanning rings...");
             telemetry.addLine("Scan count: " + ringStackEstimates.size());
+            int[] counts = getEstimateOccurances();
+            telemetry.addLine("Ring Count Votes - 0: " + counts[0] + ", 1: " + counts[1] + ", 4: " + counts[2]);
             telemetry.update();
         }
         // count up the votes that the camera collected for what drop state it is
-        wobbleDropPos = getCalculatedDropPosition(); // get which position was voted for by the camera system the most
+        wobbleDropPosLabel = getCalculatedDropPosition(); // get which position was voted for by the camera system the most
 
         ArrayList<AutoTask> autoTasks = setupAutoTasks(); // add the list of task objects to the task list
         taskManager = new AutoTaskManager(autoTasks); // then set the drive to use those tasks when required
@@ -129,14 +128,14 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         drive.setTasks(taskManager.generateCurrentTaskDriveTaskList( drive.getPoseEstimate(), drive.getDriveConstraints() )); // then set the drive to go to that task's position and do any of that auto task's drive tasks
 
-        setWobbleGoalPos(wobbleDropPos); // update the task positions based on sensor data
+        setWobbleGoalPos(wobbleDropPosLabel); // update the task positions based on sensor data
         vision.webcam.closeCameraDevice(); // stop the camera to prevent slowing down the system
         scanningComplete = true;
 
 
         telemetry.addLine(ROBOT_NAME + "'s setup completed.");
         telemetry.addLine("Ring scan count: " + ringStackEstimates.size());
-        telemetry.addLine("  Detected drop position: " + wobbleDropPos);
+        telemetry.addLine("  Detected drop position: " + wobbleDropPosLabel);
         telemetry.addData("Chosen first task", taskManager.getCurrentTask().getTaskName());
         telemetry.update();
 
@@ -169,17 +168,17 @@ public class AutoOp2020_exp extends LinearOpMode {
                     taskManager.markTaskWithNameIncomplete("Shoot Power Rings"); // activate the dependant task
                 }
                 else if( currentTaskName.equals("Shoot Power Rings") ){  // if this task completed
-                    if( !wobbleDropPos.equals("A") ){ // if there are rings to collect (aka any target position other than the one that happens when no rings)
+                    if( !wobbleDropPosLabel.equals("A") ){ // if there are rings to collect (aka any target position other than the one that happens when no rings)
                         taskManager.markTaskWithNameIncomplete("Collect Rings"); // activate the dependant task
                     }
                 }
                 else if( currentTaskName.equals("Shoot Stack Rings") ){ // if this prerec task completed
-                    if(wobbleDropPos.equals("C")){
+                    if(wobbleDropPosLabel.equals("C")){
                         //taskManager.markTaskWithNameIncomplete("Collect 4th Ring"); // activate the dependant task
                     }
                 }
                 else if( currentTaskName.equals("Collect Rings") ){ // if this prerec task completed
-                    if( wobbleDropPos.equals("B")){
+                    if( wobbleDropPosLabel.equals("B")){
                         taskManager.markTaskWithNameIncomplete("Shoot Single Ring"); // activate the dependant task
                     }
                     else {
@@ -231,7 +230,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
             if(scanningComplete) {
                 telemetry.addLine("Stack scanning complete. Scan count: " + ringStackEstimates.size());
-                telemetry.addLine("  Detected drop position: " + wobbleDropPos);
+                telemetry.addLine("  Detected drop position: " + wobbleDropPosLabel);
                 int[] counts = getEstimateOccurances();
                 telemetry.addLine("Ring Count Votes - 0: " + counts[0] + ", 1: " + counts[1] + ", 4: " + counts[2]);
             }
@@ -401,7 +400,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         if(wobbleGoalPosition.equals("B")){
             wobbleGoalPosition = wobbleGoalPosB;
         }
-        else if(wobbleDropPos.equals("C")){
+        else if(wobbleDropPosLabel.equals("C")){
             wobbleGoalPosition = wobbleGoalPosC;
         }
 
