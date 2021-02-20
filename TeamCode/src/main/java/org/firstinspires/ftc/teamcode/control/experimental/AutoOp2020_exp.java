@@ -109,7 +109,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         vision.startWebcamStreaming(); // start the streaming process
         currentTaskTime.reset();
         //while(); // wait for 500 milliseconds without stopping any background processes
-        for(int i = 0; i < RING_SCAN_COUNT || (opModeIsActive() && !isStopRequested() && currentTaskTime.milliseconds() < 1500); i++){ // scan for however long the ring_scan_time is
+        for(int i = 0; i < RING_SCAN_COUNT || (!isStopRequested() && currentTaskTime.milliseconds() < 1500); i++){ // scan for however long the ring_scan_time is
             updateSensors("Scan rings"); // call the update sensors method telling it that we are currently scanning rings
 
             telemetry.addLine("Scanning rings...");
