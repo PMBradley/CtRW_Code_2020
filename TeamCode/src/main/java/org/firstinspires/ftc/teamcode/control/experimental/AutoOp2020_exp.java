@@ -74,7 +74,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
     public static double ARM_DROP_DROP_DISTANCE = 3; // how far the robot is from the drop position before it deploys the arm early
     public static double RING_COLLECT_DISTANCE = 16.5;
-    public static int RING_SCAN_COUNT = 100; // scan the ring 100 times
+    public static int RING_SCAN_COUNT = 300; // scan the ring 100 times
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
 
@@ -120,7 +120,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             telemetry.update();
         }
         // count up the votes that the camera collected for what drop state it is
-        //wobbleDropPos = getCalculatedDropPosition(); // get which position was voted for by the camera system the most //TODO
+        wobbleDropPos = getCalculatedDropPosition(); // get which position was voted for by the camera system the most //TODO
 
         // set the first target position based on priorities and what is closest
         taskManager.updateCurrentTaskToClosest( drive.getPoseEstimate() ); // have the task manager set the current auto task to the next closest incomplete task
