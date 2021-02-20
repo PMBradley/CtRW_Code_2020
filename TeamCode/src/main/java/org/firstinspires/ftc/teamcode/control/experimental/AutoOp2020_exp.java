@@ -103,8 +103,7 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         drive.setPoseEstimate(startPose); // set the localizer's start position to our position on the field relative to the center
 
-        ArrayList<AutoTask> autoTasks = setupAutoTasks(); // add the list of task objects to the task list
-        taskManager = new AutoTaskManager(autoTasks); // then set the drive to use those tasks when required
+
 
         wobble.setArmOffset(ARM_OFFSET_DEGREES); // set the wobble's starting offset, such that the starting position behaves like 0 (as in Auto the encoder likes to start in a weird position)
 
@@ -122,6 +121,8 @@ public class AutoOp2020_exp extends LinearOpMode {
         // count up the votes that the camera collected for what drop state it is
         wobbleDropPos = getCalculatedDropPosition(); // get which position was voted for by the camera system the most
 
+        ArrayList<AutoTask> autoTasks = setupAutoTasks(); // add the list of task objects to the task list
+        taskManager = new AutoTaskManager(autoTasks); // then set the drive to use those tasks when required
         // set the first target position based on priorities and what is closest
         taskManager.updateCurrentTaskToClosest( drive.getPoseEstimate() ); // have the task manager set the current auto task to the next closest incomplete task
 
@@ -230,6 +231,8 @@ public class AutoOp2020_exp extends LinearOpMode {
             if(scanningComplete) {
                 telemetry.addLine("Stack scanning complete. Scan count: " + ringStackEstimates.size());
                 telemetry.addLine("  Detected drop position: " + wobbleDropPos);
+                int[] counts = getEstimateOccurances();
+                telemetry.addLine("Ring Count Votes - 0: " + counts[0] + ", 1: " + counts[1] + ", 4: " + counts[2]);
             }
             else {
                 int[] counts = getEstimateOccurances();
@@ -273,7 +276,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 shooter.indexerUp();
             }
 
-            if(drive.getTaskIndex() == 1 || Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE ){ // if at location and on the first subtask
+            if(drive.getTaskIndex() == 1 || (Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= ARM_DROP_DROP_DISTANCE  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE ) ){ // if at location and on the first subtask
                 wobble.goToGrabPos();
                 wobble.intakeSpinIn();
             }
@@ -448,7 +451,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         autoTasks.add(new AutoTask("Collect 4th Ring", 2, ringPickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
-        atLocationTasks.add(new DriveFollowerTask(150)); // wait msecs once at location
+        atLocationTasks.add(new DriveFollowerTask(250)); // wait msecs once at location
         atLocationTasks.add(new DriveFollowerTask(70)); // then wait msecs
         autoTasks.add(new AutoTask("Collect Wobble", 2, wobblePickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
@@ -522,6 +525,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY(), wobbleGoalPos.getHeading())); // once the position has been found, set the tasks to their new positions
             taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX()-5.4, wobbleGoalPos.getY()+1, wobbleGoalPos.getHeading() )); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
             taskManager.setTaskWithNameLocation("Collect Wobble", new TargetDrivePosition(wobblePickupPos.getX(), wobblePickupPos.getY(), wobblePickupPos.getHeading() + Math.toRadians(-5) )); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
+
         }
 
 
