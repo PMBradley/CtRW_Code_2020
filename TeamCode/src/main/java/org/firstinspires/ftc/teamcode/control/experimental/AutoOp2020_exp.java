@@ -44,11 +44,11 @@ public class AutoOp2020_exp extends LinearOpMode {
 
     private static Pose2d startPose = new Pose2d(-65.3, 7.39, Math.toRadians(0)); // the starting position of the robot relative to the middle of the field
 
-    public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(18.0, -20.0, Math.toRadians(0.0), Math.toRadians(-45)); // the positions that the robot needs to drive to
+    public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(7.6, -20.0, Math.toRadians(0.0), Math.toRadians(-45)); // the positions that the robot needs to drive to
     public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.0, -4.4, Math.toRadians(90.0));
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(44, -24, Math.toRadians(70.0), Math.toRadians(-85));
     public static TargetDrivePosition wobblePickupPos = new TargetDrivePosition(-39.5, -21.4, Math.toRadians(-45.0), Math.toRadians(-135));
-    public static TargetDrivePosition wobblePickupPosA = new TargetDrivePosition(-39.5, -20.0, Math.toRadians(-45.0), Math.toRadians(-135));
+    public static TargetDrivePosition wobblePickupPosA = new TargetDrivePosition(-39.5, -17.2, Math.toRadians(-45.0), Math.toRadians(-135));
 
 
     public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7, 0.0, Math.toRadians(-4));
@@ -424,14 +424,26 @@ public class AutoOp2020_exp extends LinearOpMode {
                 .build()
         ));
         atLocationTasks.add(new DriveFollowerTask(POWERSHOT_SHOOT_TIME)); // do the same as above
-        atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(powershot3Position.getPose2d()) // then pickup the rings shot
-               // .splineTo(new Vector2d(powerCollectStartPos.getPose2d().getX(), powerCollectStartPos.getPose2d().getY()), powerCollectStartPos.getHeading()) // go to the pickup start position
-               // .splineTo(new Vector2d(powerCollectEndPos.getPose2d().getX(), powerCollectEndPos.getPose2d().getY()), powerCollectEndPos.getHeading()) // then go to the pickup end position
-                .splineToSplineHeading(powerCollectStartPos.getPose2d(), powerCollectStartPos.getSplineHeading()) // and in the same movement go to the wobble drop position
-                .splineToSplineHeading(powerCollectEndPos.getPose2d(), powerCollectEndPos.getSplineHeading()) // and in the same movement go to the wobble drop position
-                .splineToSplineHeading(wobbleGoalPosition.getPose2d(), wobbleGoalPosition.getSplineHeading()) // and in the same movement go to the wobble drop position
-                .build()
-        ));
+        if(!wobbleDropPosLabel.equals("C")){
+            atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(powershot3Position.getPose2d()) // then pickup the rings shot
+                    .splineToSplineHeading(powerCollectStartPos.getPose2d(), powerCollectStartPos.getSplineHeading()) // and in the same movement go to the wobble drop position
+                    .splineToSplineHeading(powerCollectEndPos.getPose2d(), powerCollectEndPos.getSplineHeading()) // and in the same movement go to the wobble drop position
+                    .splineToSplineHeading(wobbleGoalPosition.getPose2d(), wobbleGoalPosition.getSplineHeading()) // and in the same movement go to the wobble drop position
+                    .build()
+            ));
+        }
+        else {
+            atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(powershot3Position.getPose2d()) // then pickup the rings shot
+                    .splineToSplineHeading(powerCollectStartPos.getPose2d(), powerCollectStartPos.getSplineHeading()) // and in the same movement go to the wobble drop position
+                    .splineToSplineHeading(powerCollectEndPos.getPose2d(), powerCollectEndPos.getSplineHeading()) // and in the same movement go to the wobble drop position
+                    .build()
+            ));
+            atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(powerCollectEndPos.getPose2d()) // then pickup the rings shot
+                    .lineToSplineHeading(wobbleGoalPosition.getPose2d())
+                    .build()
+            ));
+        }
+
         autoTasks.add(new AutoTask("Shoot Powershots", 1, powershot1Position, atLocationTasks));
 
 
@@ -507,7 +519,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             taskManager.setTaskWithNameLocationTasks("Place Wobble 1", waitTasks);
             taskManager.setTaskWithNameLocationTasks("Place Wobble 2", waitTasks);
 
-            taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY(), wobbleGoalPos.getHeading())); // once the position has been found, set the tasks to their new positions
+            taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPos.getX() + 9.6, wobbleGoalPos.getY(), wobbleGoalPos.getHeading())); // once the position has been found, set the tasks to their new positions
             taskManager.setTaskWithNameLocation("Collect Wobble", wobblePickupPosA);
         }
         else if (positionLabel.equals("B")){
