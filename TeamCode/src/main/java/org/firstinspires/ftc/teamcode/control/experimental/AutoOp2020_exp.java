@@ -120,10 +120,17 @@ public class AutoOp2020_exp extends LinearOpMode {
         }
         // count up the votes that the camera collected for what drop state it is
         wobbleDropPosLabel = getCalculatedDropPosition(); // get which position was voted for by the camera system the most
-        setWobbleGoalPos(wobbleDropPosLabel); // update the task positions based on sensor data
+        if(wobbleDropPosLabel.equals("A"))
+            wobbleGoalPos = wobbleGoalPosA;
+        else if(wobbleDropPosLabel.equals("B"))
+            wobbleGoalPos = wobbleGoalPosB;
+        else
+            wobbleGoalPos = wobbleGoalPosC;
 
         ArrayList<AutoTask> autoTasks = setupAutoTasks(); // add the list of task objects to the task list
         taskManager = new AutoTaskManager(autoTasks); // then set the drive to use those tasks when required
+        setWobbleGoalPos(wobbleDropPosLabel); // update the task positions based on sensor data
+
         // set the first target position based on priorities and what is closest
         taskManager.updateCurrentTaskToClosest( drive.getPoseEstimate() ); // have the task manager set the current auto task to the next closest incomplete task
 
