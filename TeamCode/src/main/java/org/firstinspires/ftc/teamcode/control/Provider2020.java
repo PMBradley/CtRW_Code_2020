@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -46,7 +45,7 @@ public class Provider2020 {
     public DcMotor JShootBack;
 
     // Servo Variables - names are example names, they can be set for whatever application you have
-    public Servo intakeLockServo;
+    public Servo ringGateServo;
     public Servo shooterFeederServo;
     public Servo shooterIndexerServo;
     public Servo shooterAnglerServo;
@@ -85,8 +84,6 @@ public class Provider2020 {
         this.oneHubMode = oneHubMode;
 
         init_map(hMap); // pull information from the hardware map - MUST BE DONE BEFORE
-
-        init_imu(); // setup the IMU and calibrate the current position as 0
     }
 
 
@@ -153,7 +150,7 @@ public class Provider2020 {
 
 
             // Grabbing the servos from the hardware map
-            intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
+            ringGateServo = mainMap.get(Servo.class, "ringGateServo");
             shooterFeederServo = mainMap.get(Servo.class, "feederServo");
             shooterIndexerServo = mainMap.get(Servo.class, "indexerServo");
             shooterAnglerServo = mainMap.get(Servo.class, "anglerServo");
@@ -162,8 +159,7 @@ public class Provider2020 {
             wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
 
 
-            // wobbleLeftWheelServo.getController().pwmDisable(); // set these servos to continuous mode
-            // wobbleRightWheelServo.getController().pwmDisable();
+
 
             shooterFeederServo.getController().pwmEnable(); // set these servos to discrete mode
             //shooterIndexerServo.getController().pwmEnable();
@@ -188,6 +184,7 @@ public class Provider2020 {
         */
 
         imu = mainMap.get(BNO055IMU.class, "imu");   // get Internal Measurement Unit from the hardware map
+        init_imu();
     }
 
     private void init_imu(){ // create a new IMU class instance and set our IMU to that

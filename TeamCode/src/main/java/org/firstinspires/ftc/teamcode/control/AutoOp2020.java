@@ -70,7 +70,7 @@ public class AutoOp2020 extends LinearOpMode {
 
         robot = new Provider2020(hardwareMap); // setup the hardware classes with the hardware map info (device ports, device names, etc)
         drive = new Drive_Mecanum_Auto(hardwareMap);
-        intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
+        intake = new Intake_Ring_Drop(robot.intakeMotor, robot.ringGateServo);
         shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo);
 

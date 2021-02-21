@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode.control.experimental;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.Provider2020;
+import org.firstinspires.ftc.teamcode.control.experimental.AutoOp2020_exp;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
@@ -33,10 +37,11 @@ import java.util.ArrayList;
         Ring Shooter:
         - Controller 2 X button = start a firing sequence (spins up if not spun up, then shoots a ring. can be held to fire rapidly)
         - Controller 2 Right Bumper = toggle if the shooter motor is spun up
-        - Constroller 2
+        - Constroller 2 Y Button = toggle powershot/highgoal mode
 
         Ring Intake:
         - Controller 2 Left Bumper = toggle if the ring intake is active
+        - Controller 2 Left Trigger = toggle ring blocking arm
 
         Wobble Intake/Arm:
         - Controller 2 Right Stick (y axis) = up moves the intake wheels to outtake the wobble goal, down moves the intake wheels to intake the wobble goal
@@ -46,14 +51,14 @@ import java.util.ArrayList;
  */
 
 
-@TeleOp(name = "TeleOp2020 EXP", group = "@@@")
+@TeleOp(name = "TeleOp2020 Experimental", group = "@@E")
 
 @Config
 public class TeleOp2020_exp extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
-    String robotName = "Robot 2020";
+    String robotName = "Lil' ring flinga";
 
     // Robot Speed variables
     public static double turnSpeed = 0.50; // Speed multiplier for turning (1 being 100% of power going in) when not boosting
@@ -61,21 +66,23 @@ public class TeleOp2020_exp extends LinearOpMode{
     public static double boostSpeed = 1.00; // Speed multiplier for BOOSTING (1 being 100% of power going in)
     public static double stopSpeed = 0.00; // the motor speed for stopping the robot
 
-    public static double POWERSHOT_TURN_SPEED = 0.4; // the speed that the robot turns when shooting powershots automatically
-
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
+    static final int TELEMETRY_TRANSMISSION_INTERVAL = 25;
+    static final int ENDGAME_START_TIME = 120000;
+    public static Pose2d powershotStartPos = new Pose2d(-65.3, -25, Math.toRadians(0.0));
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
-    private ElapsedTime runtime; // internal clock
     private Drive_Mecanum_Tele mecanum_drive; // the main mecanum drive class
     private StandardTrackingWheelLocalizer localizer; // the odometry based localizer - uses dead wheels to determine (x, y, r) position on the field
     private Intake_Ring_Drop intake; // the intake class instance
     private J_Shooter_Ring_ServoFed shooter; // the shooter class instance
     private Arm_Wobble_Grabber wobble; // the wobble intake/arm class instance
-    //private Arm_Wobble_Grabber wobbleClamp; // wobble intake, but clamp
     private Drive_Mecanum_Auto auto_drive;
+
+    private FtcDashboard dashboard;
+    private ElapsedTime runtime;
 
     // Flags
     private boolean firstToggleDriveRelative = true; // used to ensure proper toggling behavior (see usage under logic section)
@@ -83,15 +90,17 @@ public class TeleOp2020_exp extends LinearOpMode{
     private boolean firstIntakeRunToggle = true; // used to ensure proper toggling behavior (see usage under logic section)
     private boolean firstAngleToggle = true;
 
-    private boolean driveFieldRelative = true; // default is driving relative to field
+    private boolean driveFieldRelative = false; // default to driving robot relative
     private boolean isSpinningUp = false;
-    private boolean shooterAngledUp = false;
+    private boolean shooterAngledUp = true;
     private int wobbleArmPosition = 0; // 0 = folded pos, 1 = up pos, 2 = grab position
     private int wobbleIntakeDirection = 0; // 0 = stopped, 1 = intaking, -1 = outtaking
     private boolean intakeIsRunning = false; // holds if the intake should be running or not
     private boolean powershotDriving = false;
     private int lastPowershotIndex = 0;
     private boolean firstPowershotDrive = true;
+    private boolean firstPowershotDriveToggle = true;
+    private boolean firstGateMoveToggle = true;
 
 
     // The "Main" for TeleOp (the place where the main code is run)
@@ -103,14 +112,17 @@ public class TeleOp2020_exp extends LinearOpMode{
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed); // pass in the drive motors and the speed variables to setup properly
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
-        intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
+        intake = new Intake_Ring_Drop(robot.intakeMotor, robot.ringGateServo);
         shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo, 1.0/5.0);
 
         auto_drive = new Drive_Mecanum_Auto(hardwareMap); // setup the second automated drive class
 
+        dashboard = FtcDashboard.getInstance(); // setup the dashboard
+        dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
 
-        robot.setEncoderActive(false); // start the game without running encoders
+
+        robot.setEncoderActive(false); // start the game without running encoders on drive encoders
 
         ArrayList<DriveFollowerTask> autoPowershotTasks = getAutoPowershotTasks(); // calculate the trajectories for the powershot driving
 
@@ -123,6 +135,7 @@ public class TeleOp2020_exp extends LinearOpMode{
 
 
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
+        intake.raiseGate();
 
 
         // The main run loop - write the main robot run code here
@@ -133,8 +146,8 @@ public class TeleOp2020_exp extends LinearOpMode{
 
             // Variables
             boolean isBoosting = !gamepad1.right_bumper;  // If true, the robot will go at the boost speed, otherwise it will go at the base speed (just impacts translation)
-            double xTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
-            double yTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double xTranslatePower = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double yTranslatePower = gamepad1.left_stick_x * Math.abs(gamepad1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
             double rotatePower = gamepad1.right_stick_x * Math.abs(gamepad1.right_stick_x);
             boolean instructFire = gamepad2.x; // if pressing the second gamepad x, instruct a fire event
 
@@ -198,6 +211,29 @@ public class TeleOp2020_exp extends LinearOpMode{
                 wobbleIntakeDirection = 0;
             }
 
+            if(gamepad2.left_trigger >= 0.3 && firstGateMoveToggle){
+                String gatePos = intake.getGatePosition();// get what position the gate thinks it is in
+
+                if(gatePos.equals("UP") || gatePos.equals("PREP")){ // if in one of the two up positions, we wanna toggle down
+                    intake.lowerGate();
+                }
+                else if(runtime.milliseconds() < ENDGAME_START_TIME){ // if not up, we are down. If we are down and not in endgame, we don't wanna go all the way up
+                    intake.prepGate();
+                }
+                else {
+                    intake.raiseGate();
+                }
+
+                firstGateMoveToggle = false;
+            }
+            else if(gamepad2.left_trigger < 0.3){
+                firstGateMoveToggle = true;
+            }
+
+            if(wobbleIntakeDirection != 0 || shooter.isFiring()){
+                isBoosting = false; // if intaking/outtaking with the wobble or the shooter is spun up, slow down the robot to allow for finer control
+            }
+
 
             //setup a dead zone for the controllers
             if(Math.abs(xTranslatePower) <= DEAD_ZONE_RADIUS){ // if the value is less than the maximum deadzone value, set to zero (to stop the motor)
@@ -211,22 +247,38 @@ public class TeleOp2020_exp extends LinearOpMode{
             }
 
 
+            if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
+                powershotDriving = !powershotDriving;
 
-            if(gamepad1.dpad_right || gamepad1.dpad_left){
-                shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
-
-                if(auto_drive.getTaskIndex() != lastPowershotIndex){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
-                    shooter.instructFire(); // tell the shooter to start shooting
-
-                    lastPowershotIndex = auto_drive.getTaskIndex();
-                }
-
-                if(firstPowershotDrive) { // if first loop run
+                if (powershotDriving) {
                     auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
                     auto_drive.setTasks(autoPowershotTasks);
-
-                    firstPowershotDrive = false;
                 }
+
+                firstPowershotDriveToggle = false;
+            }
+            else if (!gamepad1.dpad_right && !gamepad1.dpad_left){
+                firstPowershotDriveToggle = true;
+            }
+
+            if(powershotDriving){
+                shooterAngledUp = false; // optimize for powershots by setting shooter to angle down
+                shooter.optimizeForPowershots();
+                shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
+                shooter.spinUp();
+
+
+                if(auto_drive.getTaskIndex() == 1 || auto_drive.getTaskIndex() == 3 || auto_drive.getTaskIndex() == 5){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
+                    shooter.instructFire(); // tell the shooter to start shooting
+
+                    //if (shooter.getFiringState() > 1) {
+                    //    lastPowershotIndex = auto_drive.getTaskIndex();
+                    //}
+                }
+
+
+                shooter.updateFeeder();
+                powershotDriving = !auto_drive.doTasksAsync();
             }
             else {
                 if(gamepad1.left_bumper){ // if we want the robot to rotate to 0
@@ -234,74 +286,65 @@ public class TeleOp2020_exp extends LinearOpMode{
                 }
 
                 powershotDriving = false; // if neither are pressed, reset the turning variable
-                firstPowershotDrive = true;
+                lastPowershotIndex = 0;
             }
 
 
 
             // Hardware instruction (telling the hardware what to do)
-            if (powershotDriving){
-                powershotDriving = !auto_drive.doTasksAsync();
-            }
-            else if(driveFieldRelative) {
-                mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
-            }
-            else {
-                mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
-            }
-
-            if(instructFire) {
-                shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
-            }
-            else {
-                shooter.resetShotCount();
-            }
-
-            if(shooter.isFiring()){ // if the shooter is firing, make sure the be updating the feeder
-                shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
-                shooter.spinUp();
-                shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
-                intake.spinDown();
-            }
-            else if(gamepad2.left_trigger > 0.5){ // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
-                shooter.indexerDown(); // move the indexer to the intaking position
-                shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
-
-                intake.setIntakeRunSpeed(-intake.DEFAULT_INTAKE_RUN_SPEED);
-                intake.spinUp(); // and run the intake
-            }
-            else if(intakeIsRunning){ // if the intake is set to be running by the user and the shooter isn't firing
-                shooter.indexerDown(); // move the indexer to the intaking position
-
-                if(isSpinningUp){ // if the shooter should be spinning up
-                    shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed()); // set the shooter to its full speed
+            if( !powershotDriving ) {
+                if(driveFieldRelative) {
+                    mecanum_drive.drive_field_relative(xTranslatePower, yTranslatePower, rotatePower, robot.getHeading(), isBoosting); // call the drive field relative method
                 }
-                else { // if not supposed to be spinnig up shooter, spin it up to a low speed to help with intaking
-                    shooter.setTargetShooterSpeed(0.2);
+                else {
+                    mecanum_drive.drive_robot_relative(xTranslatePower, yTranslatePower, rotatePower, isBoosting); // call the drive robot relative method
                 }
-                shooter.spinUp();
+
+                if (instructFire) {
+                    shooter.instructFire(); // tell the shooter it should fire (only ever queues a single fire)
+                } else {
+                    shooter.resetShotCount();
+                }
+
+                if (shooter.isFiring()) { // if the shooter is firing, make sure the be updating the feeder
+                    shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed());
+                    shooter.spinUp();
+                    shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
+                    intake.spinDown();
+                } else if (gamepad2.left_trigger > 0.5) { // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
+                    shooter.indexerDown(); // move the indexer to the intaking position
+                    shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
+
+                    intake.setIntakeRunSpeed(-intake.DEFAULT_INTAKE_RUN_SPEED);
+                    intake.spinUp(); // and run the intake
+                } else if (intakeIsRunning) { // if the intake is set to be running by the user and the shooter isn't firing
+                    shooter.indexerDown(); // move the indexer to the intaking position
+
+                    if (isSpinningUp) { // if the shooter should be spinning up
+                        shooter.setTargetShooterSpeed(shooter.getTargetShooterShootingSpeed()); // set the shooter to its full speed
+                    } else { // if not supposed to be spinnig up shooter, spin it up to a low speed to help with intaking
+                        shooter.setTargetShooterSpeed(0.2);
+                    }
+                    shooter.spinUp();
 
 
-                intake.setIntakeRunSpeed(intake.DEFAULT_INTAKE_RUN_SPEED);
-                intake.spinUp(); // and run the intake
-            }
-            else { // otherwise set the shooter to the proper mode
-                shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
-                shooter.indexerUp();
+                    intake.setIntakeRunSpeed(intake.DEFAULT_INTAKE_RUN_SPEED);
+                    intake.spinUp(); // and run the intake
+                } else { // otherwise set the shooter to the proper mode
+                    shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
+                    shooter.indexerUp();
 
-                intake.spinDown(); // and ensure that the intake is spun down
-            }
+                    intake.spinDown(); // and ensure that the intake is spun down
+                }
 
-            if ( gamepad2.b ) {
-                shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                if (gamepad2.b) {
+                    shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                } else if (shooterAngledUp) {
+                    shooter.optimizeForHighgoal();
+                } else {
+                    shooter.optimizeForPowershots();
+                }
             }
-            else if(shooterAngledUp){
-                shooter.optimizeForHighgoal();
-            }
-            else {
-                shooter.optimizeForPowershots();
-            }
-
 
             wobble.setIntakeDirection(wobbleIntakeDirection); // make sure it is intaking properly
             //wobbleClamp.setIntakeDirection(wobbleIntakeDirection);
@@ -321,11 +364,11 @@ public class TeleOp2020_exp extends LinearOpMode{
 
 
             // Telemetry
-            if(driveFieldRelative){ // add telemetry relating to robot drive mode
-                telemetry.addLine("Driving field relative");
+            if(powershotDriving){
+                telemetry.addLine("Automatically Powershot Driving");
             }
-            else if (powershotDriving){
-                telemetry.addLine("Shooting Powershots Automatically");
+            else if(driveFieldRelative){ // add telemetry relating to robot drive mode
+                telemetry.addLine("Driving field relative");
             }
             else{
                 telemetry.addLine("Driving robot relative");
@@ -346,8 +389,10 @@ public class TeleOp2020_exp extends LinearOpMode{
                 telemetry.addData("Drive BR Encoder: ", robot.driveBR.getCurrentPosition());
             }
             else{
-                //telemetry.addLine("Driving without drive encoders");
+                telemetry.addLine("Driving without drive encoders");
             }
+
+
 
             telemetry.addData("Robot is Boosting?", isBoosting);
 
@@ -359,45 +404,69 @@ public class TeleOp2020_exp extends LinearOpMode{
             telemetry.addData("Shooter is spun up?", shooter.isSpunUp());
             telemetry.addData("Shot Count: ", shooter.getShotCount());
             telemetry.addData("Firing state", shooter.getFiringState());
-            telemetry.addData("Flywheel Velocity: ", shooter.getFlywheelVelo());
             telemetry.addData("Corrected Flywheel Velocity: ", shooter.encoderVeloToMotorSpeed(shooter.getFlywheelVelo()));
+            telemetry.addData("Integral: ", shooter.getIntegral());
             telemetry.addData("Target Flywheel Velocity: ", shooter.getTargetShootingSpeed());
             telemetry.addData("Arm target position", wobble.getArmTargetPosition());
             telemetry.addData("Wheel arm position", wobble.getArmPosition());
 
             // telemetry.addData("Wheel arm encoder position", robot.wobbleArmMotor.getCurrentPosition());
             //telemetry.addData("Claw arm position", wobbleClamp.getArmPosition());
-            //telemetry.addData("Claw arm encoder position", robot.wobbleArmMotor2.getCurrentPosition());
-
+            //telemetry.addData("Claw arm encoder position", robot.wobbleArmMotor2.getCurrentPosition())
 
 
             telemetry.update();
+
+
+            updateDashboard();
         }  // end of running while loop
     }
 
 
     /* PUT ALL FUNCTIONS HERE */
-
-    private static final double FIRST_POWERSHOT_RIGHT_DISTANCE = 14.5;
-    private static final double POWERSHOT_APART_DISTANCE = 6.5;
+    public static double FIRST_POWERSHOT_BACK_DISTANCE = -21.0;
+    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 14.5;
+    public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 9.5;
+    public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 6.7;
+    public static double FORWARD_COMPENSATION_DISTANCE = 1.0; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
 
-        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(new Pose2d(0, 0, 0))
-                .strafeRight(FIRST_POWERSHOT_RIGHT_DISTANCE)
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(powershotStartPos)
+                //.lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
+                .lineToSplineHeading(AutoOp2020_exp.powershot1Position.getPose2d())
                 .build()
         ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
-                .strafeRight(POWERSHOT_APART_DISTANCE)
+                //.lineTo(new Vector2d(driveTasks.get(0).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(0).getTraj().end().getY() - SECOND_POWERSHOT_RIGHT_DISTANCE))
+                .lineToSplineHeading(AutoOp2020_exp.powershot2Position.getPose2d())
                 .build()
         ));
-        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(1).getTraj().end())
-                .strafeRight(POWERSHOT_APART_DISTANCE)
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
+                //.lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
+                .lineToSplineHeading(AutoOp2020_exp.powershot3Position.getPose2d())
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
 
         return driveTasks;
     }
+
+    public void updateDashboard(){
+        TelemetryPacket packet = new TelemetryPacket();
+
+        packet.put("raw_shooter_velo", shooter.getFlywheelVelo()); // get the shooter velocity and add that
+        packet.put("shooter_velo", J_Shooter_Ring_ServoFed.encoderVeloToMotorSpeed(shooter.getFlywheelVelo())); // get the shooter velocity and convert it to motor speed for readability
+
+
+        if(dashboard != null){
+            dashboard.sendTelemetryPacket(packet);
+        }
+    }
+
 }

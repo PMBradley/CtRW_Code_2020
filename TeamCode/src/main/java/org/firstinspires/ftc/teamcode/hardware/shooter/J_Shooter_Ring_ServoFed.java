@@ -40,7 +40,7 @@ public class J_Shooter_Ring_ServoFed {
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
     public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
-    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.5618842; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.5772783251231527; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     public static double MIN_SHOOT_SPEED = 0.40; // the lowest power the shooter will ever let the user attempt to shoot at (only matters if the user sets a custom shooting power)
     private boolean firstSpinUp = true;
@@ -57,7 +57,7 @@ public class J_Shooter_Ring_ServoFed {
     private static final double FEEDER_EXTENDED_POSITION = degToServoPos(135.0);
     public static final double FEEDER_EXTENSION_TIME = 130; // in milliseconds
 
-    private static final double INDEXER_DOWN_POSITION = degToServoPos(110.0); // the little ring lifter down position
+    private static final double INDEXER_DOWN_POSITION = degToServoPos(113.0); // the little ring lifter down position
     private static final double INDEXER_UP_POSITION = degToServoPos(65.0);
     public static double INDEXER_MOVE_TIME = 365; // in milliseconds
 

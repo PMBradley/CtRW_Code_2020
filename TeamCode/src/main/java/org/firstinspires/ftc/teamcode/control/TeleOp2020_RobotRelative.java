@@ -35,10 +35,11 @@ import java.util.ArrayList;
         Ring Shooter:
         - Controller 2 X button = start a firing sequence (spins up if not spun up, then shoots a ring. can be held to fire rapidly)
         - Controller 2 Right Bumper = toggle if the shooter motor is spun up
-        - Constroller 2
+        - Constroller 2 Y Button = toggle powershot/highgoal mode
 
         Ring Intake:
         - Controller 2 Left Bumper = toggle if the ring intake is active
+        - Controller 2 Left Trigger = toggle ring blocking arm
 
         Wobble Intake/Arm:
         - Controller 2 Right Stick (y axis) = up moves the intake wheels to outtake the wobble goal, down moves the intake wheels to intake the wobble goal
@@ -66,6 +67,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
     static final int TELEMETRY_TRANSMISSION_INTERVAL = 25;
+    static final int ENDGAME_START_TIME = 120000;
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -95,6 +97,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
     private int lastPowershotIndex = 0;
     private boolean firstPowershotDrive = true;
     private boolean firstPowershotDriveToggle = true;
+    private boolean firstGateMoveToggle = true;
 
 
     // The "Main" for TeleOp (the place where the main code is run)
@@ -106,7 +109,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
         runtime = new ElapsedTime();
         mecanum_drive = new Drive_Mecanum_Tele(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR, turnSpeed, translateSpeed, boostSpeed); // pass in the drive motors and the speed variables to setup properly
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
-        intake = new Intake_Ring_Drop(robot.intakeMotor, robot.intakeLockServo);
+        intake = new Intake_Ring_Drop(robot.intakeMotor, robot.ringGateServo);
         shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo, 1.0/5.0);
 
@@ -129,6 +132,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
 
 
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
+        intake.raiseGate();
 
 
         // The main run loop - write the main robot run code here
@@ -204,6 +208,24 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                 wobbleIntakeDirection = 0;
             }
 
+            if(gamepad2.left_trigger >= 0.3 && firstGateMoveToggle){
+                String gatePos = intake.getGatePosition();// get what position the gate thinks it is in
+
+                if(gatePos.equals("UP") || gatePos.equals("PREP")){ // if in one of the two up positions, we wanna toggle down
+                    intake.lowerGate();
+                }
+                else if(runtime.milliseconds() < ENDGAME_START_TIME){ // if not up, we are down. If we are down and not in endgame, we don't wanna go all the way up
+                    intake.prepGate();
+                }
+                else {
+                    intake.raiseGate();
+                }
+
+                firstGateMoveToggle = false;
+            }
+            else if(gamepad2.left_trigger < 0.3){
+                firstGateMoveToggle = true;
+            }
 
             if(wobbleIntakeDirection != 0 || shooter.isFiring()){
                 isBoosting = false; // if intaking/outtaking with the wobble or the shooter is spun up, slow down the robot to allow for finer control
