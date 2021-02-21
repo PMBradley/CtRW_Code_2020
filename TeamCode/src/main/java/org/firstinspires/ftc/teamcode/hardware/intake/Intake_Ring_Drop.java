@@ -16,9 +16,9 @@ public class Intake_Ring_Drop {
     private double currentIntakePower = 0.0;
 
 
-    private static double GATE_UP_POSITION   = degToServoPos(70.0);
-    private static double GATE_PREP_POSITION = degToServoPos(120.0);
-    private static double GATE_DOWN_POSITION = degToServoPos(135.0);
+    public static double GATE_UP_POSITION   = degToServoPos(70.0);
+    public static double GATE_PREP_POSITION = degToServoPos(120.0);
+    public static double GATE_DOWN_POSITION = degToServoPos(135.0);
     private String gatePosition = "UP";
 
 

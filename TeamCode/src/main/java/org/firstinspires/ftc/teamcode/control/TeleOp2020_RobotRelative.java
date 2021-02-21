@@ -208,22 +208,25 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                 wobbleIntakeDirection = 0;
             }
 
-            if(gamepad2.left_trigger >= 0.3 && firstGateMoveToggle){
+            if(gamepad2.left_trigger >= 0.5 && firstGateMoveToggle){
                 String gatePos = intake.getGatePosition();// get what position the gate thinks it is in
 
                 if(gatePos.equals("UP") || gatePos.equals("PREP")){ // if in one of the two up positions, we wanna toggle down
                     intake.lowerGate();
+                    telemetry.addLine("Gate down");
                 }
                 else if(runtime.milliseconds() < ENDGAME_START_TIME){ // if not up, we are down. If we are down and not in endgame, we don't wanna go all the way up
                     intake.prepGate();
+                    telemetry.addLine("Gate prep");
                 }
                 else {
                     intake.raiseGate();
+                    telemetry.addLine("Gate up");
                 }
 
                 firstGateMoveToggle = false;
             }
-            else if(gamepad2.left_trigger < 0.3){
+            else if(gamepad2.left_trigger < 0.5){
                 firstGateMoveToggle = true;
             }
 
@@ -308,13 +311,15 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                     shooter.spinUp();
                     shooter.updateFeeder(); // update the shooter feeder position based off of where it is in the cycle
                     intake.spinDown();
-                } else if (gamepad2.left_trigger > 0.5) { // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
+                }
+                else if (gamepad2.right_trigger > 0.5) { // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
                     shooter.indexerDown(); // move the indexer to the intaking position
                     shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
 
                     intake.setIntakeRunSpeed(-intake.DEFAULT_INTAKE_RUN_SPEED);
                     intake.spinUp(); // and run the intake
-                } else if (intakeIsRunning) { // if the intake is set to be running by the user and the shooter isn't firing
+                }
+                else if (intakeIsRunning) { // if the intake is set to be running by the user and the shooter isn't firing
                     shooter.indexerDown(); // move the indexer to the intaking position
 
                     if (isSpinningUp) { // if the shooter should be spinning up
@@ -327,7 +332,8 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
 
                     intake.setIntakeRunSpeed(intake.DEFAULT_INTAKE_RUN_SPEED);
                     intake.spinUp(); // and run the intake
-                } else { // otherwise set the shooter to the proper mode
+                }
+                else { // otherwise set the shooter to the proper mode
                     shooter.setFlywheelMode(isSpinningUp); // make sure the shooting mode it set properly
                     shooter.indexerUp();
 
@@ -335,7 +341,7 @@ public class TeleOp2020_RobotRelative extends LinearOpMode{
                 }
 
                 if (gamepad2.b) {
-                    shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                    shooter.optimizeForLonggoal();
                 } else if (shooterAngledUp) {
                     shooter.optimizeForHighgoal();
                 } else {
