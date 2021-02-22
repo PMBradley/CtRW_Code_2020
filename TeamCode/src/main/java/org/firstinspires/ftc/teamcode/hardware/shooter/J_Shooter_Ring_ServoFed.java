@@ -40,7 +40,7 @@ public class J_Shooter_Ring_ServoFed {
 
     public static final double SHOOTER_SPEED     = .65; // the power the shooter uses as a default for no PID mode
     public static double SHOOTER_PID_HIGHGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
-    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.5772783251231527; // the power the shooter uses as a default for PID mode
+    public static double SHOOTER_PID_POWERSHOT_SPEED = 0.5695812807881773; // the power the shooter uses as a default for PID mode
     public static double SHOOTER_PID_LONGGOAL_SPEED = 0.8; // the power the shooter uses as a default for PID mode
     public static double MIN_SHOOT_SPEED = 0.40; // the lowest power the shooter will ever let the user attempt to shoot at (only matters if the user sets a custom shooting power)
     private boolean firstSpinUp = true;

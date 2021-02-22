@@ -36,8 +36,8 @@ public class FarRingStackHeightPipeline extends CustomPipeline{
     /*
      * The core values which define the location and size of the sample regions
      */
-    public static Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(178, 231); // 195
-    public static Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(178,267);
+    public static Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(160, 226); // 195
+    public static Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(160,262);
     public static int REGION_WIDTH = 80;
     public static int REGION_HEIGHT = 9;
 
