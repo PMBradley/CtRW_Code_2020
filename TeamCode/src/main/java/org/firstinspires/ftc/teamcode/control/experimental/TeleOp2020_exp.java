@@ -428,32 +428,32 @@ public class TeleOp2020_exp extends LinearOpMode{
 
 
     /* PUT ALL FUNCTIONS HERE */
-    public static double FIRST_POWERSHOT_BACK_DISTANCE = -21.0;
-    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 14.5;
-    public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 9.5;
-    public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 6.7;
-    public static double FORWARD_COMPENSATION_DISTANCE = 1.0; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
+    //public static double FIRST_POWERSHOT_BACK_DISTANCE = -21.0;
+    public static double FIRST_POWERSHOT_LEFT_OFFSET = 3.2;
+    public static double SECOND_POWERSHOT_LEFT_OFFSET = 0.0;
+    public static double THIRD_POWERSHOT_LEFT_OFFSET = 1.3;
+    //public static double FORWARD_COMPENSATION_DISTANCE = 1.0; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
     private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
 
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(powershotStartPos)
                 //.lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
-                .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot1Position.getX() + 2, AutoOp2020_exp.powershot1Position.getY(), AutoOp2020_exp.powershot1Position.getHeading()))
+                .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot1Position.getX(), AutoOp2020_exp.powershot1Position.getY() + FIRST_POWERSHOT_LEFT_OFFSET, AutoOp2020_exp.powershot1Position.getHeading()))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
 
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
                 //.lineTo(new Vector2d(driveTasks.get(0).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(0).getTraj().end().getY() - SECOND_POWERSHOT_RIGHT_DISTANCE))
-                .lineToSplineHeading(AutoOp2020_exp.powershot2Position.getPose2d())
+                .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot2Position.getX(), AutoOp2020_exp.powershot2Position.getY() + SECOND_POWERSHOT_LEFT_OFFSET, AutoOp2020_exp.powershot2Position.getHeading()))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
 
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
                 //.lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
-                .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot3Position.getX() + 1, AutoOp2020_exp.powershot3Position.getY(), AutoOp2020_exp.powershot3Position.getHeading()))
+                .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot3Position.getX(), AutoOp2020_exp.powershot3Position.getY() + THIRD_POWERSHOT_LEFT_OFFSET, AutoOp2020_exp.powershot3Position.getHeading()))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
