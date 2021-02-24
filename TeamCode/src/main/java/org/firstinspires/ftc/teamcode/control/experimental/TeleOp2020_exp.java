@@ -70,7 +70,7 @@ public class TeleOp2020_exp extends LinearOpMode{
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
     static final int TELEMETRY_TRANSMISSION_INTERVAL = 25;
     static final int ENDGAME_START_TIME = 120000;
-    public static Pose2d powershotStartPos = new Pose2d(-65.3, -25, Math.toRadians(0.0));
+    public static Pose2d powershotStartPos = new Pose2d(-65.3, -37.36, Math.toRadians(0.0));
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -251,7 +251,7 @@ public class TeleOp2020_exp extends LinearOpMode{
                 powershotDriving = !powershotDriving;
 
                 if (powershotDriving) {
-                    auto_drive.setPoseEstimate(new Pose2d(0, 0, 0));
+                    auto_drive.setPoseEstimate(powershotStartPos);
                     auto_drive.setTasks(autoPowershotTasks);
                 }
 
@@ -439,7 +439,7 @@ public class TeleOp2020_exp extends LinearOpMode{
 
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(powershotStartPos)
                 //.lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
-                .lineToSplineHeading(AutoOp2020_exp.powershot1Position.getPose2d())
+                .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot1Position.getX() + 2, AutoOp2020_exp.powershot1Position.getY(), AutoOp2020_exp.powershot1Position.getHeading()))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
@@ -453,7 +453,7 @@ public class TeleOp2020_exp extends LinearOpMode{
 
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
                 //.lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
-                .lineToSplineHeading(AutoOp2020_exp.powershot3Position.getPose2d())
+                .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot3Position.getX() + 1, AutoOp2020_exp.powershot3Position.getY(), AutoOp2020_exp.powershot3Position.getHeading()))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );

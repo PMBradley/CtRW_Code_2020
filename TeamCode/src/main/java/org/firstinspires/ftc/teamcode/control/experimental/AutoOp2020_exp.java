@@ -48,36 +48,37 @@ public class AutoOp2020_exp extends LinearOpMode {
     private static Pose2d startPose = new Pose2d(-65.3, 7.39, Math.toRadians(0)); // the starting position of the robot relative to the middle of the field
 
     public static TargetDrivePosition wobbleGoalPosA  = new TargetDrivePosition(17.0, -20.0, Math.toRadians(0.0), Math.toRadians(-45)); // the positions that the robot needs to drive to
-    public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(14.5, -6.6, Math.toRadians(90.0));
+    public static TargetDrivePosition wobbleGoalPosB  = new TargetDrivePosition(15.5, -1.5, Math.toRadians(90.0));
     public static TargetDrivePosition wobbleGoalPosC  = new TargetDrivePosition(43.4, -24.2, Math.toRadians(70.0), Math.toRadians(-85));
     public static TargetDrivePosition wobblePickupPosA = new TargetDrivePosition(-41.2, -20.2, Math.toRadians(-45.0), Math.toRadians(-135));
-    public static TargetDrivePosition wobblePickupPosB = new TargetDrivePosition(-40.4, -20.2, Math.toRadians(-45.0), Math.toRadians(-135));
-    public static TargetDrivePosition wobblePickupPosC = new TargetDrivePosition(-40, -21.2, Math.toRadians(-45.0), Math.toRadians(-135));
+    public static TargetDrivePosition wobblePickupPosB = new TargetDrivePosition(-39.4, -20.5, Math.toRadians(-45.0), Math.toRadians(-140));
+    public static TargetDrivePosition wobblePickupPosC = new TargetDrivePosition(-41.15, -17.7, Math.toRadians(-38.0), Math.toRadians(-140));
 
 
-    public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7.5, 0.3, Math.toRadians(-2.9));
-    public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6.3, -13.7, Math.toRadians(15.2), Math.toRadians(-82));
-    public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.2, -2.48, Math.toRadians(15.2));
+    public static TargetDrivePosition lineShootPos = new TargetDrivePosition(-7.5, 0.3, Math.toRadians(-3.7));
+    public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-6, -14.75, Math.toRadians(15.2), Math.toRadians(-82));
+    public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-6.5, -2.3, Math.toRadians(15.2));
    //public static TargetDrivePosition powershot1Position = new TargetDrivePosition(-5.9, -13.4, Math.toRadians(15.2), Math.toRadians(-82));
    // public static TargetDrivePosition powershot2Position = new TargetDrivePosition(-5.8, -1.9, Math.toRadians(15.2));
-    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.3, 5.4, Math.toRadians(15.2));
-    public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(52.56, 25.8, Math.toRadians(-75.0), Math.toRadians(-90));
-    public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(52.56, -26.5, Math.toRadians(-75.0), Math.toRadians(-90));
+    public static TargetDrivePosition powershot3Position = new TargetDrivePosition(-6.2, 5.15, Math.toRadians(15.2));
+    public static TargetDrivePosition powerCollectStartPos = new TargetDrivePosition(53.1, 25, Math.toRadians(-69.0), Math.toRadians(-90));
+    public static TargetDrivePosition powerCollectEndPos = new TargetDrivePosition(51.3, -27.2, Math.toRadians(-69.0), Math.toRadians(-90));
 
 
-    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-26, 8, Math.toRadians(-90.0));
+    public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-28, 8.4, Math.toRadians(-90.0));
     //public static TargetDrivePosition stackPickupPos = new TargetDrivePosition(-30, -6.2, Math.toRadians(285), Math.toRadians(-90));
     public static TargetDrivePosition ringPickupPos = new TargetDrivePosition(-40.5, -12.5, Math.toRadians(180.0));
     public static TargetDrivePosition parkPosA     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(0.0));
     public static TargetDrivePosition parkPosB     = new TargetDrivePosition(2.0, -2.0, Math.toRadians(90.0));
-    public static TargetDrivePosition parkPosC     = new TargetDrivePosition(0.0, -15.0, Math.toRadians(0.0));
+    public static TargetDrivePosition parkPosC     = new TargetDrivePosition(0.0, -18.5, Math.toRadians(90.0));
 
 
-    public static double ARM_OFFSET_DEGREES = -380; // an offset for the wobble arm
+    public static double ARM_OFFSET_DEGREES = -378; // an offset for the wobble arm
     public static double ARM_COLLECT_DROP_DISTANCE = 18; // how far the robot is from collecting a wobble before it deploys the arm early
     public static double ARM_DROP_DROP_DISTANCE = 3; // how far the robot is from the drop position before it deploys the arm early
-    public static double RING_COLLECT_DISTANCE = 24.5;
-    public static int RING_SCAN_TIME = 1500; // scan the ring for 700 msecs
+    public static double RING_COLLECT_DISTANCE = 24.4;
+    public static double RING_COLLECT_2RING_OFFSET = -13.9;
+    public static int RING_SCAN_TIME = 100; // scan the ring for 700 msecs
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
 
@@ -114,6 +115,23 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         // Do the ring scanning
         vision.startWebcamStreaming(); // start the streaming process
+
+        currentTaskTime.reset();
+        while(!isStopRequested() && currentTaskTime.milliseconds() < 1000);
+
+
+        telemetry.addLine(ROBOT_NAME + "'s setup completed.");
+     //   telemetry.addLine("Ring scan count: " + ringStackEstimates.size());
+     //   telemetry.addLine("  Detected drop position: " + wobbleDropPosLabel);
+     //   telemetry.addData("Chosen first task", taskManager.getCurrentTask().getTaskName());
+        telemetry.update();
+
+
+
+        waitForStart(); // wait until play is pressed on the robot controller to progress
+
+
+        // Post start setup (usually for anything that requires moving any parts on the robot)
         currentTaskTime.reset();
         //while(); // wait for 500 milliseconds without stopping any background processes
         for(int i = 0; !isStopRequested() && currentTaskTime.milliseconds() < RING_SCAN_TIME; i++){ // scan for however long the ring_scan_time is
@@ -147,17 +165,6 @@ public class AutoOp2020_exp extends LinearOpMode {
         scanningComplete = true;
 
 
-        telemetry.addLine(ROBOT_NAME + "'s setup completed.");
-        telemetry.addLine("Ring scan count: " + ringStackEstimates.size());
-        telemetry.addLine("  Detected drop position: " + wobbleDropPosLabel);
-        telemetry.addData("Chosen first task", taskManager.getCurrentTask().getTaskName());
-        telemetry.update();
-
-
-
-        waitForStart(); // wait until play is pressed on the robot controller to progress
-
-        // Post start setup (usually for anything that requires moving any parts on the robot)
         wobble.setArmPosition(ARM_OFFSET_DEGREES);
 
         currentTaskTime.reset();
@@ -186,6 +193,9 @@ public class AutoOp2020_exp extends LinearOpMode {
                     if( !wobbleDropPosLabel.equals("A") ){ // if there are rings to collect (aka any target position other than the one that happens when no rings)
                         taskManager.markTaskWithNameIncomplete("Collect Rings"); // activate the dependant task
                     }
+                    else { // on A we don't collect rings but we still need to actually collect the wobble
+                        taskManager.markTaskWithNameIncomplete("Collect Wobble");
+                    }
                 }
                 else if( currentTaskName.equals("Shoot Stack Rings") ){ // if this prerec task completed
                     if(wobbleDropPosLabel.equals("C")){
@@ -199,13 +209,15 @@ public class AutoOp2020_exp extends LinearOpMode {
                     else {
                         taskManager.markTaskWithNameIncomplete("Shoot Stack Rings"); // activate the dependant task
                     }
-                    taskManager.markTaskWithNameIncomplete("Place Wobble 2");
+
+                    if(wobbleDropPosLabel.equals("B") || wobbleDropPosLabel.equals("C"))
+                        taskManager.markTaskWithNameIncomplete("Place Wobble 2");
                 }
                 else if( currentTaskName.equals("Collect 4th Ring")){ // this one only ever happens in a 4 stack
                     taskManager.markTaskWithNameIncomplete("Shoot Single Ring");
                 }
                 else if( currentTaskName.equals("Place Wobble 1") ){ // if this prerec task completed
-                    //taskManager.markTaskWithNameIncomplete("Collect Wobble"); // activate the dependant task
+                    taskManager.markTaskWithNameIncomplete("Collect Wobble"); // activate the dependant task
                 }
                 else if( currentTaskName.equals("Collect Wobble") ){ // if this prerec task completed
                     taskManager.markTaskWithNameIncomplete("Place Wobble 2"); // activate the dependant task
@@ -291,7 +303,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 intake.lowerGate();
             }
 
-            if(drive.getTaskIndex() == 1 || (Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= 7 && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= 8)){ // if at location and on the first subtask
+            if(drive.getTaskIndex() == 1 || (Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= 6 && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= 8)){ // if at location and on the first subtask
                 wobble.goToGrabPos();
                 wobble.intakeSpinIn();
             }
@@ -318,7 +330,7 @@ public class AutoOp2020_exp extends LinearOpMode {
                 }
                 else if(drive.getTaskIndex() >= 6){ // if driving to pick up rings
 
-                    if(Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= 0.9  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE && Math.abs(drive.getPoseEstimate().getY() - wobbleGoalPos.getY()) <= ARM_DROP_DROP_DISTANCE){
+                    if(wobbleDropPosLabel.equals("C") && Math.abs(drive.getPoseEstimate().getHeading() - wobbleGoalPos.getHeading()) <= 0.9  && Math.abs(drive.getPoseEstimate().getX() - wobbleGoalPos.getX()) <= ARM_DROP_DROP_DISTANCE && Math.abs(drive.getPoseEstimate().getY() - wobbleGoalPos.getY()) <= ARM_DROP_DROP_DISTANCE){
                         wobble.goToGrabPos();
                         wobble.intakeSpinIn();
                         intake.setIntakeRunSpeed(1);
@@ -337,7 +349,6 @@ public class AutoOp2020_exp extends LinearOpMode {
         }
         else if ( currentTaskName.equals("Shoot Power Rings") || currentTaskName.equals("Shoot Stack Rings") || currentTaskName.equals("Shoot Single Ring")) { // if current task is this task (or the other one)
             wobble.goToUpPos();
-            wobble.stopIntake();
             shooter.optimizeForHighgoal(); // set the shooter to optimize for shooting from across the field
             shooter.setTargetShooterSpeed(shooter.getTargetShootingSpeed());
 
@@ -360,14 +371,13 @@ public class AutoOp2020_exp extends LinearOpMode {
             else { // if not at location
                 intake.spinUp();
                 shooter.indexerDown();
-               /* if(currentTaskName.equals("Shoot Rings")){
-                    intake.spinUp();
-                    shooter.indexerDown();
-                }
-                else {
-                    intake.spinDown();
-                    shooter.indexerUp();
-                }*/
+            }
+
+            if(currentTaskName.equals("Shoot Stack Rings") || currentTaskName.equals("Shoot Single Ring")){
+                wobble.intakeSpinOut();
+            }
+            else {
+                wobble.stopIntake();
             }
         }
         else if( currentTaskName.equals("Collect Rings")  ){ // if current task is this task
@@ -385,7 +395,8 @@ public class AutoOp2020_exp extends LinearOpMode {
             intake.spinUp();
 
             if( drive.getTaskIndex() == 1 || taskManager.getDistanceFromTaskLocation(drive.getPoseEstimate()) <= ARM_COLLECT_DROP_DISTANCE ) { // if close to location or on the first subtask
-
+                wobble.goToGrabPos();
+                wobble.intakeSpinOut();
             }
             else if (drive.firstTaskCompleted()){ // if at location and on the second subtask
                 wobble.setArmPosition(ARM_OFFSET_DEGREES);
@@ -432,7 +443,7 @@ public class AutoOp2020_exp extends LinearOpMode {
         atLocationTasks = new ArrayList<DriveFollowerTask>();
         atLocationTasks.add(new DriveFollowerTask(420)); // once at this location, wait msecs
         atLocationTasks.add(new DriveFollowerTask(10)); // then wait msecs
-        autoTasks.add(new AutoTask("Place Wobble 1", 3, wobbleGoalPosA, new ArrayList<DriveFollowerTask>()).setCompleted(true));
+        autoTasks.add(new AutoTask("Place Wobble 1", 3, wobbleGoalPosA, new ArrayList<DriveFollowerTask>()).setCompleted(wobbleDropPosLabel.equals("C")));
         atLocationTasks = new ArrayList<DriveFollowerTask>();
         atLocationTasks.add(new DriveFollowerTask(1)); // once at this location, wait msecs
         atLocationTasks.add(new DriveFollowerTask(1)); // then wait msecs
@@ -476,18 +487,23 @@ public class AutoOp2020_exp extends LinearOpMode {
 
         autoTasks.add(new AutoTask("Shoot Powershots", 1, powershot1Position, atLocationTasks));
 
-
+        atLocationTasks = new ArrayList<DriveFollowerTask>();
+        atLocationTasks.add(new DriveFollowerTask(120));
+        autoTasks.add(new AutoTask("Shoot Single Ring", 3, new TargetDrivePosition(lineShootPos.getX(), lineShootPos.getY(), lineShootPos.getHeading()), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
         atLocationTasks = new ArrayList<DriveFollowerTask>();
         atLocationTasks.add(new DriveFollowerTask(80)); // only for the second one, give it more time just to be safe
         atLocationTasks.add(new DriveFollowerTask(420)); // once at this location, wait msecs
-        autoTasks.add(new AutoTask("Shoot Single Ring", 3, new TargetDrivePosition(lineShootPos.getX(), lineShootPos.getY(), lineShootPos.getHeading()), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
         autoTasks.add(new AutoTask("Shoot Power Rings", 3, new TargetDrivePosition(lineShootPos.getX(), lineShootPos.getY(), lineShootPos.getHeading()), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
+        atLocationTasks = new ArrayList<DriveFollowerTask>();
+        atLocationTasks.add(new DriveFollowerTask(220)); // only for the second one, give it more time just to be safe
+        atLocationTasks.add(new DriveFollowerTask(420)); // once at this location, wait msecs
         autoTasks.add(new AutoTask("Shoot Stack Rings", 3, new TargetDrivePosition(lineShootPos.getX(), lineShootPos.getY(), lineShootPos.getHeading()), atLocationTasks).setCompleted(true)); // set completed so that the pathing algorithm won't consider it until it is set true (which will happen once its prerequisite task becomes completed)
 
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
+        double collectDistanceOffset = (wobbleDropPosLabel.equals("C")) ? 0 : RING_COLLECT_2RING_OFFSET;
         atLocationTasks.add(new DriveFollowerTask(drive.trajectoryBuilder(stackPickupPos.getPose2d())
-            .forward(RING_COLLECT_DISTANCE) // go forward to pickup rings
+            .forward(RING_COLLECT_DISTANCE + collectDistanceOffset) // go forward to pickup rings
             .splineToSplineHeading(wobblePickupPosition.getPose2d(), wobblePickupPosition.getSplineHeading())
             .build()
         ));
@@ -496,8 +512,9 @@ public class AutoOp2020_exp extends LinearOpMode {
         autoTasks.add(new AutoTask("Collect 4th Ring", 3, ringPickupPos, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
-        atLocationTasks.add(new DriveFollowerTask(250)); // wait msecs once at location
-        atLocationTasks.add(new DriveFollowerTask(70)); // then wait msecs
+        atLocationTasks.add(new DriveFollowerTask(240)); // wait msecs once at location
+        if(wobbleDropPosLabel.equals("C"))
+            atLocationTasks.add(new DriveFollowerTask(80)); // then wait msecs
         autoTasks.add(new AutoTask("Collect Wobble", 3, wobblePickupPosC, atLocationTasks).setCompleted(true)); // set completed so it won't try to collect rings before shooting rings for the first time
 
         atLocationTasks = new ArrayList<DriveFollowerTask>();
@@ -562,7 +579,7 @@ public class AutoOp2020_exp extends LinearOpMode {
             parkPosition = parkPosB;
 
             taskManager.setTaskWithNameLocation("Place Wobble 1", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY(), wobbleGoalPos.getHeading())); // once the position has been found, set the tasks to their new positions
-            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY()-7.5, wobbleGoalPos.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
+            taskManager.setTaskWithNameLocation("Place Wobble 2", new TargetDrivePosition(wobbleGoalPos.getX(), wobbleGoalPos.getY()-7, wobbleGoalPos.getHeading())); // note: it is ok that if it is "A" the setting is redundant, the resources required to set are low and in FTC readability is favored over efficiency
             taskManager.setTaskWithNameLocation("Collect Wobble", new TargetDrivePosition(wobblePickupPosB.getX(), wobblePickupPosB.getY(), wobblePickupPosB.getHeading()));
 
             taskManager.setTaskWithNameLocationTasks("Place Wobble 2", taskManager.getTaskWithName("Place Wobble 1").getTasksAtLocation());
