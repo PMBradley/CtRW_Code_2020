@@ -315,7 +315,7 @@ public class TeleOp2020_exp extends LinearOpMode{
                     if(shooter.getFiringState() > 0){ // lower the gate once the shooter has actually started moving rings out of the shooter, meaning we won't get penalized for controlling more than 3 rings because it will have shot at least 1 by the time it gets all the way down
                         intake.lowerGate();
                     }
-                } else if (gamepad2.left_trigger > 0.5) { // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
+                } else if (gamepad2.right_trigger > 0.5) { // then next in the priority list, if the shooter isn't firing check if the intake should be ejecting
                     shooter.indexerDown(); // move the indexer to the intaking position
                     shooter.setFlywheelMode(isSpinningUp); // set the shooter mode based on the toggle
 
