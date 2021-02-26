@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.Provider2020;
-import org.firstinspires.ftc.teamcode.control.experimental.AutoOp2020_exp;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Auto;
 import org.firstinspires.ftc.teamcode.hardware.drive.Drive_Mecanum_Tele;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
@@ -70,7 +69,8 @@ public class TeleOp2020_exp extends LinearOpMode{
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
     static final int TELEMETRY_TRANSMISSION_INTERVAL = 25;
     static final int ENDGAME_START_TIME = 120000;
-    public static Pose2d powershotStartPos = new Pose2d(-65.3, -37.36, Math.toRadians(0.0));
+    public static Pose2d powershotAStartPos = new Pose2d(-65.3, -37.36, Math.toRadians(0.0));
+    public static Pose2d powershotBStartPos = new Pose2d(0, 0, Math.toRadians(0.0));
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -124,8 +124,8 @@ public class TeleOp2020_exp extends LinearOpMode{
 
         robot.setEncoderActive(false); // start the game without running encoders on drive encoders
 
-        ArrayList<DriveFollowerTask> autoPowershotTasks = getAutoPowershotTasks(); // calculate the trajectories for the powershot driving
-
+        ArrayList<DriveFollowerTask> autoPowershotATasks = getAutoPowershotATasks(); // calculate the trajectories for the powershot driving
+        ArrayList<DriveFollowerTask> autoPowershotBTasks = getAutoPowershotBTasks();
 
         telemetry.addData(robotName + "'s setup completed ", ")"); // Tell the user that robot setup has completed :)
         telemetry.update();
@@ -250,9 +250,13 @@ public class TeleOp2020_exp extends LinearOpMode{
             if( (gamepad1.dpad_right || gamepad1.dpad_left) && firstPowershotDriveToggle){ // code to toggle if the shooter is spinning up
                 powershotDriving = !powershotDriving;
 
-                if (powershotDriving) {
-                    auto_drive.setPoseEstimate(powershotStartPos);
-                    auto_drive.setTasks(autoPowershotTasks);
+                if (powershotDriving && gamepad1.dpad_right) {
+                    auto_drive.setPoseEstimate(powershotAStartPos);
+                    auto_drive.setTasks(autoPowershotATasks);
+                }
+                else if(powershotDriving && gamepad1.dpad_left){
+                    auto_drive.setPoseEstimate(powershotBStartPos);
+                    auto_drive.setTasks(autoPowershotBTasks);
                 }
 
                 firstPowershotDriveToggle = false;
@@ -270,15 +274,15 @@ public class TeleOp2020_exp extends LinearOpMode{
 
                 if(auto_drive.getTaskIndex() == 1 || auto_drive.getTaskIndex() == 3 || auto_drive.getTaskIndex() == 5){ // once the feeder goes to the retracting stage, a ring has been shot and we can start turning (redundant for the next 2 rings as the flag will stay flipped
                     shooter.instructFire(); // tell the shooter to start shooting
-
-                    //if (shooter.getFiringState() > 1) {
-                    //    lastPowershotIndex = auto_drive.getTaskIndex();
-                    //}
                 }
 
 
                 shooter.updateFeeder();
                 powershotDriving = !auto_drive.doTasksAsync();
+                
+                if(!powershotDriving){
+                    shooter.optimizeForHighgoal();
+                }
             }
             else {
                 if(gamepad1.left_bumper){ // if we want the robot to rotate to 0
@@ -342,7 +346,7 @@ public class TeleOp2020_exp extends LinearOpMode{
                 }
 
                 if (gamepad2.b) {
-                    shooter.optimizeForLonggoal(); // TODO: REMOVE THIS WHEN TESTING COMPLETE
+                    //shooter.optimizeForLonggoal();
                 } else if (shooterAngledUp) {
                     shooter.optimizeForHighgoal();
                 } else {
@@ -433,11 +437,11 @@ public class TeleOp2020_exp extends LinearOpMode{
     public static double SECOND_POWERSHOT_LEFT_OFFSET = 0.0;
     public static double THIRD_POWERSHOT_LEFT_OFFSET = 1.3;
     //public static double FORWARD_COMPENSATION_DISTANCE = 1.0; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
-    private ArrayList<DriveFollowerTask> getAutoPowershotTasks(){
+    private ArrayList<DriveFollowerTask> getAutoPowershotATasks(){
         ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
 
 
-        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(powershotStartPos)
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(powershotAStartPos)
                 //.lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
                 .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot1Position.getX(), AutoOp2020_exp.powershot1Position.getY() + FIRST_POWERSHOT_LEFT_OFFSET, AutoOp2020_exp.powershot1Position.getHeading()))
                 .build()
@@ -454,6 +458,36 @@ public class TeleOp2020_exp extends LinearOpMode{
         driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
                 //.lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
                 .lineToSplineHeading(new Pose2d(AutoOp2020_exp.powershot3Position.getX(), AutoOp2020_exp.powershot3Position.getY() + THIRD_POWERSHOT_LEFT_OFFSET, AutoOp2020_exp.powershot3Position.getHeading()))
+                .build()
+        ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+
+        return driveTasks;
+    }
+
+    public static double FIRST_POWERSHOT_BACK_DISTANCE = -21.0;
+    public static double FIRST_POWERSHOT_RIGHT_DISTANCE = 14.5;
+    public static double SECOND_POWERSHOT_RIGHT_DISTANCE = 9.5;
+    public static double THIRD_POWERSHOT_RIGHT_DISTANCE = 6.7;
+    public static double FORWARD_COMPENSATION_DISTANCE = 1.0; // how many inches forward the robot moves to compensate for a slight drift when strafing (for unknown reasons)
+    private ArrayList<DriveFollowerTask> getAutoPowershotBTasks(){
+        ArrayList<DriveFollowerTask> driveTasks = new ArrayList<DriveFollowerTask>();
+
+
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(powershotBStartPos)
+                .lineTo(new Vector2d(FIRST_POWERSHOT_BACK_DISTANCE, -FIRST_POWERSHOT_RIGHT_DISTANCE))
+                .build()
+        ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(0).getTraj().end())
+                .lineTo(new Vector2d(driveTasks.get(0).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(0).getTraj().end().getY() - SECOND_POWERSHOT_RIGHT_DISTANCE))
+                .build()
+        ));
+        driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
+
+        driveTasks.add( new DriveFollowerTask( auto_drive.trajectoryBuilder(driveTasks.get(2).getTraj().end())
+                .lineTo(new Vector2d(driveTasks.get(2).getTraj().end().getX() + FORWARD_COMPENSATION_DISTANCE,  driveTasks.get(2).getTraj().end().getY() - THIRD_POWERSHOT_RIGHT_DISTANCE))
                 .build()
         ));
         driveTasks.add( new DriveFollowerTask( (int)J_Shooter_Ring_ServoFed.FEEDER_EXTENSION_TIME) );
