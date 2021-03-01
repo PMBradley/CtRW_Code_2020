@@ -279,7 +279,7 @@ public class TeleOp2020_exp extends LinearOpMode{
 
                 shooter.updateFeeder();
                 powershotDriving = !auto_drive.doTasksAsync();
-                
+
                 if(!powershotDriving){
                     shooter.optimizeForHighgoal();
                 }

@@ -4,11 +4,11 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -29,8 +29,7 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
 // The main robot data class - called provider because it provides hardware classes with the robot data that they need to function
 
 public class Provider2020_exp {
-    // Motor and servo variables
-
+    // Hardware Variables
     // Drive motors
     public DcMotor driveFL;
     public DcMotor driveFR;
@@ -46,7 +45,7 @@ public class Provider2020_exp {
     public DcMotor JShootBack;
 
     // Servo Variables - names are example names, they can be set for whatever application you have
-    public Servo intakeLockServo;
+    public Servo ringGateServo;
     public Servo shooterFeederServo;
     public Servo shooterIndexerServo;
     public Servo shooterAnglerServo;
@@ -54,9 +53,8 @@ public class Provider2020_exp {
     public Servo wobbleRightWheelServo;
     public Servo wobbleClampServo;
 
-    // Sensor Variables
-    public Encoder shooterEncoder;
 
+    // Sensor Variables
     // Touch Sensor variables - it is recommended to change the word "SensorX" in the names with a basic descriptor of what they are for, for example "touchBumper"
     public DigitalChannel touchSensor0;
 
@@ -64,13 +62,18 @@ public class Provider2020_exp {
     public Rev2mDistanceSensor flightFront0;
     public Rev2mDistanceSensor flightLeft1;
 
+    // Robot State Objects
+    private MainTrackingWheelLocalizer odometry;
+    public Encoder shooterEncoder;
+    private BNO055IMU imu; // the IMU class instance
+    public VoltageSensor batteryVoltageSensor;
 
-    public BNO055IMU imu; // the IMU class instance
 
     // The all important hardware map (basically a log of what devices are plugged into what ports. Setup on the FTC Robot Controller app)
     HardwareMap mainMap;
 
-    // Flag values
+
+    // Flag variables
     public boolean driveUsingEncoders = false;
     private boolean oneHubMode;
 
@@ -85,8 +88,6 @@ public class Provider2020_exp {
         this.oneHubMode = oneHubMode;
 
         init_map(hMap); // pull information from the hardware map - MUST BE DONE BEFORE
-
-        init_imu(); // setup the IMU and calibrate the current position as 0
     }
 
 
@@ -120,7 +121,7 @@ public class Provider2020_exp {
         }
 
 
-       // Reverse drive motor directions as needed
+        // Reverse drive motor directions as needed
         driveFL.setDirection(DcMotor.Direction.REVERSE);
         driveBL.setDirection(DcMotor.Direction.REVERSE);
 
@@ -141,7 +142,8 @@ public class Provider2020_exp {
 
             //shooterMotor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.FLOAT ); // don't halt the motor actively for the shooter
 
-       //     shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
+            //JShootFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // set these  motors to run using encoders
+            //JShootBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             wobbleArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             //wobbleArmMotorClaw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -152,7 +154,7 @@ public class Provider2020_exp {
 
 
             // Grabbing the servos from the hardware map
-            intakeLockServo = mainMap.get(Servo.class, "intakeLockServo");
+            ringGateServo = mainMap.get(Servo.class, "ringGateServo");
             shooterFeederServo = mainMap.get(Servo.class, "feederServo");
             shooterIndexerServo = mainMap.get(Servo.class, "indexerServo");
             shooterAnglerServo = mainMap.get(Servo.class, "anglerServo");
@@ -161,11 +163,10 @@ public class Provider2020_exp {
             wobbleClampServo = mainMap.get(Servo.class, "wobbleClampServo");
 
 
-           // wobbleLeftWheelServo.getController().pwmDisable(); // set these servos to continuous mode
-           // wobbleRightWheelServo.getController().pwmDisable();
+
 
             shooterFeederServo.getController().pwmEnable(); // set these servos to discrete mode
-            shooterIndexerServo.getController().pwmEnable();
+            //shooterIndexerServo.getController().pwmEnable();
             shooterAnglerServo.getController().pwmEnable();
             wobbleClampServo.getController().pwmEnable();
 
@@ -185,8 +186,15 @@ public class Provider2020_exp {
         /*
         flightFront0 = (Rev2mDistanceSensor)mainMap.get(DistanceSensor.class, "flightFront0");
         */
+        batteryVoltageSensor = hMap.voltageSensor.iterator().next();
 
+
+        // setup IMU
         imu = mainMap.get(BNO055IMU.class, "imu");   // get Internal Measurement Unit from the hardware map
+        init_imu();
+
+        // setup odometry
+        odometry = new MainTrackingWheelLocalizer(hMap);
     }
 
     private void init_imu(){ // create a new IMU class instance and set our IMU to that
@@ -208,8 +216,8 @@ public class Provider2020_exp {
         init_imu();
     }
 
-    public double getHeading(){
-        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle; // get the current heading of the robot in degrees
+    public double getHeading(AngleUnit angleUnit){
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, angleUnit).firstAngle; // get the current heading of the robot in degrees
     }
 
     public void setEncoderActive(boolean usingEncoders){ // sets encoder mode based off of boolean parameter
