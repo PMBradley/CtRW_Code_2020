@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.ActionReplay;
 
+import android.os.Environment;
+import android.provider.ContactsContract;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -33,15 +36,15 @@ public class ReplayManager {
     public ReplayManager() { // if no path
         this("NO FILE");
     }
-    public ReplayManager(String filePath) {
+    public ReplayManager(String fileName) {
         recordedStatesHistory = new ArrayList<RobotState>();
         replayStates = new ArrayList<RobotState>();
 
-        if(filePath.equals("NO FILE")){
+        if(fileName.equals("NO FILE")){
             statesFile = null;
         }
         else {
-            statesFile = new File(filePath);
+            statesFile = new File(Environment.getExternalStorageDirectory(), fileName);
         }
 
         replayTimer = new ElapsedTime();

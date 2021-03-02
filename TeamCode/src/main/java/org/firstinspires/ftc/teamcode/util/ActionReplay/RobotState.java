@@ -53,7 +53,7 @@ public class RobotState {
 
 
     public String toCSVLine(){
-        return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading();
+        return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading() + "," + gamepad1State.toCSVSubline() + "," + gamepad2State.toCSVSubline();
     }
     public static RobotState parseFromCSVLine(String CSVLine){ // a static method that returns a RobotState object with the values parsed from the input line (can't be called on instances of the object, just on the class itself)
         Scanner parser = new Scanner(CSVLine); // setup a scanner to parse out the items from this line of text
@@ -66,9 +66,11 @@ public class RobotState {
 
 
        // if(parser.hasNext()){ // if still more in this line, there must be gamepad data here
+           // GamepadState newGamepad1State = GamepadState.makeFromScanner(parser);
+           // GamepadState newGamepad2State = GamepadState.makeFromScanner(parser);
 
 
-            //return new RobotState( timestamp, new Pose2d(x, y, heading), newGamepad1State, newGamepad2State);
+        //return new RobotState( timestamp, new Pose2d(x, y, heading), newGamepad1State, newGamepad2State);
        // }
        // else {
             return new RobotState( timestamp, new Pose2d(x, y, heading) ); // create a RobotState object with the timestamp and positional information that was read

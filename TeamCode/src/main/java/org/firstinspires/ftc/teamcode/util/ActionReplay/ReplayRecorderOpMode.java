@@ -42,9 +42,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     public static String robotName = "Lil' ring flinga";
-    public static String REPLAY_FILE_PATH = Environment.getExternalStorageDirectory().getPath();
     public static String REPLAY_FILE_NAME = "TestPath1.csv";
-    String replayFullFilePath = REPLAY_FILE_PATH + "\\" + REPLAY_FILE_NAME;
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
@@ -68,7 +66,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Tracking variables
     private Pose2d followerTargetPose = new Pose2d();
-
+    private int failedLoadCount = 0;
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -78,7 +76,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
         robot = new Provider2020(hardwareMap);
         mecanumDrive = new Drive_Mecanum_Tele_V2(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR); // pass in the drive motors and the speed variables to setup properly
 
-        replayManager = new ReplayManager(replayFullFilePath);
+        replayManager = new ReplayManager(REPLAY_FILE_NAME);
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         runtime = new ElapsedTime();
 
@@ -116,10 +114,12 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             // Logic
             if((gamepad1.y || gamepad2.y) && firstRecordToggle){
                 if(replayManager.isRecording()){
-                    replayManager.stopRecording();
+                    if(!replayManager.stopRecording())
+                        failedLoadCount++;
                 }
                 else {
-                    replayManager.startRecording();
+                    if(!replayManager.startRecording())
+                        failedLoadCount++;
                 }
 
                 firstRecordToggle = false;
@@ -193,7 +193,8 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                 telemetry.addLine("Currently Replaying a Path. Press the start replayin button again to stop replaying.");
             }
             telemetry.addData("Current Position:", localizer.getPoseEstimate());
-
+            telemetry.addData("Failed Load Count", failedLoadCount);
+                
             telemetry.update();
 
 
