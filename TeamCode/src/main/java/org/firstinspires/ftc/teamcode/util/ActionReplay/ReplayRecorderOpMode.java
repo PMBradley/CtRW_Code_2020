@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.ActionReplay;
 
 
+import android.os.Environment;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
@@ -40,7 +42,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     public static String robotName = "Lil' ring flinga";
-    public static String REPLAY_FILE_PATH = "TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\zLocalFiles\\replayFiles";
+    public static String REPLAY_FILE_PATH = Environment.getExternalStorageDirectory().getPath();
     public static String REPLAY_FILE_NAME = "TestPath1.csv";
     String replayFullFilePath = REPLAY_FILE_PATH + "\\" + REPLAY_FILE_NAME;
 
@@ -182,7 +184,10 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             if(replayManager.isRecording()){
-                telemetry.addLine("Currently Recording a Path. Press the start recording button again to stop recording.");
+                telemetry.addLine("Currently Recording a Path. Press Y again to stop recording.");
+            }
+            else {
+                telemetry.addLine("Not Recording a Path. Press the start recording button again to stop recording.");
             }
             if(replayManager.isReplaying()){
                 telemetry.addLine("Currently Replaying a Path. Press the start replayin button again to stop replaying.");
