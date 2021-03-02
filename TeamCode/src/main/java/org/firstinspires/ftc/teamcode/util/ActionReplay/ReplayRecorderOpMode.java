@@ -194,7 +194,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             }
             telemetry.addData("Current Position:", localizer.getPoseEstimate());
             telemetry.addData("Failed Load Count", failedLoadCount);
-                
+
             telemetry.update();
 
 
