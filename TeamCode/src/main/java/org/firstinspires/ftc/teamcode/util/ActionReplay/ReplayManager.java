@@ -15,7 +15,8 @@ import java.util.Scanner;
 public class ReplayManager {
     // Constants
     public static int MAX_LOADED_STATES = 10_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
-
+    public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
+    
     // Recording Objects
     private ArrayList<RobotState> recordedStatesHistory ; // a list of recorded states, used for drawing out where we have been while recording
     private ArrayList<RobotState> replayStates; // a list of states that is followed, loaded ahead of where we are
@@ -121,9 +122,9 @@ public class ReplayManager {
     public RobotState getCurrentTargetState(){
         if(replaying){
             int timeChunkEndIndex = 1; // the index of the first state that our current time is after or equal to, aka the beginning of the current time chunk we are operating in
-            double currentTime = replayTimer.milliseconds();
+            double effectiveCurrentTime = replayTimer.milliseconds() + LOOK_AHEAD_MSEC;
 
-            while(timeChunkEndIndex < replayStates.size() - 1 && currentTime > replayStates.get(timeChunkEndIndex).getTimestamp()){ // move the timeChunkStart index forward until we reach a state with a timestamp that is greater than our current timestamp
+            while(timeChunkEndIndex < replayStates.size() - 1 && effectiveCurrentTime > replayStates.get(timeChunkEndIndex).getTimestamp()){ // move the timeChunkStart index forward until we reach a state with a timestamp that is greater than our current timestamp
                 timeChunkEndIndex++;
             } // once we reach the state with a timestamp that is greater, we have found the end of our time chunk
 
@@ -139,7 +140,7 @@ public class ReplayManager {
             }
 
             // since we have removed all states before this chunk, the start and end of this chunk are always indexes 0 and 1. now we just get where we are between them
-            return getStateBetween(replayStates.get(0), replayStates.get(1), currentTime);
+            return getStateBetween(replayStates.get(0), replayStates.get(1), effectiveCurrentTime);
         }
         else {
             return new RobotState();
