@@ -19,7 +19,8 @@ public class ReplayManager {
     // Constants
     public static int MAX_LOADED_STATES = 10_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
     public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
-    
+    public static final String STORAGE_DIRECTORY = "ReplaySaves";
+
     // Recording Objects
     private ArrayList<RobotState> recordedStatesHistory ; // a list of recorded states, used for drawing out where we have been while recording
     private ArrayList<RobotState> replayStates; // a list of states that is followed, loaded ahead of where we are
@@ -44,7 +45,18 @@ public class ReplayManager {
             statesFile = null;
         }
         else {
-            statesFile = new File(Environment.getExternalStorageDirectory(), fileName);
+            File root = new File(Environment.getExternalStorageState(), STORAGE_DIRECTORY);
+            if(!root.exists()){
+                root.mkdirs();
+            }
+
+            statesFile = new File(root, fileName);
+
+            try{
+                statesFile.createNewFile();
+            } catch (IOException e){
+                System.out.println("Failed to Load File");
+            }
         }
 
         replayTimer = new ElapsedTime();

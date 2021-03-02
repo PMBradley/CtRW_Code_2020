@@ -60,7 +60,7 @@ public class RobotState {
             return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading();
         }
     }
-    public static RobotState parseFromCSVLine(String CSVLine){ // a static method that returns a RobotState object with the values parsed from the input line (can't be called on instances of the object, just on the class itself)
+    public static RobotState parseFromCSVLine(String CSVLine) { // a static method that returns a RobotState object with the values parsed from the input line (can't be called on instances of the object, just on the class itself)
         Scanner parser = new Scanner(CSVLine); // setup a scanner to parse out the items from this line of text
         parser.useDelimiter(","); // the items are separated by a comma
 
@@ -70,16 +70,15 @@ public class RobotState {
         double heading = parser.nextDouble();
 
 
-       // if(parser.hasNext()){ // if still more in this line, there must be gamepad data here
-           // GamepadState newGamepad1State = GamepadState.makeFromScanner(parser);
-           // GamepadState newGamepad2State = GamepadState.makeFromScanner(parser);
+        if (parser.hasNext()) { // if still more in this line, there must be gamepad data here
+            GamepadState newGamepad1State = GamepadState.makeFromScanner(parser);
+            GamepadState newGamepad2State = GamepadState.makeFromScanner(parser);
 
+            return new RobotState(timestamp, new Pose2d(x, y, heading), newGamepad1State, newGamepad2State);
+        }
+        else {
+            return new RobotState(timestamp, new Pose2d(x, y, heading)); // create a RobotState object with the timestamp and positional information that was read/ }
 
-        //return new RobotState( timestamp, new Pose2d(x, y, heading), newGamepad1State, newGamepad2State);
-       // }
-       // else {
-            return new RobotState( timestamp, new Pose2d(x, y, heading) ); // create a RobotState object with the timestamp and positional information that was read
-       // }
+        }
     }
-
 }
