@@ -16,18 +16,18 @@ public class Drive_Mecanum_Tele_V2 {
 
 
     // X Translational PID Variables
-    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(3, 0, 20);
-    public static Range2d X_I_RANGE = new Range2d(0.1, 1.5);
+    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(14, 0.1, 2);
+    public static Range2d X_I_RANGE = new Range2d(0.1, 4);
     private PIDController xPID;
 
     // Y Translational PID Variables
-    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(3, 0, 20);
-    public static Range2d Y_I_RANGE = new Range2d(0.1, 1.5);
+    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(14, 0.1, 2);
+    public static Range2d Y_I_RANGE = new Range2d(0.1, 4);
     private PIDController yPID;
 
     // Heading PID Variables
-    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(3, 0, 20);
-    public static Range2d HEADING_I_RANGE = new Range2d(Math.toRadians(0.1), Math.toRadians(0.8));
+    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(3, 0.01, 20);
+    public static Range2d HEADING_I_RANGE = new Range2d(Math.toRadians(0.05), Math.toRadians(0.8));
     private PIDController headingPID;
 
 
