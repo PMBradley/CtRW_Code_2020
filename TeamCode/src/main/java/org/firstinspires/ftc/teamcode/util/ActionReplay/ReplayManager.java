@@ -45,7 +45,7 @@ public class ReplayManager {
             statesFile = null;
         }
         else {
-            File root = new File(Environment.getExternalStorageState(), STORAGE_DIRECTORY);
+            File root = new File(Environment.getExternalStorageDirectory(), STORAGE_DIRECTORY);
             if(!root.exists()){
                 root.mkdirs();
             }
@@ -83,7 +83,7 @@ public class ReplayManager {
     public boolean recordRobotState(RobotState currentState) {
         if(recording){// only want to do these things if we are recording, if not this could cause errors as objects may not have been yet setup properly
             try {
-                stateWriter.write(currentState.toCSVLine()); // save the current state
+                stateWriter.write(currentState.toCSVLine() + "\n"); // save the current state
             }
             catch (IOException e) { return false; }
 
