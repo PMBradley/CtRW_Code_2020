@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util.ActionReplay;
 import android.os.Environment;
 import android.provider.ContactsContract;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -15,9 +16,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
+@Config
 public class ReplayManager {
     // Constants
-    public static int MAX_LOADED_STATES = 10_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
+    public static int MAX_LOADED_STATES = 10; // the largest the manager will let the states lists get, should hold around 70 seconds of states
     public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
     public static final String STORAGE_DIRECTORY = "ReplaySaves";
 
@@ -54,9 +56,7 @@ public class ReplayManager {
 
             try{
                 statesFile.createNewFile();
-            } catch (IOException e){
-                System.out.println("Failed to Load File");
-            }
+            } catch (IOException e){ e.printStackTrace(); }
         }
 
         replayTimer = new ElapsedTime();
@@ -125,21 +125,21 @@ public class ReplayManager {
             catch(IOException e){
                 return false;
             }
-            replaying = true;
 
             loadStates(MAX_LOADED_STATES); // load as many states as we can into our replayStates list for following
 
+            replaying = true;
             replayTimer.reset();
         }
 
         return true;
     }
     public RobotState getCurrentTargetState(){
-        if(replaying){
+        if(replaying && replayStates.size() > 1){
             int timeChunkEndIndex = 1; // the index of the first state that our current time is after or equal to, aka the beginning of the current time chunk we are operating in
             double effectiveCurrentTime = replayTimer.milliseconds() + LOOK_AHEAD_MSEC;
 
-            while(timeChunkEndIndex < replayStates.size() - 1 && effectiveCurrentTime > replayStates.get(timeChunkEndIndex).getTimestamp()){ // move the timeChunkStart index forward until we reach a state with a timestamp that is greater than our current timestamp
+            while(timeChunkEndIndex < replayStates.size() - 1 && replayStates.get(timeChunkEndIndex).getTimestamp() < effectiveCurrentTime ){ // move the timeChunkStart index forward until we reach a state with a timestamp that is greater than our current timestamp
                 timeChunkEndIndex++;
             } // once we reach the state with a timestamp that is greater, we have found the end of our time chunk
 

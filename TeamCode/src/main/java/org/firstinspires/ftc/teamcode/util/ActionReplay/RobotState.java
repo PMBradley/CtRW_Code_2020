@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.ActionReplay;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.Scanner;
 
@@ -54,7 +53,7 @@ public class RobotState {
 
     public String toCSVLine(){
         if(hasGamepadStates){
-            return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading() + "," + gamepad1State.toCSVSubline() + "," + gamepad2State.toCSVSubline();
+            return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading() + "," + gamepad1State.toCSVLine() + "," + gamepad2State.toCSVLine();
         }
         else {
             return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading();

@@ -47,6 +47,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
     static final int TELEMETRY_TRANSMISSION_INTERVAL = 7;
+    public static int RECORD_INTERVAL = 25; // how many milliseconds between recording waypoints, lower number = more waypoints but more computer resource use from waypoints
     public static Pose2d startPose = new Pose2d(0, 0, 0);
 
     // Robot Classes
@@ -57,6 +58,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
     private ReplayManager replayManager;
     private FtcDashboard dashboard;
     private ElapsedTime runtime;
+    private ElapsedTime timeSinceLastRecord;
 
     // Flags
     private boolean firstReplayToggle = true;
@@ -112,12 +114,14 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             // Logic
-            if((gamepad1.y || gamepad2.y) && firstRecordToggle){
+            if( (gamepad1.y || gamepad2.y) && firstRecordToggle ){
                 if(replayManager.isRecording()){
                     if(!replayManager.stopRecording())
                         failedLoadCount++;
                 }
                 else {
+                    localizer.setPoseEstimate(new Pose2d());
+
                     if(!replayManager.startRecording())
                         failedLoadCount++;
                 }
@@ -128,7 +132,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                 firstRecordToggle = true;
             }
 
-            if((gamepad1.b || gamepad2.b) && firstReplayToggle){
+            if( (gamepad1.b || gamepad2.b) && firstReplayToggle ){
                 if(replayManager.isReplaying()){
                     replayManager.stopStateReplay();
                 }
@@ -147,7 +151,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
                 firstRelativeToFieldToggle = false;
             }
-            else if(!(gamepad1.b || gamepad2.b)){
+            else if( !(gamepad1.b || gamepad2.b) ){
                 firstRelativeToFieldToggle = true;
             }
 
@@ -165,8 +169,10 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             // Hardware instruction
-            if(replayManager.isRecording()){
+            if(replayManager.isRecording() && timeSinceLastRecord.milliseconds() > RECORD_INTERVAL){
                 replayManager.recordRobotState(new RobotState(replayManager.getTimerMsec(), localizer.getPoseEstimate())); // save the robot state
+
+                timeSinceLastRecord.reset();
             }
 
             if(replayManager.isReplaying()){
@@ -187,13 +193,17 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                 telemetry.addLine("Currently Recording a Path. Press Y again to stop recording.");
             }
             else {
-                telemetry.addLine("Not Recording a Path. Press the start recording button again to stop recording.");
+                telemetry.addLine("Not Recording a Path. Press the Y to start recording.");
             }
             if(replayManager.isReplaying()){
-                telemetry.addLine("Currently Replaying a Path. Press the start replayin button again to stop replaying.");
+                telemetry.addLine("Currently Replaying a Path. Press B again to stop replaying.");
+                telemetry.addData("Target Position:", followerTargetPose);
+            }
+            else {
+                telemetry.addLine("Not Replaying a Path. Press the B to start replaying.");
             }
             telemetry.addData("Current Position:", localizer.getPoseEstimate());
-            telemetry.addData("Failed Load Count", failedLoadCount);
+            telemetry.addData("Failed Load Count:", failedLoadCount);
 
             telemetry.update();
 
@@ -222,7 +232,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
         Canvas fieldOverlay = packet.fieldOverlay();
         fieldOverlay.setStrokeWidth(1);
-        fieldOverlay.setStroke("4CAF50"); // set the current draw color to blue
+        fieldOverlay.setStroke("#3F51B5"); // set the current draw color to blue
 
         DashboardUtil.drawRobot(fieldOverlay, currentPose);
 
@@ -230,7 +240,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             DashboardUtil.drawPoseHistory(fieldOverlay, replayManager.getRecordedPositionsHistory());
         }
         else if(replayManager.isReplaying()){
-            fieldOverlay.setStroke("#3F51B5"); // set the field draw color for this bit to black
+            fieldOverlay.setStroke("4CAF50"); // set the field draw color for this bit to black
             DashboardUtil.drawPoseHistory(fieldOverlay, replayManager.getReplayPositions());
             DashboardUtil.drawRobot(fieldOverlay, followerTargetPose);
         }
