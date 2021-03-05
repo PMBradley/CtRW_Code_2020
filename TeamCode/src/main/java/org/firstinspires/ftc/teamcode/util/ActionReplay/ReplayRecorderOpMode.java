@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.util.ActionReplay;
 
 
-import android.os.Environment;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
@@ -62,9 +60,11 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Flags
     private boolean firstReplayToggle = true;
-    private boolean firstRecordToggle = true;
+    private boolean firstRecordPrimeToggle = true;
+    private boolean recordingPrimed = false;
     private boolean firstRelativeToFieldToggle = true;
     private boolean drivingFieldRelative = false;
+
 
     // Tracking variables
     private Pose2d followerTargetPose = new Pose2d();
@@ -114,39 +114,48 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             // Logic
-            if( (gamepad1.y || gamepad2.y) && firstRecordToggle ){
+            if( (gamepad1.y || gamepad2.y) && firstRecordPrimeToggle){ // toggle if recording is primed
+                recordingPrimed = !recordingPrimed;
+
+                firstRecordPrimeToggle = false;
+            }
+            else if( !(gamepad1.y || gamepad2.y) ){
+                firstRecordPrimeToggle = true;
+            }
+
+            if(recordingPrimed && (Math.abs(xTranslatePower) > 0.2 || Math.abs(yTranslatePower) > 0.2 || Math.abs(rotatePower) > 0.2)){ // if recording is primed and the driver is moving the stick, start recording
                 if(replayManager.isRecording()){
                     if(!replayManager.stopRecording())
                         failedLoadCount++;
                 }
                 else {
-                    localizer.setPoseEstimate(new Pose2d());
+                    localizer.setPoseEstimate(startPose);
 
                     if(!replayManager.startRecording())
                         failedLoadCount++;
                 }
-
-                firstRecordToggle = false;
-            }
-            else if( !(gamepad1.y || gamepad2.y) ){
-                firstRecordToggle = true;
             }
 
-            if( (gamepad1.b || gamepad2.b) && firstReplayToggle ){
+
+            if( (gamepad1.b || gamepad2.b) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying
                 if(replayManager.isReplaying()){
                     replayManager.stopStateReplay();
                 }
                 else {
+                    localizer.setPoseEstimate(startPose);
+
                     replayManager.startStateReplay();
                 }
 
+                recordingPrimed = false;
                 firstReplayToggle = false;
             }
             else if( !(gamepad1.b || gamepad2.b) ){
                 firstReplayToggle = true;
             }
 
-            if(gamepad1.dpad_up && firstRelativeToFieldToggle){
+
+            if(gamepad1.dpad_up && firstRelativeToFieldToggle){ // toggle relative to field drive
                 drivingFieldRelative = !drivingFieldRelative;
 
                 firstRelativeToFieldToggle = false;

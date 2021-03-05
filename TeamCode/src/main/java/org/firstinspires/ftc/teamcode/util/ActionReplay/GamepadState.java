@@ -77,7 +77,7 @@ public class GamepadState {
                 "," + right_trigger +
                 "," + id;
     }
-    
+
     public static GamepadState makeFromScanner(Scanner parser){ // a static method that returns a RobotState object with the values parsed from the input line (can't be called on instances of the object, just on the class itself)
         parser.useDelimiter(","); // the items are separated by a comma
 

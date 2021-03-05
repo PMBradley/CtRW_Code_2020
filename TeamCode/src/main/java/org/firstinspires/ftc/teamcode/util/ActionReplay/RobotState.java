@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 
 public class RobotState {
+    private static String CONTROLLER_INDICATOR = "CONTROLLER_DATA";
+
     private double timestamp; // the member data that the class holds
     private Pose2d position;
     private GamepadState gamepad1State;
@@ -53,10 +55,10 @@ public class RobotState {
 
     public String toCSVLine(){
         if(hasGamepadStates){
-            return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading() + "," + gamepad1State.toCSVLine() + "," + gamepad2State.toCSVLine();
+            return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading() + "," + CONTROLLER_INDICATOR + "," + gamepad1State.toCSVLine() + "," + gamepad2State.toCSVLine() + ",";
         }
         else {
-            return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading();
+            return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading() + ",";
         }
     }
     public static RobotState parseFromCSVLine(String CSVLine) { // a static method that returns a RobotState object with the values parsed from the input line (can't be called on instances of the object, just on the class itself)
@@ -69,7 +71,7 @@ public class RobotState {
         double heading = parser.nextDouble();
 
 
-        if (parser.hasNext()) { // if still more in this line, there must be gamepad data here
+        if ( parser.next().equals(CONTROLLER_INDICATOR) ) { // if still more in this line, there must be gamepad data here
             GamepadState newGamepad1State = GamepadState.makeFromScanner(parser);
             GamepadState newGamepad2State = GamepadState.makeFromScanner(parser);
 
