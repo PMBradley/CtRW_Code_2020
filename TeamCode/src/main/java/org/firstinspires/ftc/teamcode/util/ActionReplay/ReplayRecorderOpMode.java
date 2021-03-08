@@ -148,7 +148,6 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                     replayManager.startStateReplay();
                 }
 
-                recordingPrimed = false;
                 firstReplayToggle = false;
             }
             else if( !(gamepad1.b || gamepad2.b) ){

@@ -67,7 +67,7 @@ public class ReplayManager {
     public boolean startRecording() {
         stopRecording(); // stop any recording and any previous replaying just to make sure everything is cleared
         stopStateReplay();
-
+        recordedStatesHistory = new ArrayList<RobotState>();
 
         if(statesFile != null){ // only attempt to open the file and start the process if we have a file to open
             try {
@@ -112,7 +112,6 @@ public class ReplayManager {
         }
 
         previousRecordedStates = recordedStatesHistory;
-        recordedStatesHistory = new ArrayList<RobotState>();
         recording = false;
 
         return true; // return true if successful
@@ -122,8 +121,9 @@ public class ReplayManager {
     public boolean startStateReplay() {
         stopRecording(); // stop any recording and any previous replaying just to make sure everything is cleared
         stopStateReplay();
+        replayStates = new ArrayList<RobotState>();
 
-
+        
         if(statesFile != null){
             try {
                 stateReader = new Scanner(statesFile);
@@ -176,7 +176,6 @@ public class ReplayManager {
             stateReader.close();
         }
 
-        replayStates = new ArrayList<RobotState>();
         replaying = false;
     }
 
