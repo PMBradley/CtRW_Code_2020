@@ -11,7 +11,7 @@ public class GamepadState {
     private float left_stick_x, left_stick_y, right_stick_x, right_stick_y, left_trigger, right_trigger;
     private float id;
 
-    private GamepadState(){} // an empty constructor here
+    public GamepadState(){} // an empty constructor here
     public GamepadState(Gamepad gamepad){
         this.a = gamepad.a; // save all of the gamepad variables out
         this.b = gamepad.b;

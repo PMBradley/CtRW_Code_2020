@@ -61,7 +61,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Flags
     private boolean firstReplayToggle = true;
-    private boolean firstRecordPrimeToggle = true;
+    private boolean firstRecordToggle = true;
     private boolean recordingPrimed = false;
     private boolean firstRelativeToFieldToggle = true;
     private boolean drivingFieldRelative = false;
@@ -116,16 +116,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             // Logic
-            if( (gamepad1.y || gamepad2.y) && firstRecordPrimeToggle){ // toggle if recording is primed
-                recordingPrimed = !recordingPrimed;
-
-                firstRecordPrimeToggle = false;
-            }
-            else if( !(gamepad1.y || gamepad2.y) ){
-                firstRecordPrimeToggle = true;
-            }
-
-            if(recordingPrimed && (Math.abs(xTranslatePower) > 0.2 || Math.abs(yTranslatePower) > 0.2 || Math.abs(rotatePower) > 0.2)){ // if recording is primed and the driver is moving the stick, start recording
+            if( (gamepad1.y || gamepad2.y) && firstRecordToggle){ // toggle if recording is primed
                 if(replayManager.isRecording()){
                     if(!replayManager.stopRecording())
                         failedLoadCount++;
@@ -136,7 +127,15 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                     if(!replayManager.startRecording())
                         failedLoadCount++;
                 }
+
+                firstRecordToggle = false;
             }
+            else if( !(gamepad1.y || gamepad2.y) ){
+                firstRecordToggle = true;
+            }
+
+          //  if(recordingPrimed && (Math.abs(xTranslatePower) > 0.2 || Math.abs(yTranslatePower) > 0.2 || Math.abs(rotatePower) > 0.2)){ // if recording is primed and the driver is moving the stick, start recording
+            //}
 
 
             if( (gamepad1.b || gamepad2.b) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying

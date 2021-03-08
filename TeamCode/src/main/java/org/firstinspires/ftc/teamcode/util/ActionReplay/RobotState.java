@@ -26,6 +26,8 @@ public class RobotState {
         this.position = position;
 
         this.hasGamepadStates = false;
+        gamepad1State = new GamepadState();
+        gamepad2State = new GamepadState();
     }
     public RobotState(double timestamp, GamepadState gamepad1State, GamepadState gamepad2State){
         this(timestamp, new Pose2d(), gamepad1State, gamepad2State);
