@@ -39,7 +39,7 @@ public class PIDController {
 
 
     public double getOutput(double current, double target){ // ACCEPTS RADIANS
-        double error = current - target; // the error is the difference between where we want to be and where we are right now
+        double error = target - current; // the error is the difference between where we want to be and where we are right now
         double timeDifference = localRuntime.milliseconds() - lastRuntime; // timeDifference is the time since the last runtime
 
 
