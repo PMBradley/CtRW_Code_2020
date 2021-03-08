@@ -82,6 +82,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
         replayManager = new ReplayManager(REPLAY_FILE_NAME);
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         runtime = new ElapsedTime();
+        timeSinceLastRecord = new ElapsedTime();
 
 
 
