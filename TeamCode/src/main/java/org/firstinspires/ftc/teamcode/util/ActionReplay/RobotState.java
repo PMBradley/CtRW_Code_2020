@@ -85,7 +85,6 @@ public class RobotState {
         }
         else {
             return new RobotState(timestamp, new Pose2d(x, y, heading)); // create a RobotState object with the timestamp and positional information that was read/ }
-
         }
     }
 }

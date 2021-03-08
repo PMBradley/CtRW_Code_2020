@@ -155,8 +155,9 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             }
 
 
-            if(gamepad1.dpad_up && firstRelativeToFieldToggle){ // toggle relative to field drive
+            if(gamepad1.dpad_up && firstRelativeToFieldToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle relative to field drive
                 drivingFieldRelative = !drivingFieldRelative;
+                localizer.setPoseEstimate(startPose);
 
                 firstRelativeToFieldToggle = false;
             }

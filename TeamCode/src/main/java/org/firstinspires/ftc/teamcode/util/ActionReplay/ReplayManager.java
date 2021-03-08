@@ -158,14 +158,14 @@ public class ReplayManager {
                 int distanceFromListFront = timeChunkEndIndex - 1;
 
                 for(int i = 0; i < distanceFromListFront; i++){ // remove from the font until the front is the current chunk
-                    replayStates.remove(0);
+                    //replayStates.remove(0); TODO: add this back in if this isn't the problem, otherwise fix
                 }
 
                 loadStates(distanceFromListFront); // then load that many onto the front of the list
             }
 
             // since we have removed all states before this chunk, the start and end of this chunk are always indexes 0 and 1. now we just get where we are between them
-            return getStateBetween(replayStates.get(0), replayStates.get(1), effectiveCurrentTime);
+            return getStateBetween(replayStates.get(timeChunkEndIndex - 1), replayStates.get(timeChunkEndIndex), effectiveCurrentTime);
         }
         else {
             return new RobotState();
