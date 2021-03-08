@@ -6,10 +6,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import java.util.Scanner;
 
 public class GamepadState {
-    boolean a, b, x, y, dpad_up, dpad_down, dpad_left, dpad_right, left_bumper, right_bumper, left_stick_button, right_stick_button;
-    boolean circle, triangle, square, cross, start, back, share, guide, options;
-    float left_stick_x, left_stick_y, right_stick_x, right_stick_y, left_trigger, right_trigger;
-    float id;
+    private boolean a, b, x, y, dpad_up, dpad_down, dpad_left, dpad_right, left_bumper, right_bumper, left_stick_button, right_stick_button;
+    private boolean circle, triangle, square, cross, start, back, share, guide, options;
+    private float left_stick_x, left_stick_y, right_stick_x, right_stick_y, left_trigger, right_trigger;
+    private float id;
 
     private GamepadState(){} // an empty constructor here
     public GamepadState(Gamepad gamepad){

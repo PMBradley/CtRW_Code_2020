@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -67,7 +68,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
     // Tracking variables
-    private Pose2d followerTargetPose = new Pose2d();
+    private RobotState currentTargetState = new RobotState();
     private int failedLoadCount = 0;
 
     // The "Main" for TeleOp (the place where the main code is run)
@@ -179,15 +180,15 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
             // Hardware instruction
             if(replayManager.isRecording() && timeSinceLastRecord.milliseconds() > RECORD_INTERVAL){
-                replayManager.recordRobotState(new RobotState(replayManager.getTimerMsec(), localizer.getPoseEstimate())); // save the robot state
+                replayManager.recordRobotState(new RobotState(replayManager.getTimerMsec(), localizer.getPoseEstimate(), new GamepadState(gamepad1), new GamepadState(gamepad2))); // save the robot state
 
                 timeSinceLastRecord.reset();
             }
 
             if(replayManager.isReplaying()){
-                followerTargetPose = replayManager.getCurrentTargetState().getPosition();
+                currentTargetState = replayManager.getCurrentTargetState();
 
-                mecanumDrive.driveToPose(localizer.getPoseEstimate(), followerTargetPose);
+                mecanumDrive.driveToPose(localizer.getPoseEstimate(), currentTargetState.getPosition());
             }
             else if (drivingFieldRelative) { // if not replaying, allow the user to drive normally, either field relative or not
                 mecanumDrive.driveFieldRelative(xTranslatePower, yTranslatePower, rotatePower, localizer.getPoseEstimate().getHeading());
@@ -206,7 +207,8 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             }
             if(replayManager.isReplaying()){
                 telemetry.addLine("Currently Replaying a Path. Press B again to stop replaying.");
-                telemetry.addData("Target Position:", followerTargetPose);
+                telemetry.addData("Target Position:", currentTargetState.getPosition());
+                telemetry.addData("Gamepad 1 Recorded Left Stick", new Vector2d(currentTargetState.getGamepad1State().left_stick_x(), currentTargetState.getGamepad1State().left_stick_y()));
             }
             else {
                 telemetry.addLine("Not Replaying a Path. Press the B to start replaying.");
@@ -232,11 +234,11 @@ public class ReplayRecorderOpMode extends LinearOpMode{
         packet.put("Replaying", replayManager.isReplaying()); // get the shooter velocity and add that
 
         packet.put("X", currentPose.getX()); // get the shooter velocity and add that
-        packet.put("Target X", followerTargetPose.getX()); // get the shooter velocity and add that
+        packet.put("Target X", currentTargetState.getPosition().getX()); // get the shooter velocity and add that
         packet.put("Y", currentPose.getY()); // get the shooter velocity and add that
-        packet.put("Target Y", followerTargetPose.getY()); // get the shooter velocity and add that
+        packet.put("Target Y", currentTargetState.getPosition().getY()); // get the shooter velocity and add that
         packet.put("Heading", currentPose.getHeading()); // get the shooter velocity and add that
-        packet.put("Target Heading", followerTargetPose.getHeading()); // get the shooter velocity and add that
+        packet.put("Target Heading", currentTargetState.getPosition().getHeading()); // get the shooter velocity and add that
 
 
         Canvas fieldOverlay = packet.fieldOverlay();
@@ -251,7 +253,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
         else if(replayManager.isReplaying()){
             fieldOverlay.setStroke("4CAF50"); // set the field draw color for this bit to black
             DashboardUtil.drawPoseHistory(fieldOverlay, replayManager.getReplayPositions());
-            DashboardUtil.drawRobot(fieldOverlay, followerTargetPose);
+            DashboardUtil.drawRobot(fieldOverlay, currentTargetState.getPosition());
         }
 
 
