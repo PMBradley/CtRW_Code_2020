@@ -123,7 +123,7 @@ public class ReplayManager {
         stopStateReplay();
         replayStates = new ArrayList<RobotState>();
 
-        
+
         if(statesFile != null){
             try {
                 stateReader = new Scanner(statesFile);
@@ -133,7 +133,7 @@ public class ReplayManager {
             }
 
             loadStates(MAX_LOADED_STATES); // load as many states as we can into our replayStates list for following
-            replayStates = previousRecordedStates;
+           // replayStates = previousRecordedStates;
 
             replaying = true;
             replayTimer.reset();
@@ -183,9 +183,9 @@ public class ReplayManager {
     private void loadStates(int loadCount){ // loads states from the current state file into the replayStates list
         if(replaying){
             for(int i = 0; i < loadCount && i < MAX_LOADED_STATES && stateReader.hasNextLine(); i++){ // load as many as we are told to (within what we are allowed to do
-                //String currentLine = stateReader.nextLine(); // TODO: please make load work
+                String currentLine = stateReader.nextLine(); // TODO: please make load work
 
-                //replayStates.add( RobotState.parseFromCSVLine(currentLine) );
+                replayStates.add( RobotState.parseFromCSVLine(currentLine) );
             }
         }
     }
