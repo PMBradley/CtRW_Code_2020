@@ -19,13 +19,14 @@ import java.util.Scanner;
 @Config
 public class ReplayManager {
     // Constants
-    public static int MAX_LOADED_STATES = 10; // the largest the manager will let the states lists get, should hold around 70 seconds of states
+    public static int MAX_LOADED_STATES = 690; // the largest the manager will let the states lists get, should hold around 70 seconds of states
     public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
     public static final String STORAGE_DIRECTORY = "ReplaySaves";
 
     // Recording Objects
     private ArrayList<RobotState> recordedStatesHistory ; // a list of recorded states, used for drawing out where we have been while recording
     private ArrayList<RobotState> replayStates; // a list of states that is followed, loaded ahead of where we are
+    private ArrayList<RobotState> previousRecordedStates = new ArrayList<RobotState>(); // TODO: remove this at some point
     private File statesFile;
     private Scanner stateReader;
     private FileWriter stateWriter;
@@ -76,9 +77,13 @@ public class ReplayManager {
 
             recording = true;
             replayTimer.reset();
-        }
 
-        return true;
+
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     public boolean recordRobotState(RobotState currentState) {
         if(recording){// only want to do these things if we are recording, if not this could cause errors as objects may not have been yet setup properly
@@ -106,6 +111,7 @@ public class ReplayManager {
             }
         }
 
+        previousRecordedStates = recordedStatesHistory;
         recordedStatesHistory = new ArrayList<RobotState>();
         recording = false;
 
@@ -127,12 +133,16 @@ public class ReplayManager {
             }
 
             loadStates(MAX_LOADED_STATES); // load as many states as we can into our replayStates list for following
+            replayStates = previousRecordedStates;
 
             replaying = true;
             replayTimer.reset();
-        }
 
-        return true;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     public RobotState getCurrentTargetState(){
         if(replaying && replayStates.size() > 1){
@@ -174,9 +184,9 @@ public class ReplayManager {
     private void loadStates(int loadCount){ // loads states from the current state file into the replayStates list
         if(replaying){
             for(int i = 0; i < loadCount && i < MAX_LOADED_STATES && stateReader.hasNextLine(); i++){ // load as many as we are told to (within what we are allowed to do
-                String currentLine = stateReader.nextLine();
+                //String currentLine = stateReader.nextLine(); // TODO: please make load work
 
-                replayStates.add( RobotState.parseFromCSVLine(currentLine) );
+                //replayStates.add( RobotState.parseFromCSVLine(currentLine) );
             }
         }
     }
@@ -202,7 +212,13 @@ public class ReplayManager {
         double y = ((secondPose.getY() - firstPose.getY()) * fractionBetween) + firstPose.getY();
         double heading = ((secondPose.getHeading() - firstPose.getHeading()) * fractionBetween) + firstPose.getHeading();
 
-        return new RobotState( currentTime, new Pose2d(x, y, heading) );
+
+        if(firstState.hasGamepadStates()){
+            return new RobotState(currentTime, new Pose2d(x, y, heading), firstState.getGamepad1State(), secondState.getGamepad2State());
+        }
+        else {
+            return new RobotState( currentTime, new Pose2d(x, y, heading) );
+        }
     }
 
 

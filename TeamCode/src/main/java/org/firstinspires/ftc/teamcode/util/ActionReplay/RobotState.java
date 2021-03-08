@@ -47,7 +47,8 @@ public class RobotState {
     public Pose2d getPosition(){return position;}
     public GamepadState getGamepad1State(){return gamepad1State;}
     public GamepadState getGamepad2State(){return gamepad2State;}
-
+    public boolean hasGamepadStates(){return hasGamepadStates;}
+    
     public RobotState getCopy() {
         if(!hasGamepadStates){
             return new RobotState(timestamp, position);
