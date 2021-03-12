@@ -60,13 +60,33 @@ public class Drive_Mecanum_Tele_V2 {
         // if using controller inputs, ensure you reverse the y on the stick input before passing into this method because down on the stick is positive and up is negative, and we need that to be the opposite way
 
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
-        double sin = Math.sin(currentHeading);
-        double cos = Math.cos(currentHeading);
+        //double sin = Math.sin(currentHeading);
+        //double cos = Math.cos(currentHeading);
 
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
-        double field_x = (y * cos) - (x * -sin);
-        double field_y = (y * -sin) + (x * cos);
+        //double field_x = (y * cos) - (x * -sin);
+       // double field_y = (y * -sin) + (x * cos);
 
+        double heading = Math.toDegrees(currentHeading) * -1;
+        if (heading >= 0) { // if the degree value is positive, subtract 360 from it until it is between 0 and 359.999....
+            while (heading >= 360) {
+                heading -= 360;
+            }
+        }
+        else { // else it must be negative, so then add 360 to it until it is greater than or equal to 0 (and therefore must be between 0 and 359.999...
+            while (heading < 0) {
+                heading += 360;
+            }
+        }
+
+
+        // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
+        double sin = Math.sin(Math.toRadians(heading));
+        double cos = Math.cos(Math.toRadians(heading));
+
+        // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
+        double field_x = (y * cos) - (x * sin);
+        double field_y = (y * sin) + (x * cos);
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
         veloFL = (field_y + (r) + field_x);
