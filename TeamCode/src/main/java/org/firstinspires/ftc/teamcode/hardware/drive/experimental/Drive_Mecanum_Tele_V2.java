@@ -64,8 +64,8 @@ public class Drive_Mecanum_Tele_V2 {
         double cos = Math.cos(currentHeading);
 
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
-        double field_x = (y * cos) - (x * sin);
-        double field_y = (y * sin) + (x * cos);
+        double field_x = (y * cos) - (x * -sin);
+        double field_y = (y * -sin) + (x * cos);
 
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
