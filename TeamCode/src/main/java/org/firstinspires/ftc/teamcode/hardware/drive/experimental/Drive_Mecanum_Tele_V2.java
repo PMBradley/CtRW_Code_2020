@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.drive.experimental;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,22 +12,23 @@ import org.firstinspires.ftc.teamcode.util.Math.PIDController;
 import org.firstinspires.ftc.teamcode.util.Math.Range2d;
 
 
+@Config
 public class Drive_Mecanum_Tele_V2 {
     ElapsedTime localRuntime;
 
 
     // X Translational PID Variables
-    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(14, 0.1, 2);
+    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(14, 0.0, 2);
     public static Range2d X_I_RANGE = new Range2d(0.1, 4);
     private PIDController xPID;
 
     // Y Translational PID Variables
-    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(14, 0.1, 2);
+    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(14, 0.0, 2);
     public static Range2d Y_I_RANGE = new Range2d(0.1, 4);
     private PIDController yPID;
 
     // Heading PID Variables
-    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(3, 0.01, 20);
+    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(3, 0.0, 20);
     public static Range2d HEADING_I_RANGE = new Range2d(Math.toRadians(0.05), Math.toRadians(0.8));
     private PIDController headingPID;
 
@@ -79,7 +81,6 @@ public class Drive_Mecanum_Tele_V2 {
             }
         }
 
-
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
         double sin = Math.sin(Math.toRadians(heading));
         double cos = Math.cos(Math.toRadians(heading));
@@ -87,6 +88,8 @@ public class Drive_Mecanum_Tele_V2 {
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
         double field_x = (y * cos) - (x * sin);
         double field_y = (y * sin) + (x * cos);
+
+
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
         veloFL = (field_y + (r) + field_x);

@@ -148,7 +148,7 @@ public class ReplayManager {
     }
     public RobotState getCurrentTargetState(){
         if(replaying && replayStates.size() > 1){
-            int manipulatorStateEndIndex = 0; // same as below but for everything except for driving
+            int manipulatorStateEndIndex = 1; // same as below but for everything except for driving
             int driveTimeChunkEndIndex = 1; // the index of the first state that our drive time is after or equal to, aka the beginning of the current time chunk we are driving in
             double currentTime = replayTimer.milliseconds();
             double effectiveDriveTime = currentTime + LOOK_AHEAD_MSEC;
