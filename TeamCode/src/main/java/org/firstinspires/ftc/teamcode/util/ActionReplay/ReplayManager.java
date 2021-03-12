@@ -20,6 +20,8 @@ import java.util.Scanner;
 public class ReplayManager {
     // Constants
     public static int MAX_LOADED_STATES = 690; // the largest the manager will let the states lists get, should hold around 70 seconds of states
+    public static double PATH_REFRESH_TRHESHOLD = 0.05; // when 5% of the loaded path has been traversed, the robot unloads the PATH_UNLOAD_PERCENTAGE of the path that is behind it and reloads that much to the front of the path
+    public static double PATH_UNLOAD_PERCENTAGE = 0.10; // how much of the path behind us unloads when the path refresh threshold is reached
     public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
     public static final String STORAGE_DIRECTORY = "ReplaySaves";
 
@@ -146,26 +148,38 @@ public class ReplayManager {
     }
     public RobotState getCurrentTargetState(){
         if(replaying && replayStates.size() > 1){
-            int timeChunkEndIndex = 1; // the index of the first state that our current time is after or equal to, aka the beginning of the current time chunk we are operating in
-            double effectiveCurrentTime = replayTimer.milliseconds() + LOOK_AHEAD_MSEC;
+            int manipulatorStateEndIndex = 0; // same as below but for everything except for driving
+            int driveTimeChunkEndIndex = 1; // the index of the first state that our drive time is after or equal to, aka the beginning of the current time chunk we are driving in
+            double currentTime = replayTimer.milliseconds();
+            double effectiveDriveTime = currentTime + LOOK_AHEAD_MSEC;
 
-            while(timeChunkEndIndex < replayStates.size() - 1 && replayStates.get(timeChunkEndIndex).getTimestamp() < effectiveCurrentTime ){ // move the timeChunkStart index forward until we reach a state with a timestamp that is greater than our current timestamp
-                timeChunkEndIndex++;
+            // having separate states for each of
+            while(manipulatorStateEndIndex < replayStates.size() - 1 && replayStates.get(manipulatorStateEndIndex).getTimestamp() < currentTime ){ // move the timeChunkStart index forward until we reach a state with a timestamp that is greater than our current timestamp
+                manipulatorStateEndIndex++;
             } // once we reach the state with a timestamp that is greater, we have found the end of our time chunk
+            GamepadState gamepad1State = replayStates.get(manipulatorStateEndIndex - 1).getGamepad1State();
+            GamepadState gamepad2State = replayStates.get(manipulatorStateEndIndex - 1).getGamepad2State();
+
+            while(driveTimeChunkEndIndex < replayStates.size() - 1 && replayStates.get(driveTimeChunkEndIndex).getTimestamp() < effectiveDriveTime ){ // move the timeChunkStart index forward until we reach a state with a timestamp that is greater than our current timestamp
+                driveTimeChunkEndIndex++;
+            } // once we reach the state with a timestamp that is greater, we have found the end of our time chunk
+            RobotState firstDriveState = replayStates.get(driveTimeChunkEndIndex - 1);
+            RobotState secondDriveState = replayStates.get(driveTimeChunkEndIndex);
 
 
-            if(timeChunkEndIndex > 1){ // if we traversed forwards in the list at all, the current time chunk is forward in the list so to save space we want to unload any states behind the current chunk (and load in future ones to replacec them)
-                int distanceFromListFront = timeChunkEndIndex - 1;
+            if(driveTimeChunkEndIndex > MAX_LOADED_STATES * PATH_REFRESH_TRHESHOLD){ // if we traversed forwards in the list enough, the current time chunk is forward in the list so to save space we want to unload any states behind the current chunk (and load in future ones to replacec them)
+                int distanceFromListFront = driveTimeChunkEndIndex - 1;
+                int unloadCount = (int)(distanceFromListFront*PATH_UNLOAD_PERCENTAGE); // unload PATH_UNLOAD_PERCENTAGE of the states behind us, rather than all, preventing any ConcurrentModificationErrors
 
                 for(int i = 0; i < distanceFromListFront; i++){ // remove from the font until the front is the current chunk
-                    //replayStates.remove(0); TODO: add this back in if this isn't the problem, otherwise fix
+                    replayStates.remove(0); //TODO: add this back in if this isn't the problem, otherwise fix
                 }
 
                 loadStates(distanceFromListFront); // then load that many onto the front of the list
             }
 
             // since we have removed all states before this chunk, the start and end of this chunk are always indexes 0 and 1. now we just get where we are between them
-            return getStateBetween(replayStates.get(timeChunkEndIndex - 1), replayStates.get(timeChunkEndIndex), effectiveCurrentTime);
+            return getStateBetween(firstDriveState, secondDriveState, effectiveDriveTime, gamepad1State, gamepad2State);
         }
         else {
             return new RobotState();
@@ -189,11 +203,11 @@ public class ReplayManager {
             }
         }
     }
-    private RobotState getStateBetween(RobotState firstState, RobotState secondState, double currentTime){
-        if( currentTime < firstState.getTimestamp() || firstState.getTimestamp() == secondState.getTimestamp()){ // if we are before the timestamp of the first state, just return that state
+    private RobotState getStateBetween(RobotState firstState, RobotState secondState, double effectiveDriveTime, GamepadState gamepad1State, GamepadState gamepad2State){
+        if( effectiveDriveTime < firstState.getTimestamp() || firstState.getTimestamp() == secondState.getTimestamp()){ // if we are before the timestamp of the first state, just return that state
             return firstState;
         }
-        else if( currentTime > secondState.getTimestamp() ){ // if we are after the timestamp of the second state, just return that state
+        else if( effectiveDriveTime > secondState.getTimestamp() ){ // if we are after the timestamp of the second state, just return that state
             return secondState;
         }
 
@@ -201,7 +215,7 @@ public class ReplayManager {
         double firstTimestamp = firstState.getTimestamp();
         double secondTimestamp = secondState.getTimestamp();
 
-        double fractionBetween = (currentTime - firstTimestamp)/(secondTimestamp - firstTimestamp); // shift everything such that the first timestamp is 0, then see what the current time is out of the second timestamp
+        double fractionBetween = (effectiveDriveTime - firstTimestamp)/(secondTimestamp - firstTimestamp); // shift everything such that the first timestamp is 0, then see what the current time is out of the second timestamp
             // for example: the first timestamp = 2, second = 6, current = 3.  3-2 =1, 6-2 =4, we are currently 1/4 of the waybetween 2 and 6
 
         Pose2d firstPose = firstState.getPosition();
@@ -213,11 +227,14 @@ public class ReplayManager {
 
 
         if(firstState.hasGamepadStates()){
-            return new RobotState(currentTime, new Pose2d(x, y, heading), firstState.getGamepad1State(), secondState.getGamepad2State());
+            return new RobotState(effectiveDriveTime, new Pose2d(x, y, heading), gamepad1State, gamepad2State);
         }
         else {
-            return new RobotState( currentTime, new Pose2d(x, y, heading) );
+            return new RobotState( effectiveDriveTime, new Pose2d(x, y, heading) );
         }
+    }
+    private RobotState getStateBetween(RobotState firstState, RobotState secondState, double effectiveDriveTime){
+        return getStateBetween(firstState, secondState, effectiveDriveTime, firstState.getGamepad1State(), firstState.getGamepad2State());
     }
 
 

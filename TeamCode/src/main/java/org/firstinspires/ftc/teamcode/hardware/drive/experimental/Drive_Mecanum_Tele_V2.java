@@ -56,25 +56,12 @@ public class Drive_Mecanum_Tele_V2 {
 
 
     // Drive functions
-    public void driveFieldRelative(double x, double y, double r, double currentHeading) { // use with controller only - this drives relative to field
-        // if using controller inputs, ensure you reverse y in the arguments because down on the stick is positive and up is negative, and we need that to be the opposite way
-
-        // adjust the raw heading (between -180 and 180) to be reversed and between 0 and 359.9999... to make the math easier later
-        double heading = currentHeading * -1;
-        if (heading >= 0) { // if the degree value is positive, subtract 360 degrees (in radians) from it until it is between 0 and 359.999....
-            while (heading >= 2*Math.PI) {
-                heading -= 2*Math.PI;
-            }
-        }
-        else { // else it must be negative, so then add 360 to it until it is greater than or equal to 0 (and therefore must be between 0 and 359.999...
-            while (heading < 0) {
-                heading += 2*Math.PI;
-            }
-        }
+    public void driveFieldRelative(double x, double y, double r, double currentHeading) { // this drives relative to field (+x is forward, +y is left, heading is in radians)
+        // if using controller inputs, ensure you reverse the y on the stick input before passing into this method because down on the stick is positive and up is negative, and we need that to be the opposite way
 
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
-        double sin = Math.sin(heading);
-        double cos = Math.cos(heading);
+        double sin = Math.sin(currentHeading);
+        double cos = Math.cos(currentHeading);
 
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
         double field_x = (y * cos) - (x * sin);
