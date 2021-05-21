@@ -187,10 +187,10 @@ public class Drive_Mecanum_Tele_V2 {
 
         double currentHeading = currentPose.getHeading(); // adjust the current heading if needed, to make sure the most efficient path is being taken from current to target
         double targetHeading = targetPose.getHeading(); // needed because if at 0 and wanting to get to 270, you don't want to go all the way through 90 and 180, you can just go in the negative direction
-        if(currentHeading < targetHeading - 180){ // if current heading is 180 (or more) degrees below the target position, subtract 360 from the current heading so we travel the most efficient route towards the target
+        if(currentHeading + 180 < targetHeading){ // if current heading is 180 (or more) degrees below the target position, subtract 360 from the current heading so we travel the most efficient route towards the target
             targetHeading -= 360;
         }
-        else if(currentHeading > targetHeading + 180){ // else if current heading is 180 (or more) degrees above the target position, add 360 to the target heading so we travel the most efficient route towards the target
+        else if(currentHeading - 180 > targetHeading){ // else if current heading is 180 (or more) degrees above the target position, add 360 to the target heading so we travel the most efficient route towards the target
             targetHeading += 360;
         }
 
