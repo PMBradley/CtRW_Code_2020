@@ -179,15 +179,11 @@ public class Drive_Mecanum_Tele_V2 {
     }
 
     public void driveToPose(Pose2d currentPose, Pose2d targetPose){ // drives the robot to a target position when called in a loop
-        double xVelo = xPID.getOutput(currentPose.getX(), targetPose.getX()); // get the directions we need to move to reach target and how fast to get to those positions properly
-        double yVelo = yPID.getOutput(currentPose.getY(), targetPose.getY());
-        double headingVelo = headingPID.getOutput(currentPose.getHeading(), targetPose.getHeading());
-
-        driveFieldRelative(xVelo, yVelo, headingVelo, currentPose.getHeading(), false); // then drive field relative at those velocities
+        driveToPose(currentPose, targetPose, false);
     }
     public void driveToPose(Pose2d currentPose, Pose2d targetPose, boolean limitingSpeed){ // drives the robot to a target position when called in a loop
         double xVelo = xPID.getOutput(currentPose.getX(), targetPose.getX()); // get the directions we need to move to reach target and how fast to get to those positions properly
-        double yVelo = yPID.getOutput(currentPose.getY(), targetPose.getY());
+        double yVelo = -yPID.getOutput(currentPose.getY(), targetPose.getY()); // this one made negative to accommodate for the drive field relative method y negation
         double headingVelo = headingPID.getOutput(currentPose.getHeading(), targetPose.getHeading());
 
         driveFieldRelative(xVelo, yVelo, headingVelo, currentPose.getHeading(), limitingSpeed); // then drive field relative at those velocities
