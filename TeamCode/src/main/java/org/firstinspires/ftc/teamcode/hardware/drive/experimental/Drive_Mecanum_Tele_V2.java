@@ -27,7 +27,7 @@ public class Drive_Mecanum_Tele_V2 {
     private PIDController yPID;
 
     // Heading PID Variables
-    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(0.08, 0.0, 0);
+    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(4, 0.0, 0);
     public static Range2d HEADING_I_RANGE = new Range2d(Math.toRadians(0.05), Math.toRadians(0.8));
     private PIDController headingPID;
 
@@ -184,7 +184,17 @@ public class Drive_Mecanum_Tele_V2 {
     public void driveToPose(Pose2d currentPose, Pose2d targetPose, boolean limitingSpeed){ // drives the robot to a target position when called in a loop
         double xVelo = xPID.getOutput(currentPose.getX(), targetPose.getX()); // get the directions we need to move to reach target and how fast to get to those positions properly
         double yVelo = -yPID.getOutput(currentPose.getY(), targetPose.getY()); // this one made negative to accommodate for the drive field relative method y negation
-        double headingVelo = headingPID.getOutput(currentPose.getHeading(), targetPose.getHeading());
+
+        double currentHeading = currentPose.getHeading(); // adjust the current heading if needed 
+        double targetHeading = targetPose.getHeading();
+        if(currentHeading < targetHeading - 180){ // if current heading is 180 (or more) degrees below the target position, add 360 to the current heading so we travel the most efficient route towards the target
+            currentHeading += 360;
+        }
+        else if(currentHeading > targetHeading + 180){ // else if current heading is 180 (or more) degrees above the target position, subtract 360 to the current heading so we travel the most efficient route towards the target
+            currentHeading -= 360;
+        }
+
+        double headingVelo = -headingPID.getOutput(currentHeading, targetHeading);
 
         driveFieldRelative(xVelo, yVelo, headingVelo, currentPose.getHeading(), limitingSpeed); // then drive field relative at those velocities
     }
