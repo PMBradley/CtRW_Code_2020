@@ -49,10 +49,10 @@ public class CustomBackAndForth extends LinearOpMode {
             }
 
             if(runningForward){
-                mecanumDrive.driveToPose(localizer.getPoseEstimate(), drivePose);
+                mecanumDrive.driveToPose(localizer.getPoseEstimate(), drivePose, true);
             }
             else {
-                mecanumDrive.driveToPose(localizer.getPoseEstimate(), startPose);
+                mecanumDrive.driveToPose(localizer.getPoseEstimate(), startPose, true);
             }
         }
     }

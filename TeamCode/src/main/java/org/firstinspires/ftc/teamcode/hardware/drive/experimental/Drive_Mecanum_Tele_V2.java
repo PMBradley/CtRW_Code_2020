@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.util.Math.Range2d;
 public class Drive_Mecanum_Tele_V2 {
     ElapsedTime localRuntime;
 
-
     // X Translational PID Variables
     public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(0.8, 0.0, 0);
     public static Range2d X_I_RANGE = new Range2d(0.1, 4);
@@ -31,6 +30,16 @@ public class Drive_Mecanum_Tele_V2 {
     public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(0.08, 0.0, 0);
     public static Range2d HEADING_I_RANGE = new Range2d(Math.toRadians(0.05), Math.toRadians(0.8));
     private PIDController headingPID;
+
+    // Speed Limiter Variables
+    public static double MAX_TRANSLATE_SPEED_PERCENT = 1.00; // allow the bot to translate at 100% speed
+    public static double MAX_TRANSLATE_ACCELERATION = 1.00; // allow the bot to accelerate/decelerate by 100% of max translate speed per second (this number is equal to 1/(seconds to accelerate fully))
+    public static double MAX_ROTATE_SPEED_PERCENT = 1.00; // allow the bot rotate at 100% speed
+    public static double MAX_ROTATE_ACCELERATION = 2.00; // allow the bot to accelerate/decelerate by 75% of max rotate speed per second (this number is equal to 1/(seconds to accelerate fully))
+    private double lastXSpeed = 0; // robot relative recorded speed inputs into the drive method, used to regulate how fast we can accelerate
+    private double lastYSpeed = 0;
+    private double lastRSpeed = 0;
+    private double lastRunTime = 0;
 
 
     //Motor variables
@@ -58,7 +67,7 @@ public class Drive_Mecanum_Tele_V2 {
 
 
     // Drive functions
-    public void driveFieldRelative(double x, double y, double r, double currentHeading) { // this drives relative to field (+x is forward, +y is left, heading is in radians)
+    public void driveFieldRelative(double x, double y, double r, double currentHeading, boolean limitingSpeed) { // this drives relative to field (+x is forward, +y is left, heading is in radians)
         // if using controller inputs, ensure you reverse the y on the stick input before passing into this method because down on the stick is positive and up is negative, and we need that to be the opposite way
 
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
@@ -68,6 +77,52 @@ public class Drive_Mecanum_Tele_V2 {
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
         //double field_x = (y * cos) - (x * -sin);
        // double field_y = (y * -sin) + (x * cos);
+
+
+        // limiting speed before made field relative, as it is more useful to
+        if( limitingSpeed ){
+            double timeFactor = (localRuntime.milliseconds() - lastRunTime) / 1000; // gets how long it has been since the last run, in seconds so we can use it the "acceleration/second" math
+            double allowedXAccel = MAX_TRANSLATE_ACCELERATION * timeFactor * MAX_TRANSLATE_SPEED_PERCENT; // how much the new speeds are allowed to be above the old speeds
+            double allowedYAccel = MAX_TRANSLATE_ACCELERATION * timeFactor * MAX_TRANSLATE_SPEED_PERCENT;
+            double allowedRAccel = MAX_ROTATE_ACCELERATION * timeFactor * MAX_ROTATE_SPEED_PERCENT;
+
+            // limit X acceleration/deceleration
+            if(x > lastXSpeed + allowedXAccel){ // if x is accelerating too fast
+                x = lastXSpeed + allowedXAccel; // set x to the fastest speed it is allowed to accelerate
+            }
+            else if(x < lastXSpeed - allowedXAccel){ // or if decelerating too fast
+                x = lastXSpeed - allowedXAccel; // set x to the fastest speed it is allowed to accelerate
+            }
+            // then do the same for the other 2 axises of movement
+            if(y > lastYSpeed + allowedYAccel){ // if y is accelerating too fast
+                y = lastYSpeed + allowedYAccel; // set y to the fastest speed it is allowed to accelerate
+            }
+            else if(y < lastYSpeed - allowedYAccel){ // or if decelerating too fast
+                y = lastYSpeed - allowedYAccel; // set y to the fastest speed it is allowed to accelerate
+            }
+
+            if(r > lastRSpeed + allowedRAccel){ // if r is accelerating too fast
+                r = lastRSpeed + allowedRAccel; // set r to the fastest speed it is allowed to accelerate
+            }
+            else if(r < lastRSpeed - allowedRAccel){ // or if decelerating too fast
+                r = lastRSpeed - allowedRAccel; // set r to the fastest speed it is allowed to accelerate
+            }
+
+            if(Math.abs(x) > MAX_TRANSLATE_SPEED_PERCENT){ // if X is above the speed limit
+                x = MAX_TRANSLATE_SPEED_PERCENT * (Math.abs(x) / x); // set X to the speed limit (multiplied by 1 if x is positive, negative 1 if x is negative)
+            }
+            if(Math.abs(y) > MAX_TRANSLATE_SPEED_PERCENT){ // if Y is above the speed limit
+                y = MAX_TRANSLATE_SPEED_PERCENT * (Math.abs(y) / y); // set Y to the speed limit (multiplied by 1 if y is positive, negative 1 if y is negative)
+            }
+            if(Math.abs(r) > MAX_ROTATE_SPEED_PERCENT){ // if R is above the speed limit
+                r = MAX_ROTATE_SPEED_PERCENT * (Math.abs(r) / r); // set R to the speed limit (multiplied by 1 if r is positive, negative 1 if r is negative)
+            }
+        }
+        lastXSpeed = x; // speed target is limited before being recorded, to ensure proper acceleration behavior
+        lastYSpeed = y;
+        lastRSpeed = r;
+        lastRunTime = localRuntime.milliseconds();
+
 
         double heading = Math.toDegrees(currentHeading) * -1;
         if (heading >= 0) { // if the degree value is positive, subtract 360 from it until it is between 0 and 359.999....
@@ -88,7 +143,6 @@ public class Drive_Mecanum_Tele_V2 {
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
         double field_x = (y * cos) - (x * sin);
         double field_y = (y * sin) + (x * cos);
-
 
 
         // do math to get powers relative to field in addition to the cartesian mecanum formula
@@ -113,15 +167,30 @@ public class Drive_Mecanum_Tele_V2 {
         driveBL.setPower(veloBL);
         driveBR.setPower(veloBR);
     }
-    public void driveRobotRelative(double x, double y, double r) { // this drives relative to the robot, you can pass controller inputs right on in
-        driveFieldRelative(x, y, r, 0); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative, as a rotation of 0 will not alter translation)
+    public void driveFieldRelative(double x, double y, double r, double currentHeading){
+        driveFieldRelative(x, y, r, currentHeading, false);
     }
+
+    public void driveRobotRelative(double x, double y, double r) { // this drives relative to the robot, you can pass controller inputs right on in
+        driveFieldRelative(x, y, r, 0, false); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative, as a rotation of 0 will not alter translation)
+    }
+    public void driveRobotRelative(double x, double y, double r, boolean limitingSpeed) { // this drives relative to the robot, you can pass controller inputs right on in
+        driveFieldRelative(x, y, r, 0, limitingSpeed); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative, as a rotation of 0 will not alter translation)
+    }
+
     public void driveToPose(Pose2d currentPose, Pose2d targetPose){ // drives the robot to a target position when called in a loop
         double xVelo = xPID.getOutput(currentPose.getX(), targetPose.getX()); // get the directions we need to move to reach target and how fast to get to those positions properly
         double yVelo = yPID.getOutput(currentPose.getY(), targetPose.getY());
         double headingVelo = headingPID.getOutput(currentPose.getHeading(), targetPose.getHeading());
 
-        driveFieldRelative(xVelo, yVelo, headingVelo, currentPose.getHeading()); // then drive field relative at those velocities
+        driveFieldRelative(xVelo, yVelo, headingVelo, currentPose.getHeading(), false); // then drive field relative at those velocities
+    }
+    public void driveToPose(Pose2d currentPose, Pose2d targetPose, boolean limitingSpeed){ // drives the robot to a target position when called in a loop
+        double xVelo = xPID.getOutput(currentPose.getX(), targetPose.getX()); // get the directions we need to move to reach target and how fast to get to those positions properly
+        double yVelo = yPID.getOutput(currentPose.getY(), targetPose.getY());
+        double headingVelo = headingPID.getOutput(currentPose.getHeading(), targetPose.getHeading());
+
+        driveFieldRelative(xVelo, yVelo, headingVelo, currentPose.getHeading(), limitingSpeed); // then drive field relative at those velocities
     }
 }
 

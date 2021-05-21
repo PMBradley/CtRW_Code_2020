@@ -65,7 +65,8 @@ public class ReplayRecorderOpMode extends LinearOpMode{
     private boolean recordingPrimed = false;
     private boolean firstRelativeToFieldToggle = true;
     private boolean drivingFieldRelative = false;
-
+    private boolean firstSpeedLimitingToggle = true;
+    private boolean speedLimiting = true;
 
     // Tracking variables
     private RobotState currentTargetState = new RobotState();
@@ -161,8 +162,17 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
                 firstRelativeToFieldToggle = false;
             }
-            else if( !(gamepad1.b || gamepad2.b) ){
+            else if( !gamepad1.dpad_up ){
                 firstRelativeToFieldToggle = true;
+            }
+
+            if(gamepad1.dpad_down && firstSpeedLimitingToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle drive speed limiting
+                speedLimiting = !speedLimiting;
+
+                firstSpeedLimitingToggle = false;
+            }
+            else if( !gamepad1.dpad_down ){
+                firstSpeedLimitingToggle = true;
             }
 
 
@@ -188,13 +198,13 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             if(replayManager.isReplaying()){
                 currentTargetState = replayManager.getCurrentTargetState();
 
-                mecanumDrive.driveToPose(localizer.getPoseEstimate(), currentTargetState.getPosition());
+                mecanumDrive.driveToPose(localizer.getPoseEstimate(), currentTargetState.getPosition(), false);
             }
             else if (drivingFieldRelative) { // if not replaying, allow the user to drive normally, either field relative or not
-                mecanumDrive.driveFieldRelative(xTranslatePower, yTranslatePower, rotatePower, localizer.getPoseEstimate().getHeading());
+                mecanumDrive.driveFieldRelative(xTranslatePower, yTranslatePower, rotatePower, localizer.getPoseEstimate().getHeading(), speedLimiting);
             }
             else {
-                mecanumDrive.driveRobotRelative(xTranslatePower, yTranslatePower, rotatePower);
+                mecanumDrive.driveRobotRelative(xTranslatePower, yTranslatePower, rotatePower, speedLimiting);
             }
 
 
@@ -217,6 +227,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             telemetry.addData("Failed Load Count:", failedLoadCount);
             telemetry.addData("Replay States:", replayManager.getReplayStates());
             telemetry.addData("Driving field relative?", drivingFieldRelative);
+            telemetry.addData("Driver Acceleration Limiting? (d-pad down to toggle)", speedLimiting);
             telemetry.update();
 
 
