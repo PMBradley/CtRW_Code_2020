@@ -40,7 +40,7 @@ public class ReplayManager {
     private boolean replaying = false;
 
 
-    Telemetry telem;
+   // Telemetry telem;
 
 
     public ReplayManager() { // if no path
@@ -60,7 +60,7 @@ public class ReplayManager {
         replayTimer = new ElapsedTime();
     }
 
-    public ReplayManager(String fileName, Telemetry telem) { //TODO: please figure out why load no work then remove this
+ /*   public ReplayManager(String fileName, Telemetry telem) { //TODO: please figure out why load no work then remove this
         recordedStatesHistory = new ArrayList<RobotState>();
         replayStates = new ArrayList<RobotState>();
 
@@ -73,7 +73,7 @@ public class ReplayManager {
 
         replayTimer = new ElapsedTime();
         this.telem = telem;
-    }
+    }*/
 
 
     public boolean startRecording() {
@@ -155,10 +155,11 @@ public class ReplayManager {
                 return false;
             }
 
+            replaying = true; // set replaying to true so that loadStates will load states
             loadStates(MAX_LOADED_STATES); // load as many states as we can into our replayStates list for following
             //replayStates = previousRecordedStates;
 
-            replaying = true;
+
             replayTimer.reset();
 
             return true;
@@ -168,7 +169,7 @@ public class ReplayManager {
         }
     }
     public RobotState getCurrentTargetState(){
-        telem.addLine("Has a file open? " + (statesFile != null));
+        //telem.addLine("Has a file open? " + (statesFile != null));
 
         if(replaying && replayStates.size() > 1){
             int manipulatorStateEndIndex = 1; // same as below but for everything except for driving
@@ -219,12 +220,12 @@ public class ReplayManager {
 
     private void loadStates(int loadCount){ // loads states from the current state file into the replayStates list
         if(replaying){
-            telem.addData("Has lines to read?", stateReader.hasNextLine());
+            //telem.addData("Has lines to read?", stateReader.hasNextLine());
             for(int i = 0; i < loadCount && i < MAX_LOADED_STATES && stateReader.hasNextLine(); i++){ // load as many as we are told to (within what we are allowed to do
                 String currentLine = stateReader.nextLine(); // TODO: please make load work
 
-                telem.addLine("Current CSV Line: " + currentLine);
-                telem.addLine("Parsed Line: " + RobotState.parseFromCSVLine(currentLine));
+              //  telem.addLine("Current CSV Line: " + currentLine);
+              //  telem.addLine("Parsed Line: " + RobotState.parseFromCSVLine(currentLine));
 
                 replayStates.add( RobotState.parseFromCSVLine(currentLine) );
             }
