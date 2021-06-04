@@ -129,13 +129,25 @@ public class ReplayManager {
         return true; // return true if successful
     }
 
-
+    public static int linesToLoad = -1;
     public boolean startStateReplay() {
         stopRecording(); // stop any recording and any previous replaying just to make sure everything is cleared
         stopStateReplay();
         replayStates = new ArrayList<RobotState>();
 
         if(statesFile != null){
+            try {
+                stateReader = new Scanner(statesFile);
+            }
+            catch(IOException e){
+                return false;
+            }
+            linesToLoad = 0;
+            while(stateReader.hasNextLine()) {
+                stateReader.nextLine();
+                linesToLoad++;
+            }
+
             try {
                 stateReader = new Scanner(statesFile);
             }
