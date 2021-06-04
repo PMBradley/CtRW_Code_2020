@@ -80,7 +80,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
         robot = new Provider2020(hardwareMap);
         mecanumDrive = new Drive_Mecanum_Tele_V2(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR); // pass in the drive motors and the speed variables to setup properly
 
-        replayManager = new ReplayManager(REPLAY_FILE_NAME, telemetry);
+        replayManager = new ReplayManager(REPLAY_FILE_NAME);
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         runtime = new ElapsedTime();
         timeSinceLastRecord = new ElapsedTime();
