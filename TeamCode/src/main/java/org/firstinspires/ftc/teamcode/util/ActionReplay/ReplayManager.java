@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.R;
 
 import java.io.File;
@@ -39,6 +40,9 @@ public class ReplayManager {
     private boolean replaying = false;
 
 
+    Telemetry telem;
+
+
     public ReplayManager() { // if no path
         this("NO FILE");
     }
@@ -54,6 +58,21 @@ public class ReplayManager {
         }
 
         replayTimer = new ElapsedTime();
+    }
+
+    public ReplayManager(String fileName, Telemetry telem) {
+        recordedStatesHistory = new ArrayList<RobotState>();
+        replayStates = new ArrayList<RobotState>();
+
+        if(fileName.equals("NO FILE")){
+            statesFile = null;
+        }
+        else {
+            loadReplayFile(fileName);
+        }
+
+        replayTimer = new ElapsedTime();
+        this.telem = telem;
     }
 
 
@@ -187,8 +206,12 @@ public class ReplayManager {
 
     private void loadStates(int loadCount){ // loads states from the current state file into the replayStates list
         if(replaying){
+            telem.addData("Has lines to read?", stateReader.hasNextLine());
             for(int i = 0; i < loadCount && i < MAX_LOADED_STATES && stateReader.hasNextLine(); i++){ // load as many as we are told to (within what we are allowed to do
                 String currentLine = stateReader.nextLine(); // TODO: please make load work
+
+                telem.addLine("Current CSV Line: " + currentLine);
+                telem.addLine("Parsed Line: " + RobotState.parseFromCSVLine(currentLine));
 
                 replayStates.add( RobotState.parseFromCSVLine(currentLine) );
             }

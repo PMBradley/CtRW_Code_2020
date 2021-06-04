@@ -67,6 +67,9 @@ public class RobotState {
             return "" + timestamp + "," + position.getX() + "," + position.getY() + "," + position.getHeading() + ",";
         }
     }
+    public String toString(){
+        return toCSVLine();
+    }
     public static RobotState parseFromCSVLine(String CSVLine) { // a static method that returns a RobotState object with the values parsed from the input line (can't be called on instances of the object, just on the class itself)
         Scanner parser = new Scanner(CSVLine); // setup a scanner to parse out the items from this line of text
         parser.useDelimiter(","); // the items are separated by a comma
