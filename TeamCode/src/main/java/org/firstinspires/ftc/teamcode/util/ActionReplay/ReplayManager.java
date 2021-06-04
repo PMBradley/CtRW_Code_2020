@@ -60,7 +60,7 @@ public class ReplayManager {
         replayTimer = new ElapsedTime();
     }
 
-    public ReplayManager(String fileName, Telemetry telem) {
+    public ReplayManager(String fileName, Telemetry telem) { //TODO: please figure out why load no work then remove this
         recordedStatesHistory = new ArrayList<RobotState>();
         replayStates = new ArrayList<RobotState>();
 
@@ -135,7 +135,6 @@ public class ReplayManager {
         stopStateReplay();
         replayStates = new ArrayList<RobotState>();
 
-
         if(statesFile != null){
             try {
                 stateReader = new Scanner(statesFile);
@@ -157,6 +156,8 @@ public class ReplayManager {
         }
     }
     public RobotState getCurrentTargetState(){
+        telem.addLine("Has a file open? " + (statesFile != null));
+
         if(replaying && replayStates.size() > 1){
             int manipulatorStateEndIndex = 1; // same as below but for everything except for driving
             int driveTimeChunkEndIndex = 1; // the index of the first state that our drive time is after or equal to, aka the beginning of the current time chunk we are driving in
