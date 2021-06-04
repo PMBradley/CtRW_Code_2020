@@ -33,15 +33,15 @@ import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
  */
 
 
-@TeleOp(name = "Recorder Opmode", group = "@@R")
+@TeleOp(name = "Recorder No-Load Opmode", group = "@@R")
 
 @Config
-public class ReplayRecorderOpMode extends LinearOpMode{
+public class ReplayRecorderNoLoadOpMode extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     public static String robotName = "Lil' ring flinga";
-    public static String REPLAY_FILE_NAME = "TestPath.csv";
+    public static String REPLAY_FILE_NAME = "TestPath2.csv";
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
@@ -145,9 +145,6 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                 }
                 else {
                     localizer.setPoseEstimate(startPose);
-
-                    if(!replayManager.loadReplayFile(REPLAY_FILE_NAME))
-                        failedLoadCount++;
 
                     replayManager.startStateReplay();
                 }

@@ -163,8 +163,8 @@ public class Drive_Mecanum_Tele_V2 {
         driveToPose(currentPose, targetPose, false);
     }
     public void driveToPose(Pose2d currentPose, Pose2d targetPose, boolean limitingSpeed){ // drives the robot to a target position when called in a loop
-        currentPose = getRotationalCenterRelativePose(currentPose); // account for rotational center differences by navigating around the center of rotation
-        targetPose = getRotationalCenterRelativePose(targetPose);
+        //currentPose = getRotationalCenterRelativePose(currentPose); // account for rotational center differences by navigating around the center of rotation
+        //targetPose = getRotationalCenterRelativePose(targetPose);
 
         double xVelo = xPID.getOutput(currentPose.getX(), targetPose.getX()); // get the directions we need to move to reach target and how fast to get to those positions properly
         double yVelo = -yPID.getOutput(currentPose.getY(), targetPose.getY()); // the y one made negative to accommodate for the drive field relative method y negation

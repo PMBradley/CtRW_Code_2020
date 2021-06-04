@@ -50,16 +50,7 @@ public class ReplayManager {
             statesFile = null;
         }
         else {
-            File root = new File(Environment.getExternalStorageDirectory(), STORAGE_DIRECTORY);
-            if(!root.exists()){
-                root.mkdirs();
-            }
-
-            statesFile = new File(root, fileName);
-
-            try{
-                statesFile.createNewFile();
-            } catch (IOException e){ e.printStackTrace(); }
+            loadReplayFile(fileName);
         }
 
         replayTimer = new ElapsedTime();
@@ -135,7 +126,7 @@ public class ReplayManager {
             }
 
             loadStates(MAX_LOADED_STATES); // load as many states as we can into our replayStates list for following
-            replayStates = previousRecordedStates;
+            //replayStates = previousRecordedStates;
 
             replaying = true;
             replayTimer.reset();
@@ -172,7 +163,7 @@ public class ReplayManager {
                 int unloadCount = (int)(distanceFromListFront*PATH_UNLOAD_PERCENTAGE); // unload PATH_UNLOAD_PERCENTAGE of the states behind us, rather than all, preventing any ConcurrentModificationErrors
 
                 for(int i = 0; i < distanceFromListFront; i++){ // remove from the font until the front is the current chunk
-                    replayStates.remove(0); //TODO: add this back in if this isn't the problem, otherwise fix
+                    replayStates.remove(0);
                 }
 
                 loadStates(distanceFromListFront); // then load that many onto the front of the list
@@ -197,9 +188,9 @@ public class ReplayManager {
     private void loadStates(int loadCount){ // loads states from the current state file into the replayStates list
         if(replaying){
             for(int i = 0; i < loadCount && i < MAX_LOADED_STATES && stateReader.hasNextLine(); i++){ // load as many as we are told to (within what we are allowed to do
-              //  String currentLine = stateReader.nextLine(); // TODO: please make load work
+                String currentLine = stateReader.nextLine(); // TODO: please make load work
 
-               // replayStates.add( RobotState.parseFromCSVLine(currentLine) );
+                replayStates.add( RobotState.parseFromCSVLine(currentLine) );
             }
         }
     }
@@ -263,5 +254,22 @@ public class ReplayManager {
     }
     public double getTimerMsec(){
         return replayTimer.milliseconds();
+    }
+
+    public boolean loadReplayFile(String fileName){
+        boolean couldLoadFile = false;
+
+        File root = new File(Environment.getExternalStorageDirectory(), STORAGE_DIRECTORY);
+        if(!root.exists()){
+            root.mkdirs();
+        }
+
+        statesFile = new File(root, fileName);
+
+        try{
+            couldLoadFile = !statesFile.createNewFile(); // if unable to create a new file at location, could load the file (the create new file method returns true if could create a new file)
+        } catch (IOException e){ e.printStackTrace(); }
+
+        return couldLoadFile;
     }
 }
