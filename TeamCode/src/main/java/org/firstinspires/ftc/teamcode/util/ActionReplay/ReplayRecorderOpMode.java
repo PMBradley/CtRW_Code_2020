@@ -117,7 +117,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             // Logic
-            if( (gamepad1.options || gamepad2.options) && firstRecordToggle){ // toggle if recording
+            if( (gamepad1.y || gamepad2.y) && firstRecordToggle){ // toggle if recording
                 if(replayManager.isRecording()){
                     if(!replayManager.stopRecording())
                         failedLoadCount++;
@@ -139,7 +139,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             //}
 
 
-            if( (gamepad1.start || gamepad2.start) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying
+            if( (gamepad1.x || gamepad2.x) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying
                 if(replayManager.isReplaying()){
                     replayManager.stopStateReplay();
                 }
@@ -154,7 +154,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
                 firstReplayToggle = false;
             }
-            else if( !(gamepad1.start || gamepad2.start) ){
+            else if( !(gamepad1.x || gamepad2.x) ){
                 firstReplayToggle = true;
             }
 
@@ -214,18 +214,18 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             if(replayManager.isRecording()){
-                telemetry.addLine("Currently Recording a Path. Press Options again to stop recording.");
+                telemetry.addLine("Currently Recording a Path. Press Y again to stop recording.");
             }
             else {
-                telemetry.addLine("Not Recording a Path. Press the Options button to start recording.");
+                telemetry.addLine("Not Recording a Path. Press the Y button to start recording.");
             }
             if(replayManager.isReplaying()){
-                telemetry.addLine("Currently Replaying a Path. Press Start again to stop replaying.");
+                telemetry.addLine("Currently Replaying a Path. Press X again to stop replaying.");
                 telemetry.addData("Target Position:", currentTargetState.getPosition());
                 telemetry.addData("Gamepad 1 Recorded Left Stick", new Vector2d(currentTargetState.getGamepad1State().left_stick_x(), currentTargetState.getGamepad1State().left_stick_y()));
             }
             else {
-                telemetry.addLine("Not Replaying a Path. Press the Start button to start replaying.");
+                telemetry.addLine("Not Replaying a Path. Press the X button to start replaying.");
             }
             telemetry.addData("Current Position:", localizer.getPoseEstimate());
             telemetry.addData("Failed Load Count:", failedLoadCount);
