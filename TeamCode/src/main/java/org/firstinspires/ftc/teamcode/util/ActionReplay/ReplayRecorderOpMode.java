@@ -41,7 +41,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     public static String robotName = "Lil' ring flinga";
-    public static String REPLAY_FILE_NAME = "TestPath.csv";
+    public static String REPLAY_FILE_NAME = "TestPath.bin";
 
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
@@ -117,7 +117,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             // Logic
-            if( (gamepad1.y || gamepad2.y) && firstRecordToggle){ // toggle if recording is primed
+            if( (gamepad1.options || gamepad2.options) && firstRecordToggle){ // toggle if recording
                 if(replayManager.isRecording()){
                     if(!replayManager.stopRecording())
                         failedLoadCount++;
@@ -139,7 +139,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             //}
 
 
-            if( (gamepad1.b || gamepad2.b) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying
+            if( (gamepad1.start || gamepad2.start) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying
                 if(replayManager.isReplaying()){
                     replayManager.stopStateReplay();
                 }
@@ -154,7 +154,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
                 firstReplayToggle = false;
             }
-            else if( !(gamepad1.b || gamepad2.b) ){
+            else if( !(gamepad1.start || gamepad2.start) ){
                 firstReplayToggle = true;
             }
 
@@ -201,7 +201,8 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             if(replayManager.isReplaying()){
                 currentTargetState = replayManager.getCurrentTargetState();
 
-                mecanumDrive.driveToPose(localizer.getPoseEstimate(), currentTargetState.getPosition(), false);
+                mecanumDrive.setReplayBaseMovement(xTranslatePower, yTranslatePower, rotatePower, localizer.getPoseEstimate().getHeading(), drivingFieldRelative);
+                mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), currentTargetState.getPosition(), false);
             }
             else if (drivingFieldRelative) { // if not replaying, allow the user to drive normally, either field relative or not
                 mecanumDrive.driveFieldRelative(xTranslatePower, yTranslatePower, rotatePower, localizer.getPoseEstimate().getHeading(), speedLimiting);
@@ -213,18 +214,18 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             if(replayManager.isRecording()){
-                telemetry.addLine("Currently Recording a Path. Press Y again to stop recording.");
+                telemetry.addLine("Currently Recording a Path. Press Options again to stop recording.");
             }
             else {
-                telemetry.addLine("Not Recording a Path. Press the Y to start recording.");
+                telemetry.addLine("Not Recording a Path. Press the Options button to start recording.");
             }
             if(replayManager.isReplaying()){
-                telemetry.addLine("Currently Replaying a Path. Press B again to stop replaying.");
+                telemetry.addLine("Currently Replaying a Path. Press Start again to stop replaying.");
                 telemetry.addData("Target Position:", currentTargetState.getPosition());
                 telemetry.addData("Gamepad 1 Recorded Left Stick", new Vector2d(currentTargetState.getGamepad1State().left_stick_x(), currentTargetState.getGamepad1State().left_stick_y()));
             }
             else {
-                telemetry.addLine("Not Replaying a Path. Press the B to start replaying.");
+                telemetry.addLine("Not Replaying a Path. Press the Start button to start replaying.");
             }
             telemetry.addData("Current Position:", localizer.getPoseEstimate());
             telemetry.addData("Failed Load Count:", failedLoadCount);

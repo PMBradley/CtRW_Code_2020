@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.control.Provider2020;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.drive.experimental.Drive_Mecanum_Tele_V2;
-import org.firstinspires.ftc.teamcode.util.ActionReplay.ReplayManager;
 
 @Autonomous(name = "CustomBackAndForth", group = "@@T")
 public class CustomBackAndForth extends LinearOpMode {
@@ -49,10 +48,10 @@ public class CustomBackAndForth extends LinearOpMode {
             }
 
             if(runningForward){
-                mecanumDrive.driveToPose(localizer.getPoseEstimate(), drivePose, true);
+                mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), drivePose, true);
             }
             else {
-                mecanumDrive.driveToPose(localizer.getPoseEstimate(), startPose, true);
+                mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), startPose, true);
             }
         }
     }

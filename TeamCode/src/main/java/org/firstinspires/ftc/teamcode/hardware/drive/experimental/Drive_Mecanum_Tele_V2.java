@@ -59,6 +59,9 @@ public class Drive_Mecanum_Tele_V2 {
     private double lastYSpeed = 0;
     private double lastRSpeed = 0;
     private double lastRunTime = 0;
+    private double replayBaseXVelo = 0;
+    private double replayBaseYVelo = 0;
+    private double replayBaseHeadingVelo = 0;
 
     // Calculated Constants (constants calculated based on editable constants or other conditions)
     private static double TRANSLATE_ACCEL_PER_SEC =  MAX_TRANSLATE_SPEED / TRANSLATE_ACCEL_TIME; // allow the bot to accelerate/decelerate by X% of max translate speed per second (this number is equal to 1/(seconds to accelerate fully))
@@ -159,10 +162,10 @@ public class Drive_Mecanum_Tele_V2 {
         driveFieldRelative(x, y, r, 0, limitingSpeed); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative, as a rotation of 0 will not alter translation)
     }
 
-    public void driveToPose(Pose2d currentPose, Pose2d targetPose){ // drives the robot to a target position when called in a loop
-        driveToPose(currentPose, targetPose, false);
+    public void driveToReplayPose(Pose2d currentPose, Pose2d targetPose){ // drives the robot to a target position when called in a loop
+        driveToReplayPose(currentPose, targetPose, false);
     }
-    public void driveToPose(Pose2d currentPose, Pose2d targetPose, boolean limitingSpeed){ // drives the robot to a target position when called in a loop
+    public void driveToReplayPose(Pose2d currentPose, Pose2d targetPose, boolean limitingSpeed){ // drives the robot to a target position when called in a loop
         //currentPose = getRotationalCenterRelativePose(currentPose); // account for rotational center differences by navigating around the center of rotation
         //targetPose = getRotationalCenterRelativePose(targetPose);
 
@@ -180,7 +183,29 @@ public class Drive_Mecanum_Tele_V2 {
 
         double headingVelo = -headingPID.getOutput(currentHeading, targetHeading);
 
-        driveFieldRelative(xVelo, yVelo, headingVelo, currentPose.getHeading(), limitingSpeed); // then drive field relative at those velocities
+        driveFieldRelative(replayBaseXVelo + xVelo, replayBaseYVelo + yVelo, replayBaseHeadingVelo + headingVelo, currentPose.getHeading(), limitingSpeed); // then drive field relative at those velocities
+    }
+
+
+    public void setReplayBaseMovement(double xVelo, double yVelo, double headingVelo, double currentHeading, boolean velosFieldRelative){ // sets the proactive part of the replay movement (used for setting the original controller inputs to move, letting the PID just correct rather than do the bulk of the driving)
+        if(!velosFieldRelative){ // if the values are robot relative (not field relative), make them field relative
+            // first convert the xy coordinate (cartesian coordinate) to polar coordinate form, so the heading can just be added to the heading of the polar coordinate
+            double r = Math.sqrt((xVelo * xVelo) + (yVelo * yVelo)); // find the pole of the certesian coordinate in polar coordinates
+            double theta = Math.PI/2; // the default for the polar heading is 90 degrees, as if x is 0, it is pointing straight up
+            if(xVelo != 0) // if no divide by zero error, update the default to become arcTan(y / x)
+                theta = Math.atan(yVelo / xVelo);
+            if(xVelo < 0) // if x is negative, rotate the heading by 180 (aka PI) to ensure the heading is in the correct quadrant
+                theta += Math.PI;
+
+            theta += currentHeading; // add the heading of the robot to theta to rotate it and make it relative to field rather than the robot
+
+            xVelo = r * Math.cos(theta); // convert the polar coordinate back to cartesian
+            yVelo = r * Math.sin(theta);
+        }
+
+        replayBaseXVelo = xVelo;
+        replayBaseYVelo = yVelo;
+        replayBaseHeadingVelo = headingVelo;
     }
 
 

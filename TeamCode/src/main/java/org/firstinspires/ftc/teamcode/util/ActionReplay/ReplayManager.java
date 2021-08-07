@@ -1,26 +1,23 @@
 package org.firstinspires.ftc.teamcode.util.ActionReplay;
 
 import android.os.Environment;
-import android.provider.ContactsContract;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.R;
-
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 @Config
 public class ReplayManager {
     // Constants
-    public static int MAX_LOADED_STATES = 690; // the largest the manager will let the states lists get, should hold around 70 seconds of states
+    public static int MAX_LOADED_STATES = 20_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
     public static double PATH_REFRESH_TRHESHOLD = 0.05; // when 5% of the loaded path has been traversed, the robot unloads the PATH_UNLOAD_PERCENTAGE of the path that is behind it and reloads that much to the front of the path
     public static double PATH_UNLOAD_PERCENTAGE = 0.10; // how much of the path behind us unloads when the path refresh threshold is reached
     public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
@@ -31,9 +28,10 @@ public class ReplayManager {
     private ArrayList<RobotState> replayStates; // a list of states that is followed, loaded ahead of where we are
     private ArrayList<RobotState> previousRecordedStates = new ArrayList<RobotState>(); // TODO: remove this at some point
     private File statesFile;
-    private Scanner stateReader;
+    private BufferedReader stateReader;
     private FileWriter stateWriter;
     private ElapsedTime replayTimer;
+    private LoadManager loader; // the threaded object that loads states
 
     // Flags
     private boolean recording = false;
@@ -57,23 +55,9 @@ public class ReplayManager {
             loadReplayFile(fileName);
         }
 
+        loader = new LoadManager();
         replayTimer = new ElapsedTime();
     }
-
- /*   public ReplayManager(String fileName, Telemetry telem) { //TODO: please figure out why load no work then remove this
-        recordedStatesHistory = new ArrayList<RobotState>();
-        replayStates = new ArrayList<RobotState>();
-
-        if(fileName.equals("NO FILE")){
-            statesFile = null;
-        }
-        else {
-            loadReplayFile(fileName);
-        }
-
-        replayTimer = new ElapsedTime();
-        this.telem = telem;
-    }*/
 
 
     public boolean startRecording() {
@@ -137,26 +121,14 @@ public class ReplayManager {
 
         if(statesFile != null){
             try {
-                stateReader = new Scanner(statesFile);
-            }
-            catch(IOException e){
-                return false;
-            }
-            linesToLoad = 0;
-            while(stateReader.hasNextLine()) {
-                stateReader.nextLine();
-                linesToLoad++;
-            }
-
-            try {
-                stateReader = new Scanner(statesFile);
+                stateReader = new BufferedReader(new FileReader(statesFile)); // attempt to make a buffered file reader to read out the contents of the file, if it fails, return false
             }
             catch(IOException e){
                 return false;
             }
 
-            replaying = true; // set replaying to true so that loadStates will load states
-            loadStates(MAX_LOADED_STATES); // load as many states as we can into our replayStates list for following
+            replaying = true; // set replaying to true so that loadStates will load states (as it checks if replaying is true before loading states)
+            loader.loadStates(stateReader, replayStates); // load as many states as we can into our replayStates list for following, runs in a background thread constantly
             //replayStates = previousRecordedStates;
 
 
@@ -195,11 +167,11 @@ public class ReplayManager {
                 int distanceFromListFront = driveTimeChunkEndIndex - 1;
                 int unloadCount = (int)(distanceFromListFront*PATH_UNLOAD_PERCENTAGE); // unload PATH_UNLOAD_PERCENTAGE of the states behind us, rather than all, preventing any ConcurrentModificationErrors
 
-                for(int i = 0; i < distanceFromListFront; i++){ // remove from the font until the front is the current chunk
+                for(int i = 0; i < unloadCount; i++){ // remove from the font until the front is the current chunk
                     replayStates.remove(0);
                 }
 
-                loadStates(distanceFromListFront); // then load that many onto the front of the list
+                //loader.loadStates(distanceFromListFront, stateReader, replayStates); // then load that many onto the front of the list
             }
 
             // since we have removed all states before this chunk, the start and end of this chunk are always indexes 0 and 1. now we just get where we are between them
@@ -210,27 +182,18 @@ public class ReplayManager {
         }
     }
     public void stopStateReplay(){
-        if(replaying){ // only want to do these things if we were replaying, if not this could cause errors
-            stateReader.close();
+        if(replaying){ // only want to close the reader if we were replaying, if not this could cause errors
+            try {
+                stateReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         replaying = false;
     }
 
 
-    private void loadStates(int loadCount){ // loads states from the current state file into the replayStates list
-        if(replaying){
-            //telem.addData("Has lines to read?", stateReader.hasNextLine());
-            for(int i = 0; i < loadCount && i < MAX_LOADED_STATES && stateReader.hasNextLine(); i++){ // load as many as we are told to (within what we are allowed to do
-                String currentLine = stateReader.nextLine(); // TODO: please make load work
-
-              //  telem.addLine("Current CSV Line: " + currentLine);
-              //  telem.addLine("Parsed Line: " + RobotState.parseFromCSVLine(currentLine));
-
-                replayStates.add( RobotState.parseFromCSVLine(currentLine) );
-            }
-        }
-    }
     private RobotState getStateBetween(RobotState firstState, RobotState secondState, double effectiveDriveTime, GamepadState gamepad1State, GamepadState gamepad2State){
         if( effectiveDriveTime < firstState.getTimestamp() || firstState.getTimestamp() == secondState.getTimestamp()){ // if we are before the timestamp of the first state, just return that state
             return firstState;
@@ -308,5 +271,53 @@ public class ReplayManager {
         } catch (IOException e){ e.printStackTrace(); }
 
         return couldLoadFile;
+    }
+
+
+
+    class LoadManager implements Runnable { // a threaded subclass of ReplayManager that manages loading new states into the program
+        Thread thread;
+        String threadName;
+        BufferedReader stateReader;
+        ArrayList<RobotState> replayStates;
+        //int loadCount = 0;
+
+        public LoadManager() {
+            threadName = "Replay-Recorder Load Manager";
+        }
+
+        public void loadStates(BufferedReader stateReader, ArrayList<RobotState> replayStates){
+            thread = new Thread(this, threadName);
+            thread.start(); // automatically calls the run method in a separate thread
+
+            //this.loadCount = loadCount;
+            this.stateReader = stateReader;
+            this.replayStates = replayStates;
+        }
+
+        public void run() {
+            try {
+
+                load(); // attempt to load. if it fails, print the stack trace
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        private void load () throws IOException {
+            //telem.addData("Has lines to read?", stateReader.hasNextLine());
+            String currentLine = "";
+            for(int i = 0; ( i < MAX_LOADED_STATES && stateReader.ready() ); i++){ // load as many as we are told to (within what we are allowed to do
+
+                currentLine = stateReader.readLine();
+
+
+                //  telem.addLine("Current CSV Line: " + currentLine);
+                //  telem.addLine("Parsed Line: " + RobotState.parseFromCSVLine(currentLine));
+
+                if(currentLine != null && currentLine != "")
+                    replayStates.add( RobotState.parseFromCSVLine(currentLine) ); // TODO: please make load work
+            }
+        }
     }
 }
