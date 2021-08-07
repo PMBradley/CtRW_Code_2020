@@ -21,7 +21,7 @@ public class Drive_Mecanum_Tele_V2 {
         (or should) be edited to improve robot performance
 */
     // X Translational PID Variables
-    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(0.8, 0.0, 0.4);
+    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(0.8, 0.0, 0.8);
     public static Range2d X_I_RANGE = new Range2d(0.1, 4);
 
     // Y Translational PID Variables

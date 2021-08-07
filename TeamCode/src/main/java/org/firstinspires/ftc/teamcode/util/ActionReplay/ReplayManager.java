@@ -249,8 +249,8 @@ public class ReplayManager {
     public ArrayList<Pose2d> getRecordedPositionsHistory(){ // returns the states history except just the positions from each state, allows for easy plotting in dashboard for example
         ArrayList<Pose2d> recordedPositions = new ArrayList<Pose2d>();
 
-        for(RobotState state : recordedStatesHistory){ // loop through each state
-            recordedPositions.add(state.getPosition()); // and add to the recordedPositions list just the pose2d of that state
+        for(int i = 0; i < recordedStatesHistory.size(); i++){ // loop through each state
+            recordedPositions.add(recordedStatesHistory.get(i).getPosition()); // and add to the recordedPositions list just the pose2d of that state
         }
 
         return recordedPositions;
@@ -259,8 +259,8 @@ public class ReplayManager {
     public ArrayList<Pose2d> getReplayPositions(){ // returns the replay states except just the positions from each state, allows for easy plotting in dashboard for example
         ArrayList<Pose2d> replayPositions = new ArrayList<Pose2d>();
 
-        for(RobotState state : replayStates){ // loop through each state
-            replayPositions.add(state.getPosition()); // and add to the replayPositions list just the pose2d of that state
+        for(int i = 0; i < replayStates.size(); i++){ // loop through each state
+            replayPositions.add(replayStates.get(i).getPosition()); // and add to the replayPositions list just the pose2d of that state
         }
 
         return replayPositions;
