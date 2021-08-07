@@ -229,10 +229,10 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             }
             telemetry.addData("Current Position:", localizer.getPoseEstimate());
             telemetry.addData("Failed Load Count:", failedLoadCount);
-            telemetry.addData("Replay States:", replayManager.getReplayStates());
             telemetry.addData("Driving field relative?", drivingFieldRelative);
             telemetry.addData("Driver Acceleration Limiting? (d-pad down to toggle)", speedLimiting);
             telemetry.addData("Lines found to load ", ReplayManager.linesToLoad);
+            telemetry.addData("Replay States:", replayManager.getReplayStates());
             telemetry.update();
 
 

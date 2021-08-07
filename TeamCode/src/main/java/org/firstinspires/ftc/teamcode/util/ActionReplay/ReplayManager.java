@@ -50,11 +50,6 @@ public class ReplayManager {
         recordedStatesHistory = new ArrayList<RobotState>();
         replayStates = new ArrayList<RobotState>();
 
-        replayStates.add(new RobotState(0, new Pose2d(0, 0, 0), new GamepadState(), new GamepadState()));
-        replayStates.add(new RobotState(10000, new Pose2d(30, 0, 0), new GamepadState(), new GamepadState()));
-
-
-
         if(fileName.equals("NO FILE")){
             statesFile = null;
         }
@@ -127,6 +122,10 @@ public class ReplayManager {
         replayStates = new ArrayList<RobotState>();
         replayLoadedStates = new ArrayList<RobotState>();
 
+       // replayStates.add(new RobotState(0, new Pose2d(0, 0, 0), new GamepadState(), new GamepadState()));
+       // replayStates.add(new RobotState(10000, new Pose2d(30, 0, 0), new GamepadState(), new GamepadState()));
+
+
         if(statesFile != null){
             try {
                 stateReader = new Scanner(statesFile); // attempt to make a buffered file reader to read out the contents of the file, if it fails, return false
@@ -151,10 +150,10 @@ public class ReplayManager {
     public RobotState getCurrentTargetState(){
         //telem.addLine("Has a file open? " + (statesFile != null));
         if(replaying){
-            if(replayStates.size() > 0){}
-                //addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
-            else{}
-                //addReplayStatesFrom(replayLoadedStates);
+            if(replayStates.size() > 0)
+                addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
+            else
+                addReplayStatesFrom(replayLoadedStates);
         }
 
         if(replaying && replayStates.size() > 1){
@@ -287,9 +286,9 @@ public class ReplayManager {
         return couldLoadFile;
     }
     private void addReplayStatesFrom(ArrayList<RobotState> newStates, double allStatesAfterTimestamp){ // adds states into the main list from an outside list (used for loading states from the loading thread)
-        for(RobotState state : newStates){
-            if(state.getTimestamp() > allStatesAfterTimestamp){
-                replayStates.add(state);
+        for(int i = 0; i < newStates.size(); i++){
+            if(newStates.get(i).getTimestamp() > allStatesAfterTimestamp){
+                replayStates.add(newStates.get(i));
             }
         }
     }
