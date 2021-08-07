@@ -50,6 +50,11 @@ public class ReplayManager {
         recordedStatesHistory = new ArrayList<RobotState>();
         replayStates = new ArrayList<RobotState>();
 
+        replayStates.add(new RobotState(0, new Pose2d(0, 0, 0), new GamepadState(), new GamepadState()));
+        replayStates.add(new RobotState(10000, new Pose2d(30, 0, 0), new GamepadState(), new GamepadState()));
+
+
+
         if(fileName.equals("NO FILE")){
             statesFile = null;
         }
@@ -146,15 +151,13 @@ public class ReplayManager {
     public RobotState getCurrentTargetState(){
         //telem.addLine("Has a file open? " + (statesFile != null));
         if(replaying){
-            if(replayStates.size() > 0)
-                addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
-            else
-                addReplayStatesFrom(replayLoadedStates);
+            if(replayStates.size() > 0){}
+                //addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
+            else{}
+                //addReplayStatesFrom(replayLoadedStates);
         }
 
         if(replaying && replayStates.size() > 1){
-
-
             int manipulatorStateEndIndex = 1; // same as below but for everything except for driving
             int driveTimeChunkEndIndex = 1; // the index of the first state that our drive time is after or equal to, aka the beginning of the current time chunk we are driving in
             double currentTime = replayTimer.milliseconds();
@@ -299,20 +302,20 @@ public class ReplayManager {
         Thread thread;
         String threadName;
         Scanner stateReader;
-        ArrayList<RobotState> replayStates;
+        ArrayList<RobotState> stateBuffer;
         //int loadCount = 0;
 
         public LoadManager() {
             threadName = "Replay-Recorder Load Manager";
         }
 
-        public void loadStates(Scanner stateReader, ArrayList<RobotState> replayStates){
+        public void loadStates(Scanner stateReader, ArrayList<RobotState> stateBuffer){
             thread = new Thread(this, threadName);
             thread.start(); // automatically calls the run method in a separate thread
 
             //this.loadCount = loadCount;
             this.stateReader = stateReader;
-            this.replayStates = replayStates;
+            this.stateBuffer = stateBuffer;
         }
 
         public void run() {
@@ -336,7 +339,7 @@ public class ReplayManager {
                 //  telem.addLine("Parsed Line: " + RobotState.parseFromCSVLine(currentLine));
 
                 if(currentLine != null && currentLine != "")
-                    replayStates.add( RobotState.parseFromCSVLine(currentLine) ); // TODO: please make load work
+                    stateBuffer.add( RobotState.parseFromCSVLine(currentLine) );
             }
         }
     }
