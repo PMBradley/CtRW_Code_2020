@@ -18,7 +18,7 @@ import java.util.Scanner;
 @Config
 public class ReplayManager {
     // Constants
-    public static int MAX_LOADED_STATES = 1_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
+    public static int MAX_LOADED_STATES = 10_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
     public static double PATH_REFRESH_TRHESHOLD = 0.05; // when 5% of the loaded path has been traversed, the robot unloads the PATH_UNLOAD_PERCENTAGE of the path that is behind it and reloads that much to the front of the path
     public static double PATH_UNLOAD_PERCENTAGE = 0.10; // how much of the path behind us unloads when the path refresh threshold is reached
     public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
@@ -27,7 +27,7 @@ public class ReplayManager {
     // Recording Objects
     private ArrayList<RobotState> recordedStatesHistory ; // a list of recorded states, used for drawing out where we have been while recording
     private ArrayList<RobotState> replayStates; // a list of states that is followed, loaded ahead of where we are
-    private ArrayList<RobotState> replayLoadedStates; // temporarily holds the states before they get added into the list
+    private ConcurrentArrayList<RobotState> replayLoadedStates; // temporarily holds the states before they get added into the list
     private File statesFile;
     //private BufferedReader stateReader;
     private Scanner stateReader;
@@ -120,10 +120,10 @@ public class ReplayManager {
         stopRecording(); // stop any recording and any previous replaying just to make sure everything is cleared
         stopStateReplay();
         replayStates = new ArrayList<RobotState>();
-        replayLoadedStates = new ArrayList<RobotState>();
+        replayLoadedStates = new ConcurrentArrayList<RobotState>();
 
-        for(int i = 0; i < MAX_LOADED_STATES; i++)
-            replayStates.add(new RobotState(i*100, new Pose2d(Math.cos(i/4.0)*-5 + Math.PI*5, 0, 0), new GamepadState(), new GamepadState()));
+        //for(int i = 0; i < MAX_LOADED_STATES; i++)
+            //replayStates.add(new RobotState(i*100, new Pose2d(Math.cos(i/4.0)*-5 + Math.PI*5, 0, 0), new GamepadState(), new GamepadState()));
        // replayStates.add(new RobotState(10000, new Pose2d(30, 0, 0), new GamepadState(), new GamepadState()));
 
 
@@ -151,10 +151,10 @@ public class ReplayManager {
     public RobotState getCurrentTargetState(){
         //telem.addLine("Has a file open? " + (statesFile != null));
         if(replaying){
-            if(replayStates.size() > 0){}
-                //addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
-            else{}
-                //addReplayStatesFrom(replayLoadedStates);
+            if(replayStates.size() > 0)
+                addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
+            else
+                addReplayStatesFrom(replayLoadedStates);
         }
 
         if(replaying && replayStates.size() > 1){
@@ -286,14 +286,14 @@ public class ReplayManager {
 
         return couldLoadFile;
     }
-    private void addReplayStatesFrom(ArrayList<RobotState> newStates, double allStatesAfterTimestamp){ // adds states into the main list from an outside list (used for loading states from the loading thread)
+    private void addReplayStatesFrom(ConcurrentArrayList<RobotState> newStates, double allStatesAfterTimestamp){ // adds states into the main list from an outside list (used for loading states from the loading thread)
         for(int i = 0; i < newStates.size(); i++){
             if(newStates.get(i).getTimestamp() > allStatesAfterTimestamp){
                 replayStates.add(newStates.get(i));
             }
         }
     }
-    private void addReplayStatesFrom(ArrayList<RobotState> newStates){
+    private void addReplayStatesFrom(ConcurrentArrayList<RobotState> newStates){
         addReplayStatesFrom(newStates, 0); // if no time provided, just add all valid states
     }
 
@@ -302,14 +302,14 @@ public class ReplayManager {
         Thread thread;
         String threadName;
         Scanner stateReader;
-        ArrayList<RobotState> stateBuffer;
+        ConcurrentArrayList<RobotState> stateBuffer;
         //int loadCount = 0;
 
         public LoadManager() {
             threadName = "Replay-Recorder Load Manager";
         }
 
-        public void loadStates(Scanner stateReader, ArrayList<RobotState> stateBuffer){
+        public void loadStates(Scanner stateReader, ConcurrentArrayList<RobotState> stateBuffer){
             thread = new Thread(this, threadName);
             thread.start(); // automatically calls the run method in a separate thread
 
