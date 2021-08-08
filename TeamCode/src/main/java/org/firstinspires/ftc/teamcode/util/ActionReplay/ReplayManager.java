@@ -18,7 +18,7 @@ import java.util.Scanner;
 @Config
 public class ReplayManager {
     // Constants
-    public static int MAX_LOADED_STATES = 20_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
+    public static int MAX_LOADED_STATES = 1_000; // the largest the manager will let the states lists get, should hold around 70 seconds of states
     public static double PATH_REFRESH_TRHESHOLD = 0.05; // when 5% of the loaded path has been traversed, the robot unloads the PATH_UNLOAD_PERCENTAGE of the path that is behind it and reloads that much to the front of the path
     public static double PATH_UNLOAD_PERCENTAGE = 0.10; // how much of the path behind us unloads when the path refresh threshold is reached
     public static double LOOK_AHEAD_MSEC = 0.0; // how many milliseconds ahead on the path the robot will try to go to, to prevent lagging behind the timestamp
@@ -123,7 +123,7 @@ public class ReplayManager {
         replayLoadedStates = new ArrayList<RobotState>();
 
         for(int i = 0; i < MAX_LOADED_STATES; i++)
-            replayStates.add(new RobotState(0, new Pose2d(0, 0, 0), new GamepadState(), new GamepadState()));
+            replayStates.add(new RobotState(i*100, new Pose2d(Math.cos(i/4.0)*-5 + Math.PI*5, 0, 0), new GamepadState(), new GamepadState()));
        // replayStates.add(new RobotState(10000, new Pose2d(30, 0, 0), new GamepadState(), new GamepadState()));
 
 
