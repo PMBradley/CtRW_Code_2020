@@ -46,7 +46,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
     // Constants
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
     static final int TELEMETRY_TRANSMISSION_INTERVAL = 7;
-    public static int RECORD_INTERVAL = 25; // how many milliseconds between recording waypoints, lower number = more waypoints but more computer resource use from waypoints
+    public static int RECORD_INTERVAL = 100; // how many milliseconds between recording waypoints, lower number = more waypoints but more computer resource use from waypoints
     public static Pose2d startPose = new Pose2d(0, 0, 0);
 
     // Robot Classes
@@ -232,7 +232,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             telemetry.addData("Driving field relative?", drivingFieldRelative);
             telemetry.addData("Driver Acceleration Limiting? (d-pad down to toggle)", speedLimiting);
             telemetry.addData("Lines found to load ", ReplayManager.linesToLoad);
-            telemetry.addData("Replay States:", replayManager.getReplayStates());
+            //telemetry.addData("Replay States:", replayManager.getReplayStates());
             telemetry.update();
 
 
@@ -268,7 +268,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             DashboardUtil.drawPoseHistory(fieldOverlay, replayManager.getRecordedPositionsHistory());
         }
         else if(replayManager.isReplaying()){
-            fieldOverlay.setStroke("4CAF50"); // set the field draw color for this bit to black
+            fieldOverlay.setStroke("#4CAF50"); // set the field draw color for this bit to black
             DashboardUtil.drawPoseHistory(fieldOverlay, replayManager.getReplayPositions());
             DashboardUtil.drawRobot(fieldOverlay, currentTargetState.getPosition());
         }

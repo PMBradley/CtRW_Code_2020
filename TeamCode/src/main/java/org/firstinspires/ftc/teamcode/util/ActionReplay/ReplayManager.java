@@ -122,7 +122,8 @@ public class ReplayManager {
         replayStates = new ArrayList<RobotState>();
         replayLoadedStates = new ArrayList<RobotState>();
 
-       // replayStates.add(new RobotState(0, new Pose2d(0, 0, 0), new GamepadState(), new GamepadState()));
+        for(int i = 0; i < MAX_LOADED_STATES; i++)
+            replayStates.add(new RobotState(0, new Pose2d(0, 0, 0), new GamepadState(), new GamepadState()));
        // replayStates.add(new RobotState(10000, new Pose2d(30, 0, 0), new GamepadState(), new GamepadState()));
 
 
@@ -150,10 +151,10 @@ public class ReplayManager {
     public RobotState getCurrentTargetState(){
         //telem.addLine("Has a file open? " + (statesFile != null));
         if(replaying){
-            if(replayStates.size() > 0)
-                addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
-            else
-                addReplayStatesFrom(replayLoadedStates);
+            if(replayStates.size() > 0){}
+                //addReplayStatesFrom(replayLoadedStates, replayStates.get(replayStates.size() - 1).getTimestamp());
+            else{}
+                //addReplayStatesFrom(replayLoadedStates);
         }
 
         if(replaying && replayStates.size() > 1){
