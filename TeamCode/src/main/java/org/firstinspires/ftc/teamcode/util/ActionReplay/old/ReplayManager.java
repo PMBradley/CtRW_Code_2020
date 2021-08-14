@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.ActionReplay;
+package org.firstinspires.ftc.teamcode.util.ActionReplay.old;
 
 import android.os.Environment;
 
@@ -6,9 +6,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.io.BufferedReader;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +34,7 @@ public class ReplayManager {
     private FileWriter stateWriter;
     private ElapsedTime replayTimer;
     private LoadManager loader; // the threaded object that loads states
+    private Telemetry telemetry;
 
     // Flags
     private boolean recording = false;
@@ -43,10 +44,10 @@ public class ReplayManager {
    // Telemetry telem;
 
 
-    public ReplayManager() { // if no path
-        this("NO FILE");
+    public ReplayManager(Telemetry telem) { // if no path
+        this("NO FILE", telem);
     }
-    public ReplayManager(String fileName) {
+    public ReplayManager(String fileName, Telemetry telem) {
         recordedStatesHistory = new ArrayList<RobotState>();
         replayStates = new ArrayList<RobotState>();
 
@@ -54,11 +55,13 @@ public class ReplayManager {
             statesFile = null;
         }
         else {
-            loadReplayFile(fileName);
+            setReplayFile(fileName);
         }
 
         loader = new LoadManager();
         replayTimer = new ElapsedTime();
+
+        this.telemetry = telem;
     }
 
 
@@ -91,6 +94,7 @@ public class ReplayManager {
             catch (IOException e) { return false; }
 
             recordedStatesHistory.add(currentState); // add the current state to the states history in memory (doesn't impact the file)
+            telemetry.addData("G Record Telem", currentState.getGamepad1State().toCSVLine());
 
             while(recordedStatesHistory.size() > MAX_LOADED_STATES){ // then remove from the earliest point in the state history until we have a list less than the max list size
                 recordedStatesHistory.remove(0); // as a note, this only impacts what is held in memory for telemetry purposes, the states stored in the file aren't impacted by this removal
@@ -117,6 +121,7 @@ public class ReplayManager {
 
     public static int linesToLoad = -1;
     public boolean startStateReplay() {
+
         stopRecording(); // stop any recording and any previous replaying just to make sure everything is cleared
         stopStateReplay();
         replayStates = new ArrayList<RobotState>();
@@ -219,8 +224,10 @@ public class ReplayManager {
 
         double firstTimestamp = firstState.getTimestamp();
         double secondTimestamp = secondState.getTimestamp();
+        double fractionBetween = 0;
 
-        double fractionBetween = (effectiveDriveTime - firstTimestamp)/(secondTimestamp - firstTimestamp); // shift everything such that the first timestamp is 0, then see what the current time is out of the second timestamp
+        if(secondTimestamp > firstTimestamp)
+            fractionBetween = (effectiveDriveTime - firstTimestamp)/(secondTimestamp - firstTimestamp); // shift everything such that the first timestamp is 0, then see what the current time is out of the second timestamp
             // for example: the first timestamp = 2, second = 6, current = 3.  3-2 =1, 6-2 =4, we are currently 1/4 of the waybetween 2 and 6
 
         Pose2d firstPose = firstState.getPosition();
@@ -228,7 +235,16 @@ public class ReplayManager {
 
         double x = ((secondPose.getX() - firstPose.getX()) * fractionBetween) + firstPose.getX(); // shift the "line" to the origin, as though firstPose were the base, then multiply by the fraction between, then shift back
         double y = ((secondPose.getY() - firstPose.getY()) * fractionBetween) + firstPose.getY();
-        double heading = ((secondPose.getHeading() - firstPose.getHeading()) * fractionBetween) + firstPose.getHeading();
+
+        double firstPoseHeading = firstPose.getHeading();
+        double secondPoseHeading = secondPose.getHeading();
+        while(firstPoseHeading + Math.PI < secondPoseHeading){ // if current heading is 180 (or more) degrees below the target position, subtract 360 from the current heading so we travel the most efficient route towards the target
+            secondPoseHeading -= 2*Math.PI;
+        }
+        while(firstPoseHeading - Math.PI > secondPoseHeading){ // else if current heading is 180 (or more) degrees above the target position, add 360 to the target heading so we travel the most efficient route towards the target
+            secondPoseHeading += 2*Math.PI;
+        }
+        double heading = ((secondPoseHeading - firstPoseHeading) * fractionBetween) + firstPoseHeading;
 
 
         if(firstState.hasGamepadStates()){
@@ -270,7 +286,7 @@ public class ReplayManager {
         return replayTimer.milliseconds();
     }
 
-    public boolean loadReplayFile(String fileName){
+    public boolean setReplayFile(String fileName){
         boolean couldLoadFile = false;
 
         File root = new File(Environment.getExternalStorageDirectory(), STORAGE_DIRECTORY);
@@ -334,9 +350,7 @@ public class ReplayManager {
 
                 currentLine = stateReader.nextLine();
 
-
-                //  telem.addLine("Current CSV Line: " + currentLine);
-                //  telem.addLine("Parsed Line: " + RobotState.parseFromCSVLine(currentLine));
+                //telemetry.addLine("LOADED LINE: "+currentLine);
 
                 if(currentLine != null && currentLine != "")
                     stateBuffer.add( RobotState.parseFromCSVLine(currentLine) );

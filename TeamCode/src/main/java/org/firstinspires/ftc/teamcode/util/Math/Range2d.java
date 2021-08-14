@@ -5,7 +5,8 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class Range2d { // a class that neatly holds a minimum and maximum for a 2d range of values
-    double min, max;
+    public double min;
+    public double max;
 
 
     public Range2d(){

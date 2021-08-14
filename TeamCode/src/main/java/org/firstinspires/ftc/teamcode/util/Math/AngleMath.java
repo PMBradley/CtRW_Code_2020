@@ -54,4 +54,6 @@ public abstract class AngleMath {
     public static double getVectorMagnitude(Vector2d vector){ // via pythagorean theorem, find the hypotenuse of the triangle formed by the sides x and y to find the length of the line from (0, 0) to (x, y)
         return Math.sqrt( Math.pow(vector.getX(), 2) + Math.pow(vector.getY(), 2) );
     }
+
+
 }

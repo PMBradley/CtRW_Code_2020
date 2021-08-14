@@ -48,10 +48,10 @@ public class CustomBackAndForth extends LinearOpMode {
             }
 
             if(runningForward){
-                mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), drivePose, true);
+                mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), drivePose);
             }
             else {
-                mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), startPose, true);
+                mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), startPose);
             }
         }
     }

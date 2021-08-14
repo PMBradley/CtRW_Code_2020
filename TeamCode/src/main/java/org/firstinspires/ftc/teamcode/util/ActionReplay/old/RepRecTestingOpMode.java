@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.ActionReplay;
+package org.firstinspires.ftc.teamcode.util.ActionReplay.old;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -6,18 +6,12 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.Provider2020;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
-import org.firstinspires.ftc.teamcode.hardware.drive.experimental.Drive_Mecanum_Tele_V2;
-import org.firstinspires.ftc.teamcode.util.ActionReplay.backend.GamepadState;
-import org.firstinspires.ftc.teamcode.util.ActionReplay.backend.ReplayManager;
-import org.firstinspires.ftc.teamcode.util.ActionReplay.backend.RobotState;
 import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
 
 
@@ -36,18 +30,19 @@ import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
         - Controllers 1&2 B = Toggle replaying
  */
 
-@Disabled
-@TeleOp(name = "Replay-Recorder Template Teleop", group = "@@R")
+
+@TeleOp(name = "Replay-Recorder Testing", group = "@@R")
 
 @Config
-public class ReplayRecorderOpMode extends LinearOpMode{
+public class RepRecTestingOpMode extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     public static String robotName = "Lil' ring flinga";
-    public static String REPLAY_FILE_NAME = "TestPath.bin";
+    public static String REPLAY_FILE_NAME = "TestPath.csv";
 
     // Constants
+    public static double SLOW_MODE_MODIFIER = 0.55;
     static final double DEAD_ZONE_RADIUS = 0.005; // the minimum value that can be passed into the drive function
     static final int TELEMETRY_TRANSMISSION_INTERVAL = 7;
     public static int RECORD_INTERVAL = 100; // how many milliseconds between recording waypoints, lower number = more waypoints but more computer resource use from waypoints
@@ -55,7 +50,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
-    private Drive_Mecanum_Tele_V2 mecanumDrive; // the main mecanum drive class
+    private Drive_Mecanum_Tele_RepRec mecanumDrive; // the main mecanum drive class
     private StandardTrackingWheelLocalizer localizer; // the odometry based localizer - uses dead wheels to determine (x, y, r) position on the field
 
     private ReplayManager replayManager;
@@ -74,9 +69,9 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
     // Tracking variables
     private RobotState currentTargetState = new RobotState();
-    private GamepadState gp1; // gamepad state variables for replay-recorder
-    private GamepadState gp2;
-
+    private GamepadState gp1 = new GamepadState();
+    private GamepadState gp2 = new GamepadState();
+    private int failedLoadCount = 0;
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -84,9 +79,9 @@ public class ReplayRecorderOpMode extends LinearOpMode{
         /* INCLUDE ANY ROBOT SETUP CODE HERE */
         // Call class constructors here (so that nothing major happens before init)
         robot = new Provider2020(hardwareMap);
-        mecanumDrive = new Drive_Mecanum_Tele_V2(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR); // pass in the drive motors and the speed variables to setup properly
+        mecanumDrive = new Drive_Mecanum_Tele_RepRec(robot.driveFL, robot.driveFR, robot.driveBL, robot.driveBR); // pass in the drive motors and the speed variables to setup properly
 
-        replayManager = new ReplayManager();
+        replayManager = new ReplayManager(REPLAY_FILE_NAME, telemetry);
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         runtime = new ElapsedTime();
         timeSinceLastRecord = new ElapsedTime();
@@ -116,49 +111,83 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                 localizer.update(); // update our current position
             }
 
-            // replay manager logic, comes first to ensure the rest of the program runs smoothly
-            replayManager.updateModesFromGamepad(gamepad1, telemetry);
+            // Replay Logic
+            if( (gamepad1.y || gamepad2.y) && firstRecordToggle){ // toggle if recording
+                if(replayManager.isRecording()){
+                    if(!replayManager.stopRecording())
+                        failedLoadCount++;
+                }
+                else {
+                    localizer.setPoseEstimate(startPose);
+
+                    if(!replayManager.startRecording())
+                        failedLoadCount++;
+                }
+
+                firstRecordToggle = false;
+            }
+            else if( !(gamepad1.y || gamepad2.y) ){
+                firstRecordToggle = true;
+            }
+
+            if( (gamepad1.x || gamepad2.x) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying
+                if(replayManager.isReplaying()){
+                    replayManager.stopStateReplay();
+                }
+                else {
+                    localizer.setPoseEstimate(startPose);
+
+                    if(!replayManager.setReplayFile(REPLAY_FILE_NAME))
+                        failedLoadCount++;
+
+                    replayManager.startStateReplay();
+                }
+
+                firstReplayToggle = false;
+            }
+            else if( !(gamepad1.x || gamepad2.x) ){
+                firstReplayToggle = true;
+            }
 
 
-
-            if(replayManager.isReplaying()){
+            if(replayManager.isReplaying()) {
                 currentTargetState = replayManager.getCurrentTargetState();
                 gp1 = currentTargetState.getGamepad1State();
                 gp2 = currentTargetState.getGamepad2State();
             }
-            else { // if not replaying, set the gamepad states to the physical controller inputs
+            else {
                 gp1 = new GamepadState(gamepad1);
                 gp2 = new GamepadState(gamepad2);
             }
 
 
-
-
             // Variables
-            double xTranslatePower = -gp1.left_stick_y() * Math.abs(gp1.left_stick_y()); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
-            double yTranslatePower = gp1.left_stick_x() * Math.abs(gp1.left_stick_x()); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
-            double rotatePower = gp1.right_stick_x() * Math.abs(gp1.right_stick_x());
+            double xTranslatePower = -gp1.left_stick_y * Math.abs(gp1.left_stick_y); // specifically the y stick is negated because up is negative on the stick, but we want up to move the robot forward
+            double yTranslatePower = gp1.left_stick_x * Math.abs(gp1.left_stick_x); // set the robot translation/rotation speed variables based off of controller input (set later in hardware manipluation section)
+            double rotatePower = gp1.right_stick_x * Math.abs(gp1.right_stick_x);
+            boolean isSlowMode = gp1.right_bumper;
 
-
-            // Main Logic
-            if(gp1.right_bumper() && firstRelativeToFieldToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle relative to field drive
+            // main logic
+            if(gp1.dpad_up && firstRelativeToFieldToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle relative to field drive
                 drivingFieldRelative = !drivingFieldRelative;
                 localizer.setPoseEstimate(startPose);
 
                 firstRelativeToFieldToggle = false;
             }
-            else if( !gp1.right_bumper() ){
+            else if( !gamepad1.dpad_up ){
                 firstRelativeToFieldToggle = true;
             }
 
-            if(gp1.left_bumper() && firstSpeedLimitingToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle drive speed limiting
+            if(gamepad1.dpad_down && firstSpeedLimitingToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle drive speed limiting
                 speedLimiting = !speedLimiting;
 
                 firstSpeedLimitingToggle = false;
             }
-            else if( !gp1.left_bumper() ){
+            else if( !gamepad1.dpad_down ){
                 firstSpeedLimitingToggle = true;
             }
+
+
 
 
             //setup a dead zone for the controllers
@@ -172,16 +201,22 @@ public class ReplayRecorderOpMode extends LinearOpMode{
                 rotatePower = 0;
             }
 
+            if(isSlowMode){ // slow mode multipliers
+                xTranslatePower *= SLOW_MODE_MODIFIER;
+                yTranslatePower *= SLOW_MODE_MODIFIER;
+                rotatePower *= SLOW_MODE_MODIFIER;
+            }
+
 
             // Hardware instruction
-            if(replayManager.isRecording()){
-                //replayManager.recordRobotState(new RobotState(replayManager.getTimerMsec(), localizer.getPoseEstimate(), new GamepadState(gamepad1), new GamepadState(gamepad2))); // save the robot state
+            if(replayManager.isRecording() && timeSinceLastRecord.milliseconds() > RECORD_INTERVAL){
+                replayManager.recordRobotState(new RobotState(replayManager.getTimerMsec(), localizer.getPoseEstimate(), new GamepadState(gamepad1), new GamepadState(gamepad2))); // save the robot state
 
-                replayManager.recordRobotState(new RobotState(replayManager.getTimerMsec(), localizer.getPoseEstimate())); // save the robot state
+                timeSinceLastRecord.reset();
             }
 
             if(replayManager.isReplaying()){
-                mecanumDrive.setReplayBaseMovement(xTranslatePower, yTranslatePower, rotatePower, localizer.getPoseEstimate().getHeading(), false, false);
+                mecanumDrive.setReplayBaseMovement(xTranslatePower, yTranslatePower, rotatePower, localizer.getPoseEstimate().getHeading(), speedLimiting, drivingFieldRelative);
                 mecanumDrive.driveToReplayPose(localizer.getPoseEstimate(), currentTargetState.getPosition());
             }
             else if (drivingFieldRelative) { // if not replaying, allow the user to drive normally, either field relative or not
@@ -194,29 +229,25 @@ public class ReplayRecorderOpMode extends LinearOpMode{
 
 
             if(replayManager.isRecording()){
-                //telemetry.addLine("Currently Recording a Path. Press Y again to stop recording.");
+                telemetry.addLine("Currently Recording a Path. Press Y again to stop recording.");
             }
             else {
-                //telemetry.addLine("Not Recording a Path. Press the Y button to start recording.");
+                telemetry.addLine("Not Recording a Path. Press the Y button to start recording.");
             }
             if(replayManager.isReplaying()){
-                //telemetry.addLine("Currently Replaying a Path. Press X again to stop replaying.");
+                telemetry.addLine("Currently Replaying a Path. Press X again to stop replaying.");
                 telemetry.addData("Target Position:", currentTargetState.getPosition());
                 //telemetry.addData("Gamepad 1 Recorded Left Stick", new Vector2d(currentTargetState.getGamepad1State().left_stick_x(), currentTargetState.getGamepad1State().left_stick_y()));
             }
             else {
-                //telemetry.addLine("Not Replaying a Path. Press the X button to start replaying.");
+                telemetry.addLine("Not Replaying a Path. Press the X button to start replaying.");
             }
             telemetry.addData("Current Position:", localizer.getPoseEstimate());
-            //telemetry.addData("Failed Load Count:", failedLoadCount);
-            telemetry.addData("Driving field relative? (gp1 right bumper to toggle)", drivingFieldRelative);
-            telemetry.addData("Driver Acceleration Limiting? (gp1 left bumper to toggle)", speedLimiting);
-            telemetry.addLine("Gp1 Sticks:\nLeft: " + new Vector2d(gp1.left_stick_x(), gp1.left_stick_y()) + "\nRight: " + new Vector2d(gp1.right_stick_x(), gp1.right_stick_y()) );
-            telemetry.addData("X Translate Power", xTranslatePower);
-            telemetry.addData("Target state has gamepad states?", currentTargetState.hasGamepadStates());
-            telemetry.addData("GP1 A button", gp1.a());
-            telemetry.addData("GP1", gp1.toCSVLine());
-            //telemetry.addData("Replay States:", replayManager.getReplayStates());
+            telemetry.addData("Failed Load Count:", failedLoadCount);
+            telemetry.addData("Driving field relative? (GP1 d-pad up to toggle)", drivingFieldRelative);
+            telemetry.addData("Driver Acceleration Limiting? (GP1 d-pad down to toggle)", speedLimiting);
+            telemetry.addData("Running in Slowmode? (hold GP1 right bumper)", isSlowMode);
+            telemetry.addData("GP1 State", gp1.toCSVLine());
             telemetry.update();
 
 
@@ -252,7 +283,7 @@ public class ReplayRecorderOpMode extends LinearOpMode{
             DashboardUtil.drawPoseHistory(fieldOverlay, replayManager.getRecordedPositionsHistory());
         }
         else if(replayManager.isReplaying()){
-            fieldOverlay.setStroke("#632085"); // set the field draw color for this bit to dark purple
+            fieldOverlay.setStroke("#4CAF50"); // set the field draw color for this bit to black
             DashboardUtil.drawPoseHistory(fieldOverlay, replayManager.getReplayPositions());
             DashboardUtil.drawRobot(fieldOverlay, currentTargetState.getPosition());
         }

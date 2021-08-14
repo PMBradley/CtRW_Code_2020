@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.hardware.drive.experimental;
+package org.firstinspires.ftc.teamcode.util.ActionReplay.old;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -14,29 +14,29 @@ import org.firstinspires.ftc.teamcode.util.Math.Range2d;
 
 
 @Config
-public class Drive_Mecanum_Tele_V2 {
+public class Drive_Mecanum_Tele_RepRec {
 
-/*     --------------------------  EDITABLE CONSTANTS  --------------------------
-        These constants are set to default values but can
-        (or should) be edited to improve robot performance
-*/
+    /*     --------------------------  EDITABLE CONSTANTS  --------------------------
+            These constants are set to default values but can
+            (or should) be edited to improve robot performance
+    */
     // X Translational PID Variables
-    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(0.8, 0.0, 1.8);
-    public static Range2d X_I_RANGE = new Range2d(0.1, 4);
+    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(0.008, 0.0, 10.0);
+    public static Range2d X_I_RANGE = new Range2d(0.06, 0.3);
 
     // Y Translational PID Variables
-    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(0.8, 0.0, 2.8);
-    public static Range2d Y_I_RANGE = new Range2d(0.1, 4);
+    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(0.01, 0.0, 13.0);
+    public static Range2d Y_I_RANGE = new Range2d(0.06, 0.3);
 
     // Heading PID Variables
-    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(6, 0.0, 1.3);
-    public static Range2d HEADING_I_RANGE = new Range2d(Math.toRadians(0.05), Math.toRadians(0.8));
+    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(0.13, 0.0, 44.0);
+    public static Range2d HEADING_I_RANGE = new Range2d(0.03, 0.1);
 
     // Speed Limiter Variables
-    public static double MAX_TRANSLATE_SPEED = 0.92; // allow the bot to translate at 92% of full speed at
+    public static double MAX_TRANSLATE_SPEED = 0.92; // allow the bot to translate at up to 92% of its max speed
     public static double TRANSLATE_ACCEL_TIME = 0.3; // allow the robot to accelerate to max translational speed in 0.3 seconds
-    public static double MAX_ROTATE_SPEED = 0.90; // allow the bot rotate at 90% of full speed at most
-    public static double ROTATE_ACCEL_TIME = 0.25; // allow the robot to accelerate to max rotational speed in 0.25 seconds
+    public static double MAX_ROTATE_SPEED = 0.92; // allow the bot rotate at up to 92% of it's max speed speed
+    public static double ROTATE_ACCEL_TIME = 0.3; // allow the robot to accelerate to max rotational speed in 0.3 seconds
 
     // Rotational Center Correction Variables
     public static Vector2d ROTATIONAL_CENTER = new Vector2d(0,0); // the x and y of where the rotational center of the robot is to the geometric center (Ex: (1, -2) would be 1 inch up and 2 inches right of the geometric center, with up being towards the front of the bot
@@ -45,7 +45,7 @@ public class Drive_Mecanum_Tele_V2 {
     */
 
 
-//     --------------------------  CLASS START  --------------------------
+    //     --------------------------  CLASS START  --------------------------
     // Hardware variables
     private DcMotor driveFL, driveFR, driveBL, driveBR; // motors that are being used for mecanum driving
     private double veloFL, veloFR, veloBL, veloBR; // powers that are being passed to those motors
@@ -70,7 +70,7 @@ public class Drive_Mecanum_Tele_V2 {
     private static double ROTATIONAL_CENTER_THETA = 0; // the rotation component of the polar coordinate of the rotational center
 
     // Default constructor
-    public Drive_Mecanum_Tele_V2(DcMotor driveMotorFL, DcMotor driveMotorFR, DcMotor driveMotorBL, DcMotor driveMotorBR){ // passing of individual motors in a constructor as an alternative to needing a robot class passed with the proper motor names
+    public Drive_Mecanum_Tele_RepRec(DcMotor driveMotorFL, DcMotor driveMotorFR, DcMotor driveMotorBL, DcMotor driveMotorBR){ // passing of individual motors in a constructor as an alternative to needing a robot class passed with the proper motor names
         // setup motors from passed motors
         driveFL = driveMotorFL;
         driveFR = driveMotorFR;
@@ -93,7 +93,7 @@ public class Drive_Mecanum_Tele_V2 {
 
 
     // Drive functions
-    public void driveFieldRelative(double x, double y, double r, double currentHeading, boolean regulatingSpeed) { // this drives relative to field (+x is forward, +y is left, heading is in radians)
+    public void driveFieldRelative(double x, double y, double r, double currentHeading, boolean limitingSpeed) { // this drives relative to field (+x is forward, +y is left, heading is in radians)
         // if using controller inputs, ensure you reverse the y on the stick input before passing into this method because down on the stick is positive and up is negative, and we need that to be the opposite way
 
         // Set up heading factor for relative to field (convert the heading to radians, then get the sine and cosine of that radian heading
@@ -102,11 +102,11 @@ public class Drive_Mecanum_Tele_V2 {
 
         // do math to adjust to make the input drive vector relative to field (rather than relative to robot)
         //double field_x = (y * cos) - (x * -sin);
-       // double field_y = (y * -sin) + (x * cos);
+        // double field_y = (y * -sin) + (x * cos);
 
 
         // limiting speed before made field relative, as it is more useful to limit speed relative to robot (physics cares more about the robot's momentum relative to itself than to the field)
-        if( regulatingSpeed ){
+        if( limitingSpeed ){
             x = getLimitedSpeed(x, 'X'); // limit the speeds
             y = getLimitedSpeed(y, 'Y');
             r = getLimitedSpeed(r, 'R');
@@ -162,7 +162,7 @@ public class Drive_Mecanum_Tele_V2 {
         driveFieldRelative(x, y, r, 0, limitingSpeed); // pass values into the drive field relative function, but passing a heading of 0 (meaning it will end up acting robot relative, as a rotation of 0 will not alter translation)
     }
 
-    public void driveToReplayPose(Pose2d currentPose, Pose2d targetPose){ // drives the robot to a target position when called in a loop
+        public void driveToReplayPose(Pose2d currentPose, Pose2d targetPose){ // drives the robot to a target position when called in a loop
         //currentPose = getRotationalCenterRelativePose(currentPose); // account for rotational center differences by navigating around the center of rotation
         //targetPose = getRotationalCenterRelativePose(targetPose);
 
@@ -269,10 +269,7 @@ public class Drive_Mecanum_Tele_V2 {
         updateTranslateAccelPerSec();
     }
     public double updateTranslateAccelPerSec(){ // updates the acceleration per second to be proper according to the max speed and minimum time to reach that max speed
-        if(TRANSLATE_ACCEL_PER_SEC != 0)
-            TRANSLATE_ACCEL_PER_SEC = MAX_TRANSLATE_SPEED / TRANSLATE_ACCEL_TIME;
-        else
-            TRANSLATE_ACCEL_PER_SEC = Double.MAX_VALUE;
+        TRANSLATE_ACCEL_PER_SEC = MAX_TRANSLATE_SPEED / TRANSLATE_ACCEL_TIME;
         return TRANSLATE_ACCEL_PER_SEC;
     }
 
@@ -285,10 +282,7 @@ public class Drive_Mecanum_Tele_V2 {
         updateRotateAccelPerSec();
     }
     public double updateRotateAccelPerSec(){ // updates the acceleration per second to be proper according to the max speed and minimum time to reach that max speed
-        if(ROTATE_ACCEL_TIME != 0)
-            ROTATE_ACCEL_PER_SEC = MAX_ROTATE_SPEED / ROTATE_ACCEL_TIME;
-        else
-            ROTATE_ACCEL_PER_SEC = Double.MAX_VALUE;
+        ROTATE_ACCEL_PER_SEC = MAX_ROTATE_SPEED / ROTATE_ACCEL_TIME;
         return ROTATE_ACCEL_PER_SEC;
     }
 
@@ -318,4 +312,3 @@ public class Drive_Mecanum_Tele_V2 {
     }
 
 }
-
