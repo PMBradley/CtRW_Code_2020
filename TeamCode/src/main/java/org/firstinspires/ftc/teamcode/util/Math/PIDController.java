@@ -47,6 +47,10 @@ public class PIDController {
         if( Math.abs(error) >= iActiveErrorRange.getMin() && Math.abs(error) <= iActiveErrorRange.getMax() ){
             integral += error * timeDifference; // the integral is the sum of all error over time, and is used to push past unexpected resistance (as if the arm stays in a single position away from the set position for too long, it builds up over time and pushes past the resistance)
         }
+        /*else if(Math.abs(target) < iActiveErrorRange.getMax() && Math.abs(current) > iActiveErrorRange.getMax())
+            integral = 0;
+        else if(Math.abs(target) > iActiveErrorRange.getMin() && Math.abs(current) < iActiveErrorRange.getMin())
+            integral = 0;*/
 
         double dError = ((error - lastError) / timeDifference); // the rate of change of the current error, this component creates a smooth approach to the set point
 

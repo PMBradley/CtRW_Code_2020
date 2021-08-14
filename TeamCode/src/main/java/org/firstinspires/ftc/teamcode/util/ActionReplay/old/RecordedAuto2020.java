@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,8 +15,12 @@ import org.firstinspires.ftc.teamcode.control.Provider2020;
 import org.firstinspires.ftc.teamcode.hardware.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.hardware.intake.Intake_Ring_Drop;
 import org.firstinspires.ftc.teamcode.hardware.shooter.J_Shooter_Ring_ServoFed;
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.FarRingStackHeightPipeline;
+import org.firstinspires.ftc.teamcode.hardware.vision.OpenCV.Vision_OpenCV_ExternalCam;
 import org.firstinspires.ftc.teamcode.hardware.wobble.Arm_Wobble_Grabber;
 import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
+
+import java.util.ArrayList;
 
 
 
@@ -47,15 +52,15 @@ import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
  */
 
 
-@TeleOp(name = "Replay-Recorder Teleop2020", group = "@@@")
+@Autonomous(name = "Recorded Auto2020", group = "@@@")
 
 @Config
-public class ReplayRecorderTeleop2020 extends LinearOpMode{
+public class RecordedAuto2020 extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     String robotName = "Lil' ring flinga";
-    public static String REPLAY_FILE_NAME = "MainTeleop2020.bin";
+    public static String REPLAY_FILE_NAME = "AutoPath";
 
     // Robot Speed variables
     public static double SLOW_MODE_MULT = 0.50; // Speed multiplier for SLOW MODE (1 being 100% of power going in)
@@ -68,7 +73,8 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
     public static Pose2d powershotAStartPos = new Pose2d(-65.3, -37.36, Math.toRadians(0.0));
     public static Pose2d powershotBStartPos = new Pose2d(0, 0, Math.toRadians(0.0));
     public static int RECORD_INTERVAL = 75; // how many milliseconds between recording waypoints, lower number = more waypoints but more computer resource use from waypoints
-    public static Pose2d START_POSE = new Pose2d(0, 0, 0);
+    public static Pose2d START_POSE = new Pose2d(-65.3, 7.39, Math.toRadians(0));
+    public static int RING_SCAN_TIME = 100;
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -86,6 +92,8 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
     private RobotState currentTargetState = new RobotState();
     private GamepadState gp1 = new GamepadState();
     private GamepadState gp2 = new GamepadState();
+
+    Vision_OpenCV_ExternalCam vision;
 
 
     // Flags
@@ -106,6 +114,9 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
     private boolean regulatingSpeed = true;
     private boolean firstRegulatingSpeedToggle = true;
 
+    private ArrayList<String> ringStackEstimates = new ArrayList<String>();
+    private String chosenDropPosition = "A";
+
 
     // The "Main" for TeleOp (the place where the main code is run)
     @Override
@@ -120,15 +131,14 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
         shooter = new J_Shooter_Ring_ServoFed(robot.JShootFront, robot.JShootBack, robot.shooterFeederServo, robot.shooterIndexerServo, robot.shooterAnglerServo);
         wobble = new Arm_Wobble_Grabber(robot.wobbleArmMotor, robot.wobbleLeftWheelServo, robot.wobbleRightWheelServo, 1.0/5.0);
 
-        replayManager = new ReplayManager(REPLAY_FILE_NAME, telemetry);
+
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         runtime = new ElapsedTime();
         timeSinceLastRecord = new ElapsedTime();
 
+        vision = new Vision_OpenCV_ExternalCam(hardwareMap, "Webcam 1", new FarRingStackHeightPipeline());
 
 
-        dashboard = FtcDashboard.getInstance(); // setup the dashboard
-        dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
         dashboard = FtcDashboard.getInstance(); // setup the dashboard
         dashboard.setTelemetryTransmissionInterval(TELEMETRY_TRANSMISSION_INTERVAL); // interval in milliseconds
 
@@ -143,9 +153,26 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
 
         waitForStart(); // Wait for the start button to be pressed before continuing further
 
-
         runtime.reset(); // reset the clock once start has been pressed so runtime is accurate
         intake.raiseGate();
+
+
+        for(int i = 0; !isStopRequested() && runtime.milliseconds() < RING_SCAN_TIME; i++){ // scan for however long the ring_scan_time is
+            updateSensors("Scan rings"); // call the update sensors method telling it that we are currently scanning rings
+
+            telemetry.addLine("Scanning rings...");
+            telemetry.addLine("Scan count: " + ringStackEstimates.size());
+            int[] counts = getEstimateOccurances();
+            telemetry.addLine("Ring Count Votes - 0: " + counts[0] + ", 1: " + counts[1] + ", 4: " + counts[2]);
+            telemetry.update();
+        }
+
+        chosenDropPosition = getCalculatedDropPosition();
+        String routeReplayFile = REPLAY_FILE_NAME + chosenDropPosition + ".bin";
+        replayManager = new ReplayManager(routeReplayFile, telemetry);
+
+        replayManager.startStateReplay();
+
 
 
         // The main run loop - write the main robot run code here
@@ -156,49 +183,10 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
 
 
             // Replay Logic
-            if( (gamepad1.y) && firstRecordToggle){ // toggle if recording
-                if(replayManager.isRecording()){
-                    replayManager.stopRecording();
-                }
-                else {
-                    localizer.setPoseEstimate(START_POSE);
+            currentTargetState = replayManager.getCurrentTargetState();
+            gp1 = currentTargetState.getGamepad1State();
+            gp2 = currentTargetState.getGamepad2State();
 
-                    replayManager.startRecording();
-                }
-
-                firstRecordToggle = false;
-            }
-            else if( !(gamepad1.y) ){
-                firstRecordToggle = true;
-            }
-
-            if( (gamepad1.x ) && firstReplayToggle && !replayManager.isRecording()){ // toggle if we are replaying
-                if(replayManager.isReplaying()){
-                    replayManager.stopStateReplay();
-                }
-                else {
-                    localizer.setPoseEstimate(START_POSE);
-
-                    replayManager.setReplayFile(REPLAY_FILE_NAME);
-                    replayManager.startStateReplay();
-                }
-
-                firstReplayToggle = false;
-            }
-            else if( !(gamepad1.x ) ){
-                firstReplayToggle = true;
-            }
-
-
-            if(replayManager.isReplaying()) {
-                currentTargetState = replayManager.getCurrentTargetState();
-                gp1 = currentTargetState.getGamepad1State();
-                gp2 = currentTargetState.getGamepad2State();
-            }
-            else {
-                gp1 = new GamepadState(gamepad1);
-                gp2 = new GamepadState(gamepad2);
-            }
 
 
             // Variables
@@ -210,7 +198,7 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
 
 
             // Logic (figuring out what the robot should do)
-            if(gp1.dpad_down && firstRegulatingSpeedToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle drive speed limiting
+            if(gp1.dpad_down && firstRegulatingSpeedToggle){ // toggle drive speed limiting
                 regulatingSpeed = !regulatingSpeed;
 
                 firstRegulatingSpeedToggle = false;
@@ -219,7 +207,7 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
                 firstRegulatingSpeedToggle = true;
             }
 
-            if(gp1.dpad_up && firstToggleDriveRelative && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle driving relative to field if dpad up is pressed
+            if(gp1.dpad_up && firstToggleDriveRelative){ // toggle driving relative to field if dpad up is pressed
                 driveFieldRelative = !driveFieldRelative; // toggle the value
 
                 if(driveFieldRelative){ // if toggling back to driving field relative
@@ -408,15 +396,15 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
             // Telemetry
 
 
-
+            telemetry.addData("Chosen Drop Position", chosenDropPosition);
             if(replayManager.isRecording()){
-                telemetry.addLine("Currently Recording a Path. (Y again to stop recording)");
+                //telemetry.addLine("Currently Recording a Path. (Y again to stop recording)");
             }
             else {
-                telemetry.addLine("Not Recording a Path. (GP1 Y button to start recording)");
+                //telemetry.addLine("Not Recording a Path. (GP1 Y button to start recording)");
             }
             if(replayManager.isReplaying()){
-                telemetry.addLine("Currently Replaying a Path. (X again to stop replaying)\n");
+                //telemetry.addLine("Currently Replaying a Path. (X again to stop replaying)\n");
                 telemetry.addData("Target Position:", currentTargetState.getPosition());
                 //telemetry.addData("Gamepad 1 Recorded Left Stick", new Vector2d(currentTargetState.getGamepad1State().left_stick_x(), currentTargetState.getGamepad1State().left_stick_y()));
             }
@@ -517,4 +505,53 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
         }
     }
 
+
+    void updateSensors(String currentTaskName){ // updates any processing related to sensor data, in this game that mostly means camera data
+
+        if( currentTaskName.equals("Scan rings") ){ // if current task is this task and we have completed driving to location
+            String visionOutput = vision.getOutput(); // get the first character of the output string, it holds the single digit number of rings output
+            char ringCount = visionOutput.charAt(0);
+
+            if(ringCount == '0'){ // if no rings, add a vote for A position
+                ringStackEstimates.add("A");
+            }
+            else if(ringCount == '1'){ // if one ring, add a vote for B position
+                ringStackEstimates.add("B");
+            }
+            else { // if some other amount of rings (usually meaning 4), add a vote for C position
+                ringStackEstimates.add("C");
+            }
+        }
+    }
+    private int[] getEstimateOccurances(){
+        int[] occuranceCounts = new int[3];
+
+        for (String estimate : ringStackEstimates){
+            if (estimate.equals("A")){
+                occuranceCounts[0]++;
+            }
+            else  if (estimate.equals("B")){
+                occuranceCounts[1]++;
+            }
+            else { // if not A or B, then C must have just gotten a vote
+                occuranceCounts[2]++;
+            }
+        }
+
+        return occuranceCounts;
+    }
+    public String getCalculatedDropPosition(){ // sees which position gets the most "votes" by the system and return it
+
+        int[] counts = getEstimateOccurances();
+
+        if(counts[2] > counts[0] && counts[2] > counts[1]){ // if there are the most votes for c
+            return "C";
+        }
+        else if(counts[1] > counts[0] && counts[1] > counts[2]){ // if there are the most votes for b
+            return "B";
+        }
+        else { // if nothing else, must be A
+            return "A";
+        }
+    }
 }

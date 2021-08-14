@@ -3,6 +3,7 @@
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 /*
  * Welcome to the Autonomous OpMode! This opmode coordinates the robot's manipulators and drive without user input to complete challenges
  */
+@Disabled
 @Autonomous(name = "AutoOp2020", group = "@@@") // the name and group for the opmode
 @Config // allow FTC dashboard to access public static member variables here
 

@@ -78,7 +78,7 @@ public class AutoOp2020_exp extends LinearOpMode {
     public static double ARM_DROP_DROP_DISTANCE = 3; // how far the robot is from the drop position before it deploys the arm early
     public static double RING_COLLECT_DISTANCE = 22.3;
     public static double RING_COLLECT_2RING_OFFSET = -11.5;
-    public static int RING_SCAN_TIME = 100; // scan the ring for 700 msecs
+    public static int RING_SCAN_TIME = 100; // scan the ring for 100 msecs
     public static int POWERSHOT_SHOOT_TIME = (int)J_Shooter_Ring_ServoFed.INDEXER_MOVE_TIME - 130;
     public static int POWERSHOT_INTAKE_TIME = 1600; // start running the intake 1.6 seconds into driving to collect rings
     public static double MAX_RING_COLLECT_SPEED = 30.0;

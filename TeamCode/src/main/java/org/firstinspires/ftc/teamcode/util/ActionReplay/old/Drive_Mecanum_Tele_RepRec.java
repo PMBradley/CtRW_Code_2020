@@ -21,15 +21,15 @@ public class Drive_Mecanum_Tele_RepRec {
             (or should) be edited to improve robot performance
     */
     // X Translational PID Variables
-    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(0.008, 0.0, 10.0);
-    public static Range2d X_I_RANGE = new Range2d(0.06, 0.3);
+    public static PIDCoefficients X_COEFFICIENTS = new PIDCoefficients(0.06, 0.00, 11.0);
+    public static Range2d X_I_RANGE = new Range2d(0.08, 2);
 
     // Y Translational PID Variables
-    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(0.01, 0.0, 13.0);
-    public static Range2d Y_I_RANGE = new Range2d(0.06, 0.3);
+    public static PIDCoefficients Y_COEFFICIENTS = new PIDCoefficients(0.08, 0.0, 20.0);
+    public static Range2d Y_I_RANGE = new Range2d(0.08, 2);
 
     // Heading PID Variables
-    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(0.13, 0.0, 44.0);
+    public static PIDCoefficients HEADING_COEFFICIENTS = new PIDCoefficients(0.75, 0.0, 170.0);
     public static Range2d HEADING_I_RANGE = new Range2d(0.03, 0.1);
 
     // Speed Limiter Variables

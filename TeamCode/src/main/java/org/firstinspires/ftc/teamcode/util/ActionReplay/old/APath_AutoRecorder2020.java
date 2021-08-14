@@ -47,15 +47,15 @@ import org.firstinspires.ftc.teamcode.util.io.DashboardUtil;
  */
 
 
-@TeleOp(name = "Replay-Recorder Teleop2020", group = "@@@")
+@TeleOp(name = "A Path AutoRecorder2020", group = "@@A")
 
 @Config
-public class ReplayRecorderTeleop2020 extends LinearOpMode{
+public class APath_AutoRecorder2020 extends LinearOpMode{
     // TeleOp Variables
 
     // Robot Name - Feel free to set it to whatever suits your creative fancy :)
     String robotName = "Lil' ring flinga";
-    public static String REPLAY_FILE_NAME = "MainTeleop2020.bin";
+    public static String REPLAY_FILE_NAME = "AutoPathA.bin";
 
     // Robot Speed variables
     public static double SLOW_MODE_MULT = 0.50; // Speed multiplier for SLOW MODE (1 being 100% of power going in)
@@ -68,7 +68,7 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
     public static Pose2d powershotAStartPos = new Pose2d(-65.3, -37.36, Math.toRadians(0.0));
     public static Pose2d powershotBStartPos = new Pose2d(0, 0, Math.toRadians(0.0));
     public static int RECORD_INTERVAL = 75; // how many milliseconds between recording waypoints, lower number = more waypoints but more computer resource use from waypoints
-    public static Pose2d START_POSE = new Pose2d(0, 0, 0);
+    public static Pose2d START_POSE = new Pose2d(-65.3, 7.39, Math.toRadians(0));
 
     // Robot Classes
     private Provider2020 robot; // Main robot data class (ALWAYS CREATE AN INSTANCE OF THIS CLASS FIRST - HARDWARE MAP SETUP IS DONE WITHIN)
@@ -210,7 +210,7 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
 
 
             // Logic (figuring out what the robot should do)
-            if(gp1.dpad_down && firstRegulatingSpeedToggle && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle drive speed limiting
+            if(gp1.dpad_down && firstRegulatingSpeedToggle){ // toggle drive speed limiting
                 regulatingSpeed = !regulatingSpeed;
 
                 firstRegulatingSpeedToggle = false;
@@ -219,7 +219,7 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
                 firstRegulatingSpeedToggle = true;
             }
 
-            if(gp1.dpad_up && firstToggleDriveRelative && !replayManager.isRecording() && !replayManager.isReplaying()){ // toggle driving relative to field if dpad up is pressed
+            if(gp1.dpad_up && firstToggleDriveRelative){ // toggle driving relative to field if dpad up is pressed
                 driveFieldRelative = !driveFieldRelative; // toggle the value
 
                 if(driveFieldRelative){ // if toggling back to driving field relative
@@ -232,7 +232,6 @@ public class ReplayRecorderTeleop2020 extends LinearOpMode{
             else if (!gp1.dpad_up){ // wait to set the flag back to true until the button is released
                 firstToggleDriveRelative = true; // until the button is released
             }
-
 
             if( gp2.right_bumper && firstSpinUpToggle ){ // code to toggle if the shooter is spinning up
                 isSpinningUp = !isSpinningUp;
